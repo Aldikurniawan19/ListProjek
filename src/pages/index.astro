@@ -169,10 +169,10 @@ import Layout from '../layouts/Layout.astro';
 			</div>
 
 			<!-- VIEW 2: TASK DETAIL VIEW -->
-			<div id="detailView" class="task-detail-view flex-col flex-1 space-y-4">
+			<div id="detailView" class="task-detail-view flex-col flex-1 min-h-0 space-y-4 overflow-hidden">
 
-				<!-- On-Page Modern Navigation Bar -->
-				<div class="flex items-center justify-between gap-3 flex-wrap">
+				<!-- On-Page Modern Navigation Bar (Fixed) -->
+				<div class="flex items-center justify-between gap-3 flex-wrap shrink-0">
 					<button onclick="showDashboardView()" class="inline-flex items-center gap-2.5 px-4 py-2 rounded-xl bg-white hover:bg-brand-50 text-slate-700 hover:text-brand-600 border border-brand-100 text-xs font-semibold shadow-2xs hover:shadow-xs transition-all group cursor-pointer">
 						<i class="fa-solid fa-arrow-left text-xs transition-transform group-hover:-translate-x-1 text-brand-600"></i>
 						<span>Kembali ke Daftar Projek</span>
@@ -184,8 +184,8 @@ import Layout from '../layouts/Layout.astro';
 					</div>
 				</div>
 
-				<!-- Compact Project Summary Bar -->
-				<div class="bg-white p-5 rounded-2xl border border-brand-100 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+				<!-- Compact Project Summary Bar (Fixed) -->
+				<div class="bg-white p-5 rounded-2xl border border-brand-100 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4 shrink-0">
 					<div class="space-y-1 min-w-0">
 						<div class="flex items-center gap-2 flex-wrap">
 							<span id="detailProjectCategory" class="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-brand-50 text-brand-700 border border-brand-200">
@@ -222,9 +222,9 @@ import Layout from '../layouts/Layout.astro';
 				</div>
 
 				<!-- MAIN TASK LIST CONTAINER -->
-				<div class="bg-white rounded-2xl border border-brand-100 shadow-sm overflow-hidden flex flex-col">
-					<!-- Task List Header & Filters -->
-					<div class="p-4 sm:p-5 border-b border-brand-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-50/50">
+				<div class="bg-white rounded-2xl border border-brand-100 shadow-sm overflow-hidden flex-1 min-h-0 flex flex-col">
+					<!-- Task List Header & Filters (Fixed) -->
+					<div class="p-4 sm:p-5 border-b border-brand-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-50/50 shrink-0">
 						<div class="flex items-center gap-2.5">
 							<div class="w-8 h-8 rounded-lg bg-brand-600 text-white flex items-center justify-center text-xs font-bold shadow-sm">
 								<i class="fa-solid fa-list-check"></i>
@@ -249,8 +249,8 @@ import Layout from '../layouts/Layout.astro';
 						</div>
 					</div>
 
-					<!-- Quick Add Task Bar -->
-					<div class="p-3.5 border-b border-brand-100 bg-white">
+					<!-- Quick Add Task Bar (Fixed) -->
+					<div class="p-3.5 border-b border-brand-100 bg-white shrink-0">
 						<form onsubmit="quickAddTask(event)" class="flex items-center gap-2">
 							<div class="relative flex-1">
 								<i class="fa-solid fa-plus absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
@@ -262,12 +262,12 @@ import Layout from '../layouts/Layout.astro';
 						</form>
 					</div>
 
-					<!-- Task List Items -->
-					<div id="tasksListContainer" class="divide-y divide-brand-50">
+					<!-- Task List Items (Scrollable) -->
+					<div id="tasksListContainer" class="divide-y divide-brand-50 overflow-y-auto flex-1 min-h-0">
 					</div>
 
 					<!-- Empty State -->
-					<div id="tasksEmptyState" class="hidden p-12 text-center flex-col items-center justify-center">
+					<div id="tasksEmptyState" class="hidden p-12 text-center flex-col items-center justify-center overflow-y-auto flex-1 min-h-0">
 						<div class="w-14 h-14 rounded-2xl bg-brand-50 border border-brand-100 text-brand-600 flex items-center justify-center text-xl mb-3 shadow-xs">
 							<i class="fa-solid fa-clipboard-check"></i>
 						</div>
@@ -544,11 +544,13 @@ import Layout from '../layouts/Layout.astro';
 		function showProjectDetailView(id) {
 			activeProjectId = id;
 			const main = document.getElementById('mainContent');
-			main.className = 'flex-1 p-4 md:p-6 overflow-y-auto space-y-6';
+			main.className = 'flex-1 p-4 md:p-6 overflow-hidden flex flex-col min-h-0 space-y-4';
 			const stats = document.getElementById('statsOverview');
 			if (stats) stats.style.display = 'none';
 			document.getElementById('listView').style.display = 'none';
-			document.getElementById('detailView').classList.add('active-view');
+			const detailView = document.getElementById('detailView');
+			detailView.classList.add('active-view');
+			detailView.className = 'task-detail-view active-view flex-col flex-1 min-h-0 space-y-4 overflow-hidden';
 			document.getElementById('viewTitle').innerText = 'Detail Task Projek';
 			document.getElementById('mainActionBtn').onclick = () => openModal('taskModal');
 			document.getElementById('mainActionBtn').querySelector('span').innerText = 'Tambah Task';
