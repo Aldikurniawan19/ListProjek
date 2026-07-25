@@ -128,14 +128,14 @@ import Layout from '../layouts/Layout.astro';
 				<div class="bg-white rounded-2xl border border-brand-100 shadow-sm overflow-hidden flex-1 min-h-0 flex flex-col">
 					<div class="overflow-y-auto overflow-x-auto flex-1 min-h-0">
 						<table class="w-full text-left border-collapse">
-							<thead class="border-b border-brand-100 text-brand-950 uppercase text-[11px] tracking-wider font-bold sticky top-0 z-10 shadow-2xs">
+							<thead class="bg-brand-50/95 backdrop-blur-sm border-b border-brand-100 text-brand-950 uppercase text-[11px] tracking-wider font-bold sticky top-0 z-10 shadow-2xs">
 								<tr>
-									<th class="px-6 py-4 bg-white">Nama Projek & Deskripsi</th>
-									<th class="px-6 py-4 bg-slate-100/80">Kategori</th>
-									<th class="px-6 py-4 bg-white">Jumlah Task</th>
-									<th class="px-6 py-4 w-48 bg-slate-100/80">Progres Kerja</th>
-									<th class="px-6 py-4 bg-white">Status</th>
-									<th class="px-6 py-4 text-center bg-slate-100/80">Aksi</th>
+									<th class="px-6 py-4">Nama Projek & Deskripsi</th>
+									<th class="px-6 py-4">Kategori</th>
+									<th class="px-6 py-4">Jumlah Task</th>
+									<th class="px-6 py-4 w-48">Progres Kerja</th>
+									<th class="px-6 py-4">Status</th>
+									<th class="px-6 py-4 text-center">Aksi</th>
 								</tr>
 							</thead>
 							<tbody id="projectsTableBody" class="divide-y divide-brand-50 text-xs">
@@ -779,18 +779,19 @@ import Layout from '../layouts/Layout.astro';
 				emptyState.classList.remove('flex');
 			}
 
-			filtered.forEach(p => {
+			filtered.forEach((p, index) => {
 				const totalTasks = p.tasks.length;
 				const completedTasks = p.tasks.filter(t => t.completed).length;
 				const progress = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
 				const isCompleted = totalTasks > 0 && completedTasks === totalTasks;
 
 				const tr = document.createElement('tr');
-				tr.className = 'hover:bg-brand-50/40 cursor-pointer transition-colors group';
+				const bgRow = index % 2 === 0 ? 'bg-white' : 'bg-slate-50/80';
+				tr.className = `${bgRow} hover:bg-brand-50/50 cursor-pointer transition-colors group`;
 				tr.onclick = () => showProjectDetailView(p.id);
 
 				tr.innerHTML = `
-					<td class="px-6 py-4 bg-white">
+					<td class="px-6 py-4">
 						<div class="font-bold text-brand-950 text-sm group-hover:text-brand-600 transition-colors">
 							${escapeHtml(p.title)}
 						</div>
@@ -798,15 +799,15 @@ import Layout from '../layouts/Layout.astro';
 							${escapeHtml(p.description)}
 						</div>
 					</td>
-					<td class="px-6 py-4 whitespace-nowrap bg-slate-50/70">
+					<td class="px-6 py-4 whitespace-nowrap">
 						<span class="px-2.5 py-1 rounded-md text-[11px] font-bold bg-brand-50 text-brand-700 border border-brand-100">
 							${escapeHtml(p.category)}
 						</span>
 					</td>
-					<td class="px-6 py-4 whitespace-nowrap font-medium text-slate-700 bg-white">
+					<td class="px-6 py-4 whitespace-nowrap font-medium text-slate-700">
 						<i class="fa-regular fa-check-square mr-1 text-brand-500"></i> ${completedTasks} / ${totalTasks} Task
 					</td>
-					<td class="px-6 py-4 whitespace-nowrap bg-slate-50/70">
+					<td class="px-6 py-4 whitespace-nowrap">
 						<div class="flex items-center gap-2">
 							<div class="w-full bg-slate-100 h-3 rounded-full overflow-hidden border border-slate-100">
 								<div class="bg-emerald-500 h-full rounded-full transition-all duration-300" style="width: ${progress}%"></div>
@@ -814,7 +815,7 @@ import Layout from '../layouts/Layout.astro';
 							<span class="font-bold text-xs text-brand-700 w-9 text-right">${progress}%</span>
 						</div>
 					</td>
-					<td class="px-6 py-4 whitespace-nowrap bg-white">
+					<td class="px-6 py-4 whitespace-nowrap">
 						${isCompleted ? 
 							`<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-brand-100 text-brand-800 border border-brand-200">
 								<i class="fa-solid fa-check text-[9px]"></i> Selesai
@@ -824,7 +825,7 @@ import Layout from '../layouts/Layout.astro';
 							 </span>`
 						}
 					</td>
-					<td class="px-6 py-4 whitespace-nowrap text-center bg-slate-50/70">
+					<td class="px-6 py-4 whitespace-nowrap text-center">
 						<div class="flex items-center justify-center gap-2">
 							<button onclick="event.stopPropagation(); showProjectDetailView('${p.id}')" class="px-3 py-1.5 bg-brand-50 hover:bg-brand-600 text-brand-700 hover:text-white rounded-lg font-semibold transition-all border border-brand-100 flex items-center gap-1.5">
 								<span>Buka Task</span>
