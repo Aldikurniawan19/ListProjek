@@ -919,11 +919,10 @@ import Layout from '../layouts/Layout.astro';
 				emptyState.classList.remove('flex');
 			}
 
-			filteredTasks.forEach(task => {
+			filteredTasks.forEach((task, index) => {
 				const item = document.createElement('div');
-				item.className = `p-4 sm:px-6 hover:bg-slate-50/80 transition-colors flex items-start justify-between gap-4 group ${
-					task.completed ? 'bg-slate-50/40' : ''
-				}`;
+				const bgTask = index % 2 === 0 ? 'bg-slate-50/80 hover:bg-brand-100/40' : 'bg-white hover:bg-brand-50/60';
+				item.className = `p-4 sm:px-6 ${bgTask} transition-colors flex items-start justify-between gap-4 group`;
 
 				item.innerHTML = `
 					<div class="flex items-start gap-3.5 min-w-0 flex-1">
