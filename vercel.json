@@ -1,0 +1,10 @@
+{
+  "buildCommand": "prisma generate && astro build",
+  "outputDirectory": "dist/client",
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/api"
+    }
+  ]
+}
