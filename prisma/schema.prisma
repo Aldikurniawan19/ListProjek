@@ -1,0 +1,26 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model Project {
+  id          String   @id @default(cuid())
+  title       String
+  category    String   @default("Umum")
+  description String   @default("Tidak ada deskripsi projek.")
+  createdAt   DateTime @default(now())
+  tasks       Task[]
+}
+
+model Task {
+  id          String  @id @default(cuid())
+  title       String
+  description String  @default("Tidak ada deskripsi detail.")
+  completed   Boolean @default(false)
+  projectId   String
+  project     Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
