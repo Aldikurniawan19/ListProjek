@@ -128,7 +128,7 @@ import Layout from '../layouts/Layout.astro';
 				<div class="bg-white rounded-2xl border border-brand-100 shadow-sm overflow-hidden flex-1 min-h-0 flex flex-col">
 					<div class="overflow-y-auto overflow-x-auto flex-1 min-h-0">
 						<table class="w-full text-left border-collapse">
-							<thead class="bg-brand-50/95 backdrop-blur-sm border-b border-brand-100 text-brand-950 uppercase text-[11px] tracking-wider font-bold sticky top-0 z-10 shadow-2xs">
+							<thead class="bg-white border-b border-brand-200 text-brand-950 uppercase text-[11px] tracking-wider font-bold sticky top-0 z-10 shadow-2xs">
 								<tr>
 									<th class="px-6 py-4">Nama Projek & Deskripsi</th>
 									<th class="px-6 py-4">Kategori</th>
@@ -786,7 +786,7 @@ import Layout from '../layouts/Layout.astro';
 				const isCompleted = totalTasks > 0 && completedTasks === totalTasks;
 
 				const tr = document.createElement('tr');
-				const bgRow = index % 2 === 0 ? 'bg-white hover:bg-brand-50/60' : 'bg-slate-50/80 hover:bg-brand-100/50';
+				const bgRow = index % 2 === 0 ? 'bg-slate-50/80 hover:bg-brand-100/50' : 'bg-white hover:bg-brand-50/60';
 				tr.className = `${bgRow} cursor-pointer transition-colors group`;
 				tr.onclick = () => showProjectDetailView(p.id);
 
