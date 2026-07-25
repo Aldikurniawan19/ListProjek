@@ -786,8 +786,8 @@ import Layout from '../layouts/Layout.astro';
 				const isCompleted = totalTasks > 0 && completedTasks === totalTasks;
 
 				const tr = document.createElement('tr');
-				const bgRow = index % 2 === 0 ? 'bg-white' : 'bg-slate-50/80';
-				tr.className = `${bgRow} hover:bg-brand-50/50 cursor-pointer transition-colors group`;
+				const bgRow = index % 2 === 0 ? 'bg-white hover:bg-brand-50/60' : 'bg-slate-50/80 hover:bg-brand-100/50';
+				tr.className = `${bgRow} cursor-pointer transition-colors group`;
 				tr.onclick = () => showProjectDetailView(p.id);
 
 				tr.innerHTML = `
