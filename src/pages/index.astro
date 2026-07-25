@@ -1,427 +1,742 @@
 ---
-import Layout from '../layouts/Layout.astro';
+import Layout from "../layouts/Layout.astro";
 ---
 
 <Layout>
-	<!-- Sidebar Mobile Toggle Overlay -->
-	<div id="sidebarOverlay" class="fixed inset-0 bg-brand-950/40 z-20 hidden md:hidden" onclick="toggleSidebar()"></div>
+  <!-- Sidebar Mobile Toggle Overlay -->
+  <div
+    id="sidebarOverlay"
+    class="fixed inset-0 bg-brand-950/40 z-20 hidden md:hidden"
+    onclick="toggleSidebar()"
+  >
+  </div>
 
-	<!-- Sidebar Navigation -->
-	<aside id="sidebar" class="fixed inset-y-0 left-0 w-64 bg-white border-r border-brand-100 z-30 transform -translate-x-full md:translate-x-0 transition-transform duration-200 ease-in-out flex flex-col shrink-0">
-		<div>
-			<div class="h-16 flex items-center px-6 border-b border-brand-100 justify-between">
-				<div class="flex items-center gap-3">
-					<div class="w-9 h-9 rounded-lg bg-brand-600 flex items-center justify-center text-white font-bold text-lg shadow-md shadow-brand-500/20">
-						<i class="fa-solid fa-list-check"></i>
-					</div>
-					<div>
-						<h1 class="font-bold text-brand-950 text-base leading-tight">ProgresTask</h1>
-						<p class="text-[10px] font-medium text-brand-600 tracking-wider uppercase">Manajemen Projek</p>
-					</div>
-				</div>
-				<button onclick="toggleSidebar()" class="md:hidden text-slate-400 hover:text-brand-600">
-					<i class="fa-solid fa-xmark text-lg"></i>
-				</button>
-			</div>
+  <!-- Sidebar Navigation -->
+  <aside
+    id="sidebar"
+    class="fixed inset-y-0 left-0 w-64 bg-white border-r border-brand-100 z-30 transform -translate-x-full md:translate-x-0 transition-transform duration-200 ease-in-out flex flex-col shrink-0"
+  >
+    <div>
+      <div
+        class="h-16 flex items-center px-6 border-b border-brand-100 justify-between"
+      >
+        <div class="flex items-center gap-3">
+          <div
+            class="w-9 h-9 rounded-lg bg-brand-600 flex items-center justify-center text-white font-bold text-lg shadow-md shadow-brand-500/20"
+          >
+            <i class="fa-solid fa-list-check"></i>
+          </div>
+          <div>
+            <h1 class="font-bold text-brand-950 text-base leading-tight">
+              ProgresTask
+            </h1>
+            <p
+              class="text-[10px] font-medium text-brand-600 tracking-wider uppercase"
+            >
+              Manajemen Projek
+            </p>
+          </div>
+        </div>
+        <button
+          onclick="toggleSidebar()"
+          class="md:hidden text-slate-400 hover:text-brand-600"
+        >
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
 
-			<nav class="p-4 space-y-1">
-				<button onclick="showDashboardView()" id="navProjectBtn" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg bg-brand-50 text-brand-700 font-semibold text-sm transition-colors text-left">
-					<i class="fa-solid fa-folder-open text-brand-600 w-5 text-center"></i>
-					Daftar Projek
-				</button>
-			</nav>
-		</div>
-	</aside>
+      <nav class="p-4 space-y-1">
+        <button
+          onclick="showDashboardView()"
+          id="navProjectBtn"
+          class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg bg-brand-50 text-brand-700 font-semibold text-sm transition-colors text-left"
+        >
+          <i class="fa-solid fa-folder-open text-brand-600 w-5 text-center"></i>
+          Daftar Projek
+        </button>
+      </nav>
+    </div>
+  </aside>
 
-	<!-- Main Content Area -->
-	<div class="flex-1 flex flex-col min-w-0 h-screen md:ml-64 overflow-hidden">
+  <!-- Main Content Area -->
+  <div class="flex-1 flex flex-col min-w-0 h-screen md:ml-64 overflow-hidden">
+    <!-- Header -->
+    <header
+      class="h-16 bg-white border-b border-brand-100 px-4 md:px-8 flex items-center justify-between gap-4 shrink-0 z-10"
+    >
+      <div class="flex items-center gap-3">
+        <button
+          onclick="toggleSidebar()"
+          class="md:hidden p-2 text-slate-500 hover:text-brand-600 hover:bg-brand-50 rounded-lg"
+        >
+          <i class="fa-solid fa-bars text-lg"></i>
+        </button>
+        <div class="flex items-center gap-2">
+          <h2 id="viewTitle" class="text-lg font-bold text-brand-950">
+            Daftar Projek Utama
+          </h2>
+        </div>
+      </div>
 
-		<!-- Header -->
-		<header class="h-16 bg-white border-b border-brand-100 px-4 md:px-8 flex items-center justify-between gap-4 shrink-0 z-10">
-			<div class="flex items-center gap-3">
-				<button onclick="toggleSidebar()" class="md:hidden p-2 text-slate-500 hover:text-brand-600 hover:bg-brand-50 rounded-lg">
-					<i class="fa-solid fa-bars text-lg"></i>
-				</button>
-				<div class="flex items-center gap-2">
-					<h2 id="viewTitle" class="text-lg font-bold text-brand-950">Daftar Projek Utama</h2>
-				</div>
-			</div>
+      <div class="flex items-center gap-3">
+        <div class="relative w-48 sm:w-64">
+          <i
+            class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"
+          ></i>
+          <input
+            type="text"
+            id="searchInput"
+            oninput="handleSearch()"
+            placeholder="Cari projek atau task..."
+            class="w-full pl-9 pr-4 py-2 bg-slate-50 border border-brand-100 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-brand-500 focus:bg-white transition-all"
+          />
+        </div>
+        <button
+          id="mainActionBtn"
+          onclick="openModal('projectModal')"
+          class="bg-brand-600 hover:bg-brand-700 text-white px-4 py-2 rounded-lg text-xs font-semibold flex items-center gap-2 transition-all shadow-sm shadow-brand-500/20 whitespace-nowrap"
+        >
+          <i class="fa-solid fa-plus"></i>
+          <span>Projek Baru</span>
+        </button>
+      </div>
+    </header>
 
-			<div class="flex items-center gap-3">
-				<div class="relative w-48 sm:w-64">
-					<i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
-					<input type="text" id="searchInput" oninput="handleSearch()" placeholder="Cari projek atau task..." class="w-full pl-9 pr-4 py-2 bg-slate-50 border border-brand-100 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-brand-500 focus:bg-white transition-all">
-				</div>
-				<button id="mainActionBtn" onclick="openModal('projectModal')" class="bg-brand-600 hover:bg-brand-700 text-white px-4 py-2 rounded-lg text-xs font-semibold flex items-center gap-2 transition-all shadow-sm shadow-brand-500/20 whitespace-nowrap">
-					<i class="fa-solid fa-plus"></i>
-					<span>Projek Baru</span>
-				</button>
-			</div>
-		</header>
+    <!-- Main Body -->
+    <main
+      id="mainContent"
+      class="flex-1 p-4 md:p-6 overflow-hidden flex flex-col min-h-0 space-y-4"
+    >
+      <!-- Stats Overview Cards (Fixed) -->
+      <div
+        id="statsOverview"
+        class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 shrink-0"
+      >
+        <div
+          class="bg-white p-5 rounded-2xl border border-brand-100 shadow-sm flex items-center justify-between"
+        >
+          <div>
+            <p
+              class="text-xs font-medium text-slate-500 uppercase tracking-wider"
+            >
+              Total Projek
+            </p>
+            <h3
+              class="text-2xl font-bold text-brand-950 mt-1"
+              id="statTotalProjects"
+            >
+              0
+            </h3>
+          </div>
+          <div
+            class="w-12 h-12 rounded-xl bg-brand-50 border border-brand-100 text-brand-600 flex items-center justify-center text-xl"
+          >
+            <i class="fa-solid fa-folder"></i>
+          </div>
+        </div>
 
-		<!-- Main Body -->
-		<main id="mainContent" class="flex-1 p-4 md:p-6 overflow-hidden flex flex-col min-h-0 space-y-4">
+        <div
+          class="bg-white p-5 rounded-2xl border border-brand-100 shadow-sm flex items-center justify-between"
+        >
+          <div>
+            <p
+              class="text-xs font-medium text-slate-500 uppercase tracking-wider"
+            >
+              Total Sub-Task
+            </p>
+            <h3
+              class="text-2xl font-bold text-brand-950 mt-1"
+              id="statTotalTasks"
+            >
+              0
+            </h3>
+          </div>
+          <div
+            class="w-12 h-12 rounded-xl bg-brand-50 border border-brand-100 text-brand-600 flex items-center justify-center text-xl"
+          >
+            <i class="fa-solid fa-list-ul"></i>
+          </div>
+        </div>
 
-			<!-- Stats Overview Cards (Fixed) -->
-			<div id="statsOverview" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 shrink-0">
-				<div class="bg-white p-5 rounded-2xl border border-brand-100 shadow-sm flex items-center justify-between">
-					<div>
-						<p class="text-xs font-medium text-slate-500 uppercase tracking-wider">Total Projek</p>
-						<h3 class="text-2xl font-bold text-brand-950 mt-1" id="statTotalProjects">0</h3>
-					</div>
-					<div class="w-12 h-12 rounded-xl bg-brand-50 border border-brand-100 text-brand-600 flex items-center justify-center text-xl">
-						<i class="fa-solid fa-folder"></i>
-					</div>
-				</div>
+        <div
+          class="bg-white p-5 rounded-2xl border border-brand-100 shadow-sm flex items-center justify-between"
+        >
+          <div>
+            <p
+              class="text-xs font-medium text-slate-500 uppercase tracking-wider"
+            >
+              Task Selesai
+            </p>
+            <h3
+              class="text-2xl font-bold text-brand-950 mt-1"
+              id="statCompletedTasks"
+            >
+              0
+            </h3>
+          </div>
+          <div
+            class="w-12 h-12 rounded-xl bg-brand-50 border border-brand-100 text-brand-600 flex items-center justify-center text-xl"
+          >
+            <i class="fa-solid fa-circle-check"></i>
+          </div>
+        </div>
 
-				<div class="bg-white p-5 rounded-2xl border border-brand-100 shadow-sm flex items-center justify-between">
-					<div>
-						<p class="text-xs font-medium text-slate-500 uppercase tracking-wider">Total Sub-Task</p>
-						<h3 class="text-2xl font-bold text-brand-950 mt-1" id="statTotalTasks">0</h3>
-					</div>
-					<div class="w-12 h-12 rounded-xl bg-brand-50 border border-brand-100 text-brand-600 flex items-center justify-center text-xl">
-						<i class="fa-solid fa-list-ul"></i>
-					</div>
-				</div>
+        <div
+          class="bg-white p-5 rounded-2xl border border-brand-100 shadow-sm flex items-center justify-between"
+        >
+          <div>
+            <p
+              class="text-xs font-medium text-slate-500 uppercase tracking-wider"
+            >
+              Rata-Rata Progres
+            </p>
+            <h3
+              class="text-2xl font-bold text-brand-950 mt-1"
+              id="statAvgProgress"
+            >
+              0%
+            </h3>
+          </div>
+          <div
+            class="w-12 h-12 rounded-xl bg-brand-50 border border-brand-100 text-brand-600 flex items-center justify-center text-xl"
+          >
+            <i class="fa-solid fa-chart-line"></i>
+          </div>
+        </div>
+      </div>
 
-				<div class="bg-white p-5 rounded-2xl border border-brand-100 shadow-sm flex items-center justify-between">
-					<div>
-						<p class="text-xs font-medium text-slate-500 uppercase tracking-wider">Task Selesai</p>
-						<h3 class="text-2xl font-bold text-brand-950 mt-1" id="statCompletedTasks">0</h3>
-					</div>
-					<div class="w-12 h-12 rounded-xl bg-brand-50 border border-brand-100 text-brand-600 flex items-center justify-center text-xl">
-						<i class="fa-solid fa-circle-check"></i>
-					</div>
-				</div>
+      <!-- VIEW 1: PROJECTS TABLE VIEW -->
+      <div
+        id="listView"
+        class="flex-1 min-h-0 flex flex-col space-y-4 overflow-hidden"
+      >
+        <!-- Filter Bar (Fixed) -->
+        <div
+          class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-white p-3 rounded-xl border border-brand-100 shadow-sm shrink-0"
+        >
+          <div class="flex items-center gap-1 overflow-x-auto w-full sm:w-auto">
+            <button
+              onclick="setFilter('all')"
+              id="filter-all"
+              class="filter-btn px-4 py-1.5 rounded-lg text-xs font-semibold transition-all bg-brand-600 text-white"
+            >
+              Semua Projek
+            </button>
+            <button
+              onclick="setFilter('in-progress')"
+              id="filter-in-progress"
+              class="filter-btn px-4 py-1.5 rounded-lg text-xs font-medium text-slate-600 hover:bg-brand-50 hover:text-brand-600 transition-all"
+            >
+              Sedang Berjalan
+            </button>
+            <button
+              onclick="setFilter('completed')"
+              id="filter-completed"
+              class="filter-btn px-4 py-1.5 rounded-lg text-xs font-medium text-slate-600 hover:bg-brand-50 hover:text-brand-600 transition-all"
+            >
+              Selesai
+            </button>
+          </div>
+          <span
+            class="text-xs text-slate-500 px-2 font-medium"
+            id="projectCountLabel">Menampilkan 0 Projek</span
+          >
+        </div>
 
-				<div class="bg-white p-5 rounded-2xl border border-brand-100 shadow-sm flex items-center justify-between">
-					<div>
-						<p class="text-xs font-medium text-slate-500 uppercase tracking-wider">Rata-Rata Progres</p>
-						<h3 class="text-2xl font-bold text-brand-950 mt-1" id="statAvgProgress">0%</h3>
-					</div>
-					<div class="w-12 h-12 rounded-xl bg-brand-50 border border-brand-100 text-brand-600 flex items-center justify-center text-xl">
-						<i class="fa-solid fa-chart-line"></i>
-					</div>
-				</div>
-			</div>
+        <!-- Table Container (Scrollable Table) -->
+        <div
+          class="bg-white rounded-2xl border border-brand-100 shadow-sm overflow-hidden flex-1 min-h-0 flex flex-col"
+        >
+          <div class="overflow-y-auto overflow-x-auto flex-1 min-h-0">
+            <table class="w-full text-left border-collapse">
+              <thead
+                class="bg-white border-b border-brand-200 text-brand-950 uppercase text-[11px] tracking-wider font-bold sticky top-0 z-10 shadow-2xs"
+              >
+                <tr>
+                  <th class="px-6 py-4">Nama Projek & Deskripsi</th>
+                  <th class="px-6 py-4">Kategori</th>
+                  <th class="px-6 py-4">Jumlah Task</th>
+                  <th class="px-6 py-4 w-48">Progres Kerja</th>
+                  <th class="px-6 py-4">Status</th>
+                  <th class="px-6 py-4 text-center">Aksi</th>
+                </tr>
+              </thead>
+              <tbody
+                id="projectsTableBody"
+                class="divide-y divide-brand-50 text-xs"
+              >
+              </tbody>
+            </table>
+          </div>
 
-			<!-- VIEW 1: PROJECTS TABLE VIEW -->
-			<div id="listView" class="flex-1 min-h-0 flex flex-col space-y-4 overflow-hidden">
+          <div
+            id="tableEmptyState"
+            class="hidden flex-col items-center justify-center p-12 text-center"
+          >
+            <div
+              class="w-14 h-14 rounded-full bg-brand-50 border border-brand-100 text-brand-500 flex items-center justify-center text-xl mb-3"
+            >
+              <i class="fa-solid fa-folder-open"></i>
+            </div>
+            <h3 class="text-sm font-bold text-brand-950">
+              Tidak Ada Projek Ditemukan
+            </h3>
+            <p class="text-xs text-slate-500 mt-1 max-w-xs">
+              Belum ada projek yang ditambahkan atau pencarian Anda tidak
+              ditemukan.
+            </p>
+            <button
+              onclick="openModal('projectModal')"
+              class="mt-4 bg-brand-600 text-white px-4 py-2 rounded-lg text-xs font-semibold"
+            >
+              + Tambah Projek Baru
+            </button>
+          </div>
+        </div>
+      </div>
 
-				<!-- Filter Bar (Fixed) -->
-				<div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-white p-3 rounded-xl border border-brand-100 shadow-sm shrink-0">
-					<div class="flex items-center gap-1 overflow-x-auto w-full sm:w-auto">
-						<button onclick="setFilter('all')" id="filter-all" class="filter-btn px-4 py-1.5 rounded-lg text-xs font-semibold transition-all bg-brand-600 text-white">
-							Semua Projek
-						</button>
-						<button onclick="setFilter('in-progress')" id="filter-in-progress" class="filter-btn px-4 py-1.5 rounded-lg text-xs font-medium text-slate-600 hover:bg-brand-50 hover:text-brand-600 transition-all">
-							Sedang Berjalan
-						</button>
-						<button onclick="setFilter('completed')" id="filter-completed" class="filter-btn px-4 py-1.5 rounded-lg text-xs font-medium text-slate-600 hover:bg-brand-50 hover:text-brand-600 transition-all">
-							Selesai
-						</button>
-					</div>
-					<span class="text-xs text-slate-500 px-2 font-medium" id="projectCountLabel">Menampilkan 0 Projek</span>
-				</div>
+      <!-- VIEW 2: TASK DETAIL VIEW -->
+      <div
+        id="detailView"
+        class="task-detail-view flex-col flex-1 min-h-0 space-y-4 overflow-hidden"
+      >
+        <!-- On-Page Modern Navigation Bar (Fixed) -->
+        <div class="flex items-center justify-between gap-3 flex-wrap shrink-0">
+          <button
+            onclick="showDashboardView()"
+            class="inline-flex items-center gap-2.5 px-4 py-2 rounded-xl bg-white hover:bg-brand-50 text-slate-700 hover:text-brand-600 border border-brand-100 text-xs font-semibold shadow-2xs hover:shadow-xs transition-all group cursor-pointer"
+          >
+            <i
+              class="fa-solid fa-arrow-left text-xs transition-transform group-hover:-translate-x-1 text-brand-600"
+            ></i>
+            <span>Kembali ke Daftar Projek</span>
+          </button>
+          <div
+            class="flex items-center gap-2 text-xs text-slate-500 font-medium bg-white px-3.5 py-1.5 rounded-xl border border-brand-100/80 shadow-2xs"
+          >
+            <span
+              class="hover:text-brand-600 cursor-pointer transition-colors"
+              onclick="showDashboardView()">Daftar Projek</span
+            >
+            <i class="fa-solid fa-chevron-right text-[10px] text-slate-300"></i>
+            <span
+              id="breadcrumbProjectTitle"
+              class="font-bold text-brand-950 truncate max-w-[200px]"
+              >Detail Projek</span
+            >
+          </div>
+        </div>
 
-				<!-- Table Container (Scrollable Table) -->
-				<div class="bg-white rounded-2xl border border-brand-100 shadow-sm overflow-hidden flex-1 min-h-0 flex flex-col">
-					<div class="overflow-y-auto overflow-x-auto flex-1 min-h-0">
-						<table class="w-full text-left border-collapse">
-							<thead class="bg-white border-b border-brand-200 text-brand-950 uppercase text-[11px] tracking-wider font-bold sticky top-0 z-10 shadow-2xs">
-								<tr>
-									<th class="px-6 py-4">Nama Projek & Deskripsi</th>
-									<th class="px-6 py-4">Kategori</th>
-									<th class="px-6 py-4">Jumlah Task</th>
-									<th class="px-6 py-4 w-48">Progres Kerja</th>
-									<th class="px-6 py-4">Status</th>
-									<th class="px-6 py-4 text-center">Aksi</th>
-								</tr>
-							</thead>
-							<tbody id="projectsTableBody" class="divide-y divide-brand-50 text-xs">
-							</tbody>
-						</table>
-					</div>
+        <!-- Compact Project Summary Bar (Fixed) -->
+        <div
+          class="bg-white p-5 rounded-2xl border border-brand-100 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4 shrink-0"
+        >
+          <div class="space-y-1 min-w-0">
+            <div class="flex items-center gap-2 flex-wrap">
+              <span
+                id="detailProjectCategory"
+                class="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-brand-50 text-brand-700 border border-brand-200"
+              >
+                Kategori
+              </span>
+              <span
+                id="detailProjectStatus"
+                class="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-slate-100 text-slate-600 border border-slate-200"
+              >
+                Status
+              </span>
+            </div>
+            <h2
+              id="detailProjectTitle"
+              class="text-xl font-bold text-brand-950 leading-tight"
+            >
+              Judul Projek
+            </h2>
+            <p
+              id="detailProjectDesc"
+              class="text-xs text-slate-500 line-clamp-2"
+            >
+              Deskripsi projek...
+            </p>
+          </div>
 
-					<div id="tableEmptyState" class="hidden flex-col items-center justify-center p-12 text-center">
-						<div class="w-14 h-14 rounded-full bg-brand-50 border border-brand-100 text-brand-500 flex items-center justify-center text-xl mb-3">
-							<i class="fa-solid fa-folder-open"></i>
-						</div>
-						<h3 class="text-sm font-bold text-brand-950">Tidak Ada Projek Ditemukan</h3>
-						<p class="text-xs text-slate-500 mt-1 max-w-xs">Belum ada projek yang ditambahkan atau pencarian Anda tidak ditemukan.</p>
-						<button onclick="openModal('projectModal')" class="mt-4 bg-brand-600 text-white px-4 py-2 rounded-lg text-xs font-semibold">
-							+ Tambah Projek Baru
-						</button>
-					</div>
-				</div>
-			</div>
+          <div class="flex items-center gap-4 shrink-0">
+            <div class="w-36 sm:w-44 hidden sm:block">
+              <div
+                class="flex justify-between text-[11px] font-medium text-slate-500 mb-1"
+              >
+                <span>Progres Task</span>
+                <span id="detailProgressText" class="font-bold text-emerald-600"
+                  >0%</span
+                >
+              </div>
+              <div
+                class="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden border border-slate-100"
+              >
+                <div
+                  id="detailProgressBar"
+                  class="bg-emerald-500 h-full rounded-full transition-all duration-300"
+                  style="width: 0%"
+                >
+                </div>
+              </div>
+            </div>
+            <div class="flex items-center gap-2">
+              <button
+                onclick="openModal('taskModal')"
+                class="bg-brand-600 hover:bg-brand-700 text-white px-3.5 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 transition-all shadow-sm shadow-brand-500/20"
+              >
+                <i class="fa-solid fa-plus"></i>
+                <span>Tambah Task</span>
+              </button>
+              <button
+                onclick="deleteActiveProject()"
+                title="Hapus Projek Ini"
+                class="text-slate-400 hover:text-red-600 hover:bg-red-50 p-2 rounded-xl border border-brand-100 transition-colors"
+              >
+                <i class="fa-regular fa-trash-can text-sm"></i>
+              </button>
+            </div>
+          </div>
+        </div>
 
-			<!-- VIEW 2: TASK DETAIL VIEW -->
-			<div id="detailView" class="task-detail-view flex-col flex-1 min-h-0 space-y-4 overflow-hidden">
+        <!-- MAIN TASK LIST CONTAINER -->
+        <div
+          class="bg-white rounded-2xl border border-brand-100 shadow-sm overflow-hidden flex-1 min-h-0 flex flex-col"
+        >
+          <!-- Task List Header & Filters (Fixed) -->
+          <div
+            class="p-4 sm:p-5 border-b border-brand-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-50/50 shrink-0"
+          >
+            <div class="flex items-center gap-2.5">
+              <div
+                class="w-8 h-8 rounded-lg bg-brand-600 text-white flex items-center justify-center text-xs font-bold shadow-sm"
+              >
+                <i class="fa-solid fa-list-check"></i>
+              </div>
+              <div>
+                <h3 class="text-sm font-bold text-brand-950">
+                  Daftar Task Projek
+                </h3>
+                <p
+                  class="text-[11px] text-slate-500 font-medium"
+                  id="detailTaskCountLabel"
+                >
+                  0 task tersimpan
+                </p>
+              </div>
+            </div>
 
-				<!-- On-Page Modern Navigation Bar (Fixed) -->
-				<div class="flex items-center justify-between gap-3 flex-wrap shrink-0">
-					<button onclick="showDashboardView()" class="inline-flex items-center gap-2.5 px-4 py-2 rounded-xl bg-white hover:bg-brand-50 text-slate-700 hover:text-brand-600 border border-brand-100 text-xs font-semibold shadow-2xs hover:shadow-xs transition-all group cursor-pointer">
-						<i class="fa-solid fa-arrow-left text-xs transition-transform group-hover:-translate-x-1 text-brand-600"></i>
-						<span>Kembali ke Daftar Projek</span>
-					</button>
-					<div class="flex items-center gap-2 text-xs text-slate-500 font-medium bg-white px-3.5 py-1.5 rounded-xl border border-brand-100/80 shadow-2xs">
-						<span class="hover:text-brand-600 cursor-pointer transition-colors" onclick="showDashboardView()">Daftar Projek</span>
-						<i class="fa-solid fa-chevron-right text-[10px] text-slate-300"></i>
-						<span id="breadcrumbProjectTitle" class="font-bold text-brand-950 truncate max-w-[200px]">Detail Projek</span>
-					</div>
-				</div>
+            <!-- Task Filter Pills -->
+            <div
+              class="flex items-center gap-1 bg-white p-1 rounded-xl border border-brand-100 shadow-2xs self-start sm:self-auto"
+            >
+              <button
+                onclick="setTaskFilter('all')"
+                id="taskFilter-all"
+                class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all bg-brand-600 text-white"
+              >
+                Semua Task
+              </button>
+              <button
+                onclick="setTaskFilter('active')"
+                id="taskFilter-active"
+                class="px-3 py-1.5 rounded-lg text-xs font-medium text-slate-600 hover:text-brand-600 transition-all"
+              >
+                Belum Selesai
+              </button>
+              <button
+                onclick="setTaskFilter('completed')"
+                id="taskFilter-completed"
+                class="px-3 py-1.5 rounded-lg text-xs font-medium text-slate-600 hover:text-brand-600 transition-all"
+              >
+                Selesai
+              </button>
+            </div>
+          </div>
 
-				<!-- Compact Project Summary Bar (Fixed) -->
-				<div class="bg-white p-5 rounded-2xl border border-brand-100 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4 shrink-0">
-					<div class="space-y-1 min-w-0">
-						<div class="flex items-center gap-2 flex-wrap">
-							<span id="detailProjectCategory" class="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-brand-50 text-brand-700 border border-brand-200">
-								Kategori
-							</span>
-							<span id="detailProjectStatus" class="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-slate-100 text-slate-600 border border-slate-200">
-								Status
-							</span>
-						</div>
-						<h2 id="detailProjectTitle" class="text-xl font-bold text-brand-950 leading-tight">Judul Projek</h2>
-						<p id="detailProjectDesc" class="text-xs text-slate-500 line-clamp-2">Deskripsi projek...</p>
-					</div>
+          <!-- Quick Add Task Bar (Fixed) -->
 
-					<div class="flex items-center gap-4 shrink-0">
-						<div class="w-36 sm:w-44 hidden sm:block">
-							<div class="flex justify-between text-[11px] font-medium text-slate-500 mb-1">
-								<span>Progres Task</span>
-								<span id="detailProgressText" class="font-bold text-emerald-600">0%</span>
-							</div>
-							<div class="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden border border-slate-100">
-								<div id="detailProgressBar" class="bg-emerald-500 h-full rounded-full transition-all duration-300" style="width: 0%"></div>
-							</div>
-						</div>
-						<div class="flex items-center gap-2">
-							<button onclick="openModal('taskModal')" class="bg-brand-600 hover:bg-brand-700 text-white px-3.5 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 transition-all shadow-sm shadow-brand-500/20">
-								<i class="fa-solid fa-plus"></i>
-								<span>Tambah Task</span>
-							</button>
-							<button onclick="deleteActiveProject()" title="Hapus Projek Ini" class="text-slate-400 hover:text-red-600 hover:bg-red-50 p-2 rounded-xl border border-brand-100 transition-colors">
-								<i class="fa-regular fa-trash-can text-sm"></i>
-							</button>
-						</div>
-					</div>
-				</div>
+          <!-- Task List Items (Scrollable) -->
+          <div
+            id="tasksListContainer"
+            class="divide-y divide-brand-50 overflow-y-auto flex-1 min-h-0"
+          >
+          </div>
 
-				<!-- MAIN TASK LIST CONTAINER -->
-				<div class="bg-white rounded-2xl border border-brand-100 shadow-sm overflow-hidden flex-1 min-h-0 flex flex-col">
-					<!-- Task List Header & Filters (Fixed) -->
-					<div class="p-4 sm:p-5 border-b border-brand-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-50/50 shrink-0">
-						<div class="flex items-center gap-2.5">
-							<div class="w-8 h-8 rounded-lg bg-brand-600 text-white flex items-center justify-center text-xs font-bold shadow-sm">
-								<i class="fa-solid fa-list-check"></i>
-							</div>
-							<div>
-								<h3 class="text-sm font-bold text-brand-950">Daftar Task Projek</h3>
-								<p class="text-[11px] text-slate-500 font-medium" id="detailTaskCountLabel">0 task tersimpan</p>
-							</div>
-						</div>
+          <!-- Empty State -->
+          <div
+            id="tasksEmptyState"
+            class="hidden p-12 text-center flex-col items-center justify-center overflow-y-auto flex-1 min-h-0"
+          >
+            <div
+              class="w-14 h-14 rounded-2xl bg-brand-50 border border-brand-100 text-brand-600 flex items-center justify-center text-xl mb-3 shadow-xs"
+            >
+              <i class="fa-solid fa-clipboard-check"></i>
+            </div>
+            <h4 class="text-sm font-bold text-brand-950">Belum Ada Task</h4>
+            <p class="text-xs text-slate-500 mt-1 max-w-xs">
+              Tambahkan task pertama Anda di atas untuk mulai mencatat progres
+              projek ini.
+            </p>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
 
-						<!-- Task Filter Pills -->
-						<div class="flex items-center gap-1 bg-white p-1 rounded-xl border border-brand-100 shadow-2xs self-start sm:self-auto">
-							<button onclick="setTaskFilter('all')" id="taskFilter-all" class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all bg-brand-600 text-white">
-								Semua Task
-							</button>
-							<button onclick="setTaskFilter('active')" id="taskFilter-active" class="px-3 py-1.5 rounded-lg text-xs font-medium text-slate-600 hover:text-brand-600 transition-all">
-								Belum Selesai
-							</button>
-							<button onclick="setTaskFilter('completed')" id="taskFilter-completed" class="px-3 py-1.5 rounded-lg text-xs font-medium text-slate-600 hover:text-brand-600 transition-all">
-								Selesai
-							</button>
-						</div>
-					</div>
+  <!-- MODAL 1: Tambah Projek Baru -->
+  <div
+    id="projectModal"
+    class="fixed inset-0 bg-brand-950/40 z-50 flex items-center justify-center p-4 hidden backdrop-blur-sm"
+  >
+    <div
+      class="bg-white rounded-2xl border border-brand-100 shadow-xl w-full max-w-md overflow-hidden"
+    >
+      <div
+        class="px-6 py-4 border-b border-brand-100 flex items-center justify-between bg-brand-50/50"
+      >
+        <h3 class="font-bold text-brand-950 text-sm flex items-center gap-2">
+          <i class="fa-solid fa-folder-plus text-brand-600"></i>
+          Buat Projek Baru
+        </h3>
+        <button
+          onclick="closeModal('projectModal')"
+          class="text-slate-400 hover:text-brand-600 text-sm"
+        >
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <form
+        id="projectForm"
+        onsubmit="saveProject(event)"
+        class="p-6 space-y-4"
+      >
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1"
+            >Nama Projek <span class="text-brand-600">*</span></label
+          >
+          <input
+            type="text"
+            id="projectTitle"
+            required
+            placeholder="Contoh: Projek Membuat Website E-Commerce"
+            class="w-full px-3 py-2 bg-slate-50 border border-brand-100 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-brand-500 focus:bg-white transition-all"
+          />
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1"
+            >Kategori Projek</label
+          >
+          <input
+            type="text"
+            id="projectCategory"
+            placeholder="Contoh: Web Development, Design, UI/UX"
+            class="w-full px-3 py-2 bg-slate-50 border border-brand-100 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-brand-500 focus:bg-white transition-all"
+          />
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1"
+            >Deskripsi Ringkas Projek</label
+          >
+          <textarea
+            id="projectDesc"
+            rows="3"
+            placeholder="Tuliskan gambaran umum pekerjaan..."
+            class="w-full px-3 py-2 bg-slate-50 border border-brand-100 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-brand-500 focus:bg-white transition-all resize-none"
+          ></textarea>
+        </div>
+        <div
+          class="flex items-center justify-end gap-2 pt-2 border-t border-brand-100"
+        >
+          <button
+            type="button"
+            onclick="closeModal('projectModal')"
+            class="px-4 py-2 rounded-lg text-xs font-semibold text-slate-600 hover:bg-slate-100 transition-all"
+          >
+            Batal
+          </button>
+          <button
+            type="submit"
+            class="px-4 py-2 rounded-lg text-xs font-semibold bg-brand-600 hover:bg-brand-700 text-white shadow-sm shadow-brand-500/20 transition-all"
+          >
+            Simpan Projek
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
 
-					<!-- Quick Add Task Bar (Fixed) -->
-					<div class="p-3.5 border-b border-brand-100 bg-white shrink-0">
-						<form onsubmit="quickAddTask(event)" class="flex items-center gap-2">
-							<div class="relative flex-1">
-								<i class="fa-solid fa-plus absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
-								<input type="text" id="quickTaskInput" placeholder="Tambah task baru secara cepat..." class="w-full pl-9 pr-4 py-2 bg-slate-50 border border-brand-100 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-brand-500 focus:bg-white transition-all">
-							</div>
-							<button type="submit" class="bg-brand-600 hover:bg-brand-700 text-white px-4 py-2 rounded-xl text-xs font-semibold transition-all shrink-0">
-								Tambah
-							</button>
-						</form>
-					</div>
+  <!-- MODAL 2: Tambah Task -->
+  <div
+    id="taskModal"
+    class="fixed inset-0 bg-brand-950/40 z-50 flex items-center justify-center p-4 hidden backdrop-blur-sm"
+  >
+    <div
+      class="bg-white rounded-2xl border border-brand-100 shadow-xl w-full max-w-lg overflow-hidden"
+    >
+      <div
+        class="px-6 py-4 border-b border-brand-100 flex items-center justify-between bg-brand-50/50"
+      >
+        <h3 class="font-bold text-brand-950 text-sm flex items-center gap-2">
+          <i class="fa-solid fa-list-check text-brand-600"></i>
+          Tambah Task / Pekerjaan Baru
+        </h3>
+        <button
+          onclick="closeModal('taskModal')"
+          class="text-slate-400 hover:text-brand-600 text-sm"
+        >
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <form id="taskForm" onsubmit="saveTask(event)" class="p-6 space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1"
+            >Nama / Judul Task <span class="text-brand-600">*</span></label
+          >
+          <input
+            type="text"
+            id="taskTitle"
+            required
+            placeholder="Contoh: Membuat menu dashboard"
+            class="w-full px-3 py-2 bg-slate-50 border border-brand-100 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-brand-500 focus:bg-white transition-all"
+          />
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1"
+            >Deskripsi Detail Task</label
+          >
+          <textarea
+            id="taskDesc"
+            rows="4"
+            placeholder="Contoh: Nantinya menu akan menampilkan grafik penjualan, total transaksi bulanan, serta statistik performa harian..."
+            class="w-full px-3 py-2 bg-slate-50 border border-brand-100 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-brand-500 focus:bg-white transition-all resize-none"
+          ></textarea>
+        </div>
+        <div
+          class="flex items-center justify-end gap-2 pt-2 border-t border-brand-100"
+        >
+          <button
+            type="button"
+            onclick="closeModal('taskModal')"
+            class="px-4 py-2 rounded-lg text-xs font-semibold text-slate-600 hover:bg-slate-100 transition-all"
+          >
+            Batal
+          </button>
+          <button
+            type="submit"
+            class="px-4 py-2 rounded-lg text-xs font-semibold bg-brand-600 hover:bg-brand-700 text-white shadow-sm shadow-brand-500/20 transition-all"
+          >
+            Simpan Task
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
 
-					<!-- Task List Items (Scrollable) -->
-					<div id="tasksListContainer" class="divide-y divide-brand-50 overflow-y-auto flex-1 min-h-0">
-					</div>
+  <script is:inline>
+    const Ghostoast = {
+      container: null,
+      init() {
+        if (!this.container) {
+          this.container = document.createElement("div");
+          this.container.id = "ghostoastContainer";
+          this.container.className =
+            "fixed bottom-6 right-6 z-50 flex flex-col gap-3 max-w-sm w-full pointer-events-none px-4 sm:px-0";
+          document.body.appendChild(this.container);
+        }
+      },
+      show({ type = "info", title = "", message = "", duration = 3500 }) {
+        this.init();
+        const toast = document.createElement("div");
+        toast.className =
+          "pointer-events-auto transform translate-y-4 opacity-0 transition-all duration-300 ease-out bg-slate-900/90 text-white backdrop-blur-xl border border-slate-700/60 p-4 rounded-2xl shadow-2xl flex items-start gap-3.5 relative overflow-hidden group";
 
-					<!-- Empty State -->
-					<div id="tasksEmptyState" class="hidden p-12 text-center flex-col items-center justify-center overflow-y-auto flex-1 min-h-0">
-						<div class="w-14 h-14 rounded-2xl bg-brand-50 border border-brand-100 text-brand-600 flex items-center justify-center text-xl mb-3 shadow-xs">
-							<i class="fa-solid fa-clipboard-check"></i>
-						</div>
-						<h4 class="text-sm font-bold text-brand-950">Belum Ada Task</h4>
-						<p class="text-xs text-slate-500 mt-1 max-w-xs">Tambahkan task pertama Anda di atas untuk mulai mencatat progres projek ini.</p>
-					</div>
-				</div>
+        const icons = {
+          success: {
+            icon: "fa-circle-check",
+            color: "text-emerald-400 bg-emerald-500/10 border-emerald-500/30",
+          },
+          error: {
+            icon: "fa-circle-xmark",
+            color: "text-rose-400 bg-rose-500/10 border-rose-500/30",
+          },
+          info: {
+            icon: "fa-circle-info",
+            color: "text-sky-400 bg-sky-500/10 border-sky-500/30",
+          },
+          warning: {
+            icon: "fa-triangle-exclamation",
+            color: "text-amber-400 bg-amber-500/10 border-amber-500/30",
+          },
+        };
 
-			</div>
+        const config = icons[type] || icons.info;
 
-		</main>
-	</div>
-
-	<!-- MODAL 1: Tambah Projek Baru -->
-	<div id="projectModal" class="fixed inset-0 bg-brand-950/40 z-50 flex items-center justify-center p-4 hidden backdrop-blur-sm">
-		<div class="bg-white rounded-2xl border border-brand-100 shadow-xl w-full max-w-md overflow-hidden">
-			<div class="px-6 py-4 border-b border-brand-100 flex items-center justify-between bg-brand-50/50">
-				<h3 class="font-bold text-brand-950 text-sm flex items-center gap-2">
-					<i class="fa-solid fa-folder-plus text-brand-600"></i>
-					Buat Projek Baru
-				</h3>
-				<button onclick="closeModal('projectModal')" class="text-slate-400 hover:text-brand-600 text-sm">
-					<i class="fa-solid fa-xmark"></i>
-				</button>
-			</div>
-			<form id="projectForm" onsubmit="saveProject(event)" class="p-6 space-y-4">
-				<div>
-					<label class="block text-xs font-semibold text-slate-700 mb-1">Nama Projek <span class="text-brand-600">*</span></label>
-					<input type="text" id="projectTitle" required placeholder="Contoh: Projek Membuat Website E-Commerce" class="w-full px-3 py-2 bg-slate-50 border border-brand-100 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-brand-500 focus:bg-white transition-all">
-				</div>
-				<div>
-					<label class="block text-xs font-semibold text-slate-700 mb-1">Kategori Projek</label>
-					<input type="text" id="projectCategory" placeholder="Contoh: Web Development, Design, UI/UX" class="w-full px-3 py-2 bg-slate-50 border border-brand-100 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-brand-500 focus:bg-white transition-all">
-				</div>
-				<div>
-					<label class="block text-xs font-semibold text-slate-700 mb-1">Deskripsi Ringkas Projek</label>
-					<textarea id="projectDesc" rows="3" placeholder="Tuliskan gambaran umum pekerjaan..." class="w-full px-3 py-2 bg-slate-50 border border-brand-100 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-brand-500 focus:bg-white transition-all resize-none"></textarea>
-				</div>
-				<div class="flex items-center justify-end gap-2 pt-2 border-t border-brand-100">
-					<button type="button" onclick="closeModal('projectModal')" class="px-4 py-2 rounded-lg text-xs font-semibold text-slate-600 hover:bg-slate-100 transition-all">
-						Batal
-					</button>
-					<button type="submit" class="px-4 py-2 rounded-lg text-xs font-semibold bg-brand-600 hover:bg-brand-700 text-white shadow-sm shadow-brand-500/20 transition-all">
-						Simpan Projek
-					</button>
-				</div>
-			</form>
-		</div>
-	</div>
-
-	<!-- MODAL 2: Tambah Task -->
-	<div id="taskModal" class="fixed inset-0 bg-brand-950/40 z-50 flex items-center justify-center p-4 hidden backdrop-blur-sm">
-		<div class="bg-white rounded-2xl border border-brand-100 shadow-xl w-full max-w-lg overflow-hidden">
-			<div class="px-6 py-4 border-b border-brand-100 flex items-center justify-between bg-brand-50/50">
-				<h3 class="font-bold text-brand-950 text-sm flex items-center gap-2">
-					<i class="fa-solid fa-list-check text-brand-600"></i>
-					Tambah Task / Pekerjaan Baru
-				</h3>
-				<button onclick="closeModal('taskModal')" class="text-slate-400 hover:text-brand-600 text-sm">
-					<i class="fa-solid fa-xmark"></i>
-				</button>
-			</div>
-			<form id="taskForm" onsubmit="saveTask(event)" class="p-6 space-y-4">
-				<div>
-					<label class="block text-xs font-semibold text-slate-700 mb-1">Nama / Judul Task <span class="text-brand-600">*</span></label>
-					<input type="text" id="taskTitle" required placeholder="Contoh: Membuat menu dashboard" class="w-full px-3 py-2 bg-slate-50 border border-brand-100 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-brand-500 focus:bg-white transition-all">
-				</div>
-				<div>
-					<label class="block text-xs font-semibold text-slate-700 mb-1">Deskripsi Detail Task</label>
-					<textarea id="taskDesc" rows="4" placeholder="Contoh: Nantinya menu akan menampilkan grafik penjualan, total transaksi bulanan, serta statistik performa harian..." class="w-full px-3 py-2 bg-slate-50 border border-brand-100 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-brand-500 focus:bg-white transition-all resize-none"></textarea>
-				</div>
-				<div class="flex items-center justify-end gap-2 pt-2 border-t border-brand-100">
-					<button type="button" onclick="closeModal('taskModal')" class="px-4 py-2 rounded-lg text-xs font-semibold text-slate-600 hover:bg-slate-100 transition-all">
-						Batal
-					</button>
-					<button type="submit" class="px-4 py-2 rounded-lg text-xs font-semibold bg-brand-600 hover:bg-brand-700 text-white shadow-sm shadow-brand-500/20 transition-all">
-						Simpan Task
-					</button>
-				</div>
-			</form>
-		</div>
-	</div>
-
-	<script is:inline>
-		const Ghostoast = {
-			container: null,
-			init() {
-				if (!this.container) {
-					this.container = document.createElement('div');
-					this.container.id = 'ghostoastContainer';
-					this.container.className = 'fixed bottom-6 right-6 z-50 flex flex-col gap-3 max-w-sm w-full pointer-events-none px-4 sm:px-0';
-					document.body.appendChild(this.container);
-				}
-			},
-			show({ type = 'info', title = '', message = '', duration = 3500 }) {
-				this.init();
-				const toast = document.createElement('div');
-				toast.className = 'pointer-events-auto transform translate-y-4 opacity-0 transition-all duration-300 ease-out bg-slate-900/90 text-white backdrop-blur-xl border border-slate-700/60 p-4 rounded-2xl shadow-2xl flex items-start gap-3.5 relative overflow-hidden group';
-
-				const icons = {
-					success: { icon: 'fa-circle-check', color: 'text-emerald-400 bg-emerald-500/10 border-emerald-500/30' },
-					error: { icon: 'fa-circle-xmark', color: 'text-rose-400 bg-rose-500/10 border-rose-500/30' },
-					info: { icon: 'fa-circle-info', color: 'text-sky-400 bg-sky-500/10 border-sky-500/30' },
-					warning: { icon: 'fa-triangle-exclamation', color: 'text-amber-400 bg-amber-500/10 border-amber-500/30' }
-				};
-
-				const config = icons[type] || icons.info;
-
-				toast.innerHTML = `
+        toast.innerHTML = `
 					<div class="w-9 h-9 rounded-xl ${config.color} border flex items-center justify-center shrink-0 text-base shadow-sm">
 						<i class="fa-solid ${config.icon}"></i>
 					</div>
 					<div class="flex-1 min-w-0 pr-2">
-						${title ? `<h4 class="font-bold text-xs text-slate-100 mb-0.5 tracking-tight">${escapeHtml(title)}</h4>` : ''}
+						${title ? `<h4 class="font-bold text-xs text-slate-100 mb-0.5 tracking-tight">${escapeHtml(title)}</h4>` : ""}
 						<p class="text-xs text-slate-300 leading-relaxed font-normal">${escapeHtml(message)}</p>
 					</div>
 					<button onclick="Ghostoast.dismiss(this.parentElement)" class="text-slate-400 hover:text-white transition-colors p-1 rounded-lg hover:bg-slate-800">
 						<i class="fa-solid fa-xmark text-xs"></i>
 					</button>
 					<div class="absolute bottom-0 left-0 right-0 h-0.5 bg-slate-800">
-						<div class="h-full ${type === 'success' ? 'bg-emerald-400' : type === 'error' ? 'bg-rose-400' : type === 'warning' ? 'bg-amber-400' : 'bg-sky-400'}" style="animation: ghostoastProgress ${duration}ms linear forwards"></div>
+						<div class="h-full ${type === "success" ? "bg-emerald-400" : type === "error" ? "bg-rose-400" : type === "warning" ? "bg-amber-400" : "bg-sky-400"}" style="animation: ghostoastProgress ${duration}ms linear forwards"></div>
 					</div>
 				`;
 
-				this.container.appendChild(toast);
+        this.container.appendChild(toast);
 
-				requestAnimationFrame(() => {
-					toast.classList.remove('translate-y-4', 'opacity-0');
-					toast.classList.add('translate-y-0', 'opacity-100');
-				});
+        requestAnimationFrame(() => {
+          toast.classList.remove("translate-y-4", "opacity-0");
+          toast.classList.add("translate-y-0", "opacity-100");
+        });
 
-				const timer = setTimeout(() => {
-					this.dismiss(toast);
-				}, duration);
+        const timer = setTimeout(() => {
+          this.dismiss(toast);
+        }, duration);
 
-				toast.dataset.timer = timer;
-			},
-			dismiss(toast) {
-				if (!toast || toast.classList.contains('dismissing')) return;
-				toast.classList.add('dismissing');
-				if (toast.dataset.timer) clearTimeout(parseInt(toast.dataset.timer));
-				toast.classList.remove('translate-y-0', 'opacity-100');
-				toast.classList.add('translate-y-2', 'opacity-0', 'scale-95');
-				setTimeout(() => {
-					if (toast.parentElement) toast.parentElement.removeChild(toast);
-				}, 300);
-			},
-			success(message, title = 'Berhasil') {
-				this.show({ type: 'success', title, message });
-			},
-			error(message, title = 'Gagal') {
-				this.show({ type: 'error', title, message });
-			},
-			info(message, title = 'Informasi') {
-				this.show({ type: 'info', title, message });
-			},
-			warning(message, title = 'Peringatan') {
-				this.show({ type: 'warning', title, message });
-			},
-			confirm({ title = 'Konfirmasi Hapus', message = 'Apakah Anda yakin ingin menghapus data ini?', confirmText = 'Ya, Hapus', onConfirm }) {
-				let confirmModal = document.getElementById('ghostoastConfirmModal');
-				if (!confirmModal) {
-					confirmModal = document.createElement('div');
-					confirmModal.id = 'ghostoastConfirmModal';
-					confirmModal.className = 'fixed inset-0 bg-brand-950/40 z-50 flex items-center justify-center p-4 hidden backdrop-blur-sm transition-opacity duration-200';
-					confirmModal.innerHTML = `
+        toast.dataset.timer = timer;
+      },
+      dismiss(toast) {
+        if (!toast || toast.classList.contains("dismissing")) return;
+        toast.classList.add("dismissing");
+        if (toast.dataset.timer) clearTimeout(parseInt(toast.dataset.timer));
+        toast.classList.remove("translate-y-0", "opacity-100");
+        toast.classList.add("translate-y-2", "opacity-0", "scale-95");
+        setTimeout(() => {
+          if (toast.parentElement) toast.parentElement.removeChild(toast);
+        }, 300);
+      },
+      success(message, title = "Berhasil") {
+        this.show({ type: "success", title, message });
+      },
+      error(message, title = "Gagal") {
+        this.show({ type: "error", title, message });
+      },
+      info(message, title = "Informasi") {
+        this.show({ type: "info", title, message });
+      },
+      warning(message, title = "Peringatan") {
+        this.show({ type: "warning", title, message });
+      },
+      confirm({
+        title = "Konfirmasi Hapus",
+        message = "Apakah Anda yakin ingin menghapus data ini?",
+        confirmText = "Ya, Hapus",
+        onConfirm,
+      }) {
+        let confirmModal = document.getElementById("ghostoastConfirmModal");
+        if (!confirmModal) {
+          confirmModal = document.createElement("div");
+          confirmModal.id = "ghostoastConfirmModal";
+          confirmModal.className =
+            "fixed inset-0 bg-brand-950/40 z-50 flex items-center justify-center p-4 hidden backdrop-blur-sm transition-opacity duration-200";
+          confirmModal.innerHTML = `
 						<div class="bg-white rounded-2xl border border-brand-100 shadow-2xl w-full max-w-sm overflow-hidden transform transition-all p-6 text-center space-y-4">
 							<div class="w-14 h-14 rounded-2xl bg-rose-50 border border-rose-100 text-rose-500 flex items-center justify-center text-2xl mx-auto shadow-xs">
 								<i class="fa-solid fa-triangle-exclamation"></i>
@@ -441,356 +756,397 @@ import Layout from '../layouts/Layout.astro';
 							</div>
 						</div>
 					`;
-					document.body.appendChild(confirmModal);
-				}
+          document.body.appendChild(confirmModal);
+        }
 
-				document.getElementById('confirmModalTitle').innerText = title;
-				document.getElementById('confirmModalMessage').innerText = message;
-				document.getElementById('confirmModalActionText').innerText = confirmText;
+        document.getElementById("confirmModalTitle").innerText = title;
+        document.getElementById("confirmModalMessage").innerText = message;
+        document.getElementById("confirmModalActionText").innerText =
+          confirmText;
 
-				const cancelBtn = document.getElementById('confirmModalCancelBtn');
-				const actionBtn = document.getElementById('confirmModalActionBtn');
+        const cancelBtn = document.getElementById("confirmModalCancelBtn");
+        const actionBtn = document.getElementById("confirmModalActionBtn");
 
-				const close = () => {
-					confirmModal.classList.add('hidden');
-				};
+        const close = () => {
+          confirmModal.classList.add("hidden");
+        };
 
-				cancelBtn.onclick = () => close();
+        cancelBtn.onclick = () => close();
 
-				actionBtn.onclick = async () => {
-					close();
-					if (onConfirm) await onConfirm();
-				};
+        actionBtn.onclick = async () => {
+          close();
+          if (onConfirm) await onConfirm();
+        };
 
-				confirmModal.classList.remove('hidden');
-			}
-		};
+        confirmModal.classList.remove("hidden");
+      },
+    };
 
-		let projects = [];
-		let activeProjectId = null;
-		let currentFilter = 'all';
-		let currentTaskFilter = 'all';
-		let searchQuery = '';
+    let projects = [];
+    let activeProjectId = null;
+    let currentFilter = "all";
+    let currentTaskFilter = "all";
+    let searchQuery = "";
 
-		document.addEventListener('DOMContentLoaded', () => {
-			fetchProjects();
-		});
+    document.addEventListener("DOMContentLoaded", () => {
+      fetchProjects();
+    });
 
-		async function fetchProjects() {
-			try {
-				const res = await fetch('/api/projects');
-				projects = await res.json();
-				renderDashboard();
-			} catch (err) {
-				console.error('Gagal mengambil data projek:', err);
-			}
-		}
+    async function fetchProjects() {
+      try {
+        const res = await fetch("/api/projects");
+        projects = await res.json();
+        renderDashboard();
+      } catch (err) {
+        console.error("Gagal mengambil data projek:", err);
+      }
+    }
 
-		async function api(url, options = {}) {
-			const res = await fetch(url, {
-				headers: { 'Content-Type': 'application/json' },
-				...options,
-			});
-			const data = await res.json();
-			if (!res.ok) throw new Error(data.error || 'Request failed');
-			return data;
-		}
+    async function api(url, options = {}) {
+      const res = await fetch(url, {
+        headers: { "Content-Type": "application/json" },
+        ...options,
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Request failed");
+      return data;
+    }
 
-		function toggleSidebar() {
-			const sidebar = document.getElementById('sidebar');
-			const overlay = document.getElementById('sidebarOverlay');
-			sidebar.classList.toggle('-translate-x-full');
-			overlay.classList.toggle('hidden');
-		}
+    function toggleSidebar() {
+      const sidebar = document.getElementById("sidebar");
+      const overlay = document.getElementById("sidebarOverlay");
+      sidebar.classList.toggle("-translate-x-full");
+      overlay.classList.toggle("hidden");
+    }
 
-		function openModal(modalId) {
-			document.getElementById(modalId).classList.remove('hidden');
-		}
+    function openModal(modalId) {
+      document.getElementById(modalId).classList.remove("hidden");
+    }
 
-		function closeModal(modalId) {
-			document.getElementById(modalId).classList.add('hidden');
-			if (modalId === 'projectModal') document.getElementById('projectForm').reset();
-			if (modalId === 'taskModal') document.getElementById('taskForm').reset();
-		}
+    function closeModal(modalId) {
+      document.getElementById(modalId).classList.add("hidden");
+      if (modalId === "projectModal")
+        document.getElementById("projectForm").reset();
+      if (modalId === "taskModal") document.getElementById("taskForm").reset();
+    }
 
-		function showDashboardView() {
-			activeProjectId = null;
-			const main = document.getElementById('mainContent');
-			main.className = 'flex-1 p-4 md:p-6 overflow-hidden flex flex-col min-h-0 space-y-4';
-			const stats = document.getElementById('statsOverview');
-			if (stats) stats.style.display = 'grid';
-			const listView = document.getElementById('listView');
-			listView.style.display = 'flex';
-			listView.className = 'flex-1 min-h-0 flex flex-col space-y-4 overflow-hidden';
-			document.getElementById('detailView').classList.remove('active-view');
-			document.getElementById('viewTitle').innerText = 'Daftar Projek Utama';
-			document.getElementById('mainActionBtn').onclick = () => openModal('projectModal');
-			document.getElementById('mainActionBtn').querySelector('span').innerText = 'Projek Baru';
-			renderDashboard();
-		}
+    function showDashboardView() {
+      activeProjectId = null;
+      const main = document.getElementById("mainContent");
+      main.className =
+        "flex-1 p-4 md:p-6 overflow-hidden flex flex-col min-h-0 space-y-4";
+      const stats = document.getElementById("statsOverview");
+      if (stats) stats.style.display = "grid";
+      const listView = document.getElementById("listView");
+      listView.style.display = "flex";
+      listView.className =
+        "flex-1 min-h-0 flex flex-col space-y-4 overflow-hidden";
+      document.getElementById("detailView").classList.remove("active-view");
+      document.getElementById("viewTitle").innerText = "Daftar Projek Utama";
+      document.getElementById("mainActionBtn").onclick = () =>
+        openModal("projectModal");
+      document.getElementById("mainActionBtn").querySelector("span").innerText =
+        "Projek Baru";
+      renderDashboard();
+    }
 
-		function showProjectDetailView(id) {
-			activeProjectId = id;
-			const main = document.getElementById('mainContent');
-			main.className = 'flex-1 p-4 md:p-6 overflow-hidden flex flex-col min-h-0 space-y-4';
-			const stats = document.getElementById('statsOverview');
-			if (stats) stats.style.display = 'none';
-			document.getElementById('listView').style.display = 'none';
-			const detailView = document.getElementById('detailView');
-			detailView.classList.add('active-view');
-			detailView.className = 'task-detail-view active-view flex-col flex-1 min-h-0 space-y-4 overflow-hidden';
-			document.getElementById('viewTitle').innerText = 'Detail Task Projek';
-			document.getElementById('mainActionBtn').onclick = () => openModal('taskModal');
-			document.getElementById('mainActionBtn').querySelector('span').innerText = 'Tambah Task';
+    function showProjectDetailView(id) {
+      activeProjectId = id;
+      const main = document.getElementById("mainContent");
+      main.className =
+        "flex-1 p-4 md:p-6 overflow-hidden flex flex-col min-h-0 space-y-4";
+      const stats = document.getElementById("statsOverview");
+      if (stats) stats.style.display = "none";
+      document.getElementById("listView").style.display = "none";
+      const detailView = document.getElementById("detailView");
+      detailView.classList.add("active-view");
+      detailView.className =
+        "task-detail-view active-view flex-col flex-1 min-h-0 space-y-4 overflow-hidden";
+      document.getElementById("viewTitle").innerText = "Detail Task Projek";
+      document.getElementById("mainActionBtn").onclick = () =>
+        openModal("taskModal");
+      document.getElementById("mainActionBtn").querySelector("span").innerText =
+        "Tambah Task";
 
-			const project = projects.find(p => p.id === id);
-			if (project) {
-				const bcTitle = document.getElementById('breadcrumbProjectTitle');
-				if (bcTitle) bcTitle.innerText = project.title;
-			}
-			renderDashboard();
-		}
+      const project = projects.find((p) => p.id === id);
+      if (project) {
+        const bcTitle = document.getElementById("breadcrumbProjectTitle");
+        if (bcTitle) bcTitle.innerText = project.title;
+      }
+      renderDashboard();
+    }
 
-		// Project CRUD
-		async function saveProject(e) {
-			e.preventDefault();
-			const title = document.getElementById('projectTitle').value.trim();
-			const category = document.getElementById('projectCategory').value.trim() || 'Umum';
-			const description = document.getElementById('projectDesc').value.trim();
+    // Project CRUD
+    async function saveProject(e) {
+      e.preventDefault();
+      const title = document.getElementById("projectTitle").value.trim();
+      const category =
+        document.getElementById("projectCategory").value.trim() || "Umum";
+      const description = document.getElementById("projectDesc").value.trim();
 
-			if (!title) return;
+      if (!title) return;
 
-			try {
-				const project = await api('/api/projects', {
-					method: 'POST',
-					body: JSON.stringify({ title, category, description }),
-				});
-				projects.unshift(project);
-				closeModal('projectModal');
-				Ghostoast.success(`Projek "${title}" berhasil dibuat.`, 'Projek Disimpan');
-				showProjectDetailView(project.id);
-			} catch (err) {
-				console.error('Gagal menyimpan projek:', err);
-				Ghostoast.error('Gagal menyimpan projek baru.', 'Terjadi Kesalahan');
-			}
-		}
+      try {
+        const project = await api("/api/projects", {
+          method: "POST",
+          body: JSON.stringify({ title, category, description }),
+        });
+        projects.unshift(project);
+        closeModal("projectModal");
+        Ghostoast.success(
+          `Projek "${title}" berhasil dibuat.`,
+          "Projek Disimpan",
+        );
+        showProjectDetailView(project.id);
+      } catch (err) {
+        console.error("Gagal menyimpan projek:", err);
+        Ghostoast.error("Gagal menyimpan projek baru.", "Terjadi Kesalahan");
+      }
+    }
 
-		async function deleteProject(projectId, event) {
-			if (event) event.stopPropagation();
-			const project = projects.find(p => p.id === projectId);
-			const title = project ? `Hapus Projek "${project.title}"?` : 'Hapus Projek Ini?';
+    async function deleteProject(projectId, event) {
+      if (event) event.stopPropagation();
+      const project = projects.find((p) => p.id === projectId);
+      const title = project
+        ? `Hapus Projek "${project.title}"?`
+        : "Hapus Projek Ini?";
 
-			Ghostoast.confirm({
-				title: title,
-				message: 'Projek ini beserta seluruh sub-task di dalamnya akan dihapus secara permanen.',
-				confirmText: 'Ya, Hapus Projek',
-				onConfirm: async () => {
-					try {
-						await api(`/api/projects/${projectId}`, { method: 'DELETE' });
-						projects = projects.filter(p => p.id !== projectId);
-						Ghostoast.success('Projek beserta seluruh tasknya telah dihapus.', 'Projek Dihapus');
-						if (activeProjectId === projectId) {
-							showDashboardView();
-						} else {
-							renderDashboard();
-						}
-					} catch (err) {
-						console.error('Gagal menghapus projek:', err);
-						Ghostoast.error('Gagal menghapus projek.', 'Terjadi Kesalahan');
-					}
-				}
-			});
-		}
+      Ghostoast.confirm({
+        title: title,
+        message:
+          "Projek ini beserta seluruh sub-task di dalamnya akan dihapus secara permanen.",
+        confirmText: "Ya, Hapus Projek",
+        onConfirm: async () => {
+          try {
+            await api(`/api/projects/${projectId}`, { method: "DELETE" });
+            projects = projects.filter((p) => p.id !== projectId);
+            Ghostoast.success(
+              "Projek beserta seluruh tasknya telah dihapus.",
+              "Projek Dihapus",
+            );
+            if (activeProjectId === projectId) {
+              showDashboardView();
+            } else {
+              renderDashboard();
+            }
+          } catch (err) {
+            console.error("Gagal menghapus projek:", err);
+            Ghostoast.error("Gagal menghapus projek.", "Terjadi Kesalahan");
+          }
+        },
+      });
+    }
 
-		function deleteActiveProject() {
-			if (activeProjectId) {
-				deleteProject(activeProjectId, null);
-			}
-		}
+    function deleteActiveProject() {
+      if (activeProjectId) {
+        deleteProject(activeProjectId, null);
+      }
+    }
 
-		// Task CRUD
-		async function saveTask(e) {
-			e.preventDefault();
-			if (!activeProjectId) return;
+    // Task CRUD
+    async function saveTask(e) {
+      e.preventDefault();
+      if (!activeProjectId) return;
 
-			const title = document.getElementById('taskTitle').value.trim();
-			const description = document.getElementById('taskDesc').value.trim();
-			if (!title) return;
+      const title = document.getElementById("taskTitle").value.trim();
+      const description = document.getElementById("taskDesc").value.trim();
+      if (!title) return;
 
-			try {
-				const task = await api(`/api/projects/${activeProjectId}/tasks`, {
-					method: 'POST',
-					body: JSON.stringify({ title, description }),
-				});
-				const project = projects.find(p => p.id === activeProjectId);
-				if (project) project.tasks.push(task);
-				closeModal('taskModal');
-				Ghostoast.success(`Task "${title}" berhasil ditambahkan.`, 'Task Dibuat');
-				renderDashboard();
-			} catch (err) {
-				console.error('Gagal menyimpan task:', err);
-				Ghostoast.error('Gagal menyimpan task baru.', 'Terjadi Kesalahan');
-			}
-		}
+      try {
+        const task = await api(`/api/projects/${activeProjectId}/tasks`, {
+          method: "POST",
+          body: JSON.stringify({ title, description }),
+        });
+        const project = projects.find((p) => p.id === activeProjectId);
+        if (project) project.tasks.push(task);
+        closeModal("taskModal");
+        Ghostoast.success(
+          `Task "${title}" berhasil ditambahkan.`,
+          "Task Dibuat",
+        );
+        renderDashboard();
+      } catch (err) {
+        console.error("Gagal menyimpan task:", err);
+        Ghostoast.error("Gagal menyimpan task baru.", "Terjadi Kesalahan");
+      }
+    }
 
-		async function toggleTask(projectId, taskId) {
-			const project = projects.find(p => p.id === projectId);
-			if (!project) return;
-			const task = project.tasks.find(t => t.id === taskId);
-			if (!task) return;
+    async function toggleTask(projectId, taskId) {
+      const project = projects.find((p) => p.id === projectId);
+      if (!project) return;
+      const task = project.tasks.find((t) => t.id === taskId);
+      if (!task) return;
 
-			try {
-				const updated = await api(`/api/tasks/${taskId}`, {
-					method: 'PUT',
-					body: JSON.stringify({ completed: !task.completed }),
-				});
-				task.completed = updated.completed;
-				if (updated.completed) {
-					Ghostoast.success(`Task "${task.title}" telah selesai! 🎉`, 'Task Selesai');
-				} else {
-					Ghostoast.info(`Status task "${task.title}" dikembalikan.`, 'Status Diperbarui');
-				}
-				renderDashboard();
-			} catch (err) {
-				console.error('Gagal mengupdate task:', err);
-				Ghostoast.error('Gagal mengupdate status task.', 'Terjadi Kesalahan');
-			}
-		}
+      try {
+        const updated = await api(`/api/tasks/${taskId}`, {
+          method: "PUT",
+          body: JSON.stringify({ completed: !task.completed }),
+        });
+        task.completed = updated.completed;
+        if (updated.completed) {
+          Ghostoast.success(
+            `Task "${task.title}" telah selesai! 🎉`,
+            "Task Selesai",
+          );
+        } else {
+          Ghostoast.info(
+            `Status task "${task.title}" dikembalikan.`,
+            "Status Diperbarui",
+          );
+        }
+        renderDashboard();
+      } catch (err) {
+        console.error("Gagal mengupdate task:", err);
+        Ghostoast.error("Gagal mengupdate status task.", "Terjadi Kesalahan");
+      }
+    }
 
-		async function deleteTask(projectId, taskId) {
-			const project = projects.find(p => p.id === projectId);
-			if (!project) return;
-			const task = project.tasks.find(t => t.id === taskId);
-			const title = task ? `Hapus Task "${task.title}"?` : 'Hapus Task Ini?';
+    async function deleteTask(projectId, taskId) {
+      const project = projects.find((p) => p.id === projectId);
+      if (!project) return;
+      const task = project.tasks.find((t) => t.id === taskId);
+      const title = task ? `Hapus Task "${task.title}"?` : "Hapus Task Ini?";
 
-			Ghostoast.confirm({
-				title: title,
-				message: 'Task ini akan dihapus secara permanen dari daftar projek.',
-				confirmText: 'Ya, Hapus Task',
-				onConfirm: async () => {
-					try {
-						await api(`/api/tasks/${taskId}`, { method: 'DELETE' });
-						project.tasks = project.tasks.filter(t => t.id !== taskId);
-						Ghostoast.info('Task berhasil dihapus.', 'Task Dihapus');
-						renderDashboard();
-					} catch (err) {
-						console.error('Gagal menghapus task:', err);
-						Ghostoast.error('Gagal menghapus task.', 'Terjadi Kesalahan');
-					}
-				}
-			});
-		}
+      Ghostoast.confirm({
+        title: title,
+        message: "Task ini akan dihapus secara permanen dari daftar projek.",
+        confirmText: "Ya, Hapus Task",
+        onConfirm: async () => {
+          try {
+            await api(`/api/tasks/${taskId}`, { method: "DELETE" });
+            project.tasks = project.tasks.filter((t) => t.id !== taskId);
+            Ghostoast.info("Task berhasil dihapus.", "Task Dihapus");
+            renderDashboard();
+          } catch (err) {
+            console.error("Gagal menghapus task:", err);
+            Ghostoast.error("Gagal menghapus task.", "Terjadi Kesalahan");
+          }
+        },
+      });
+    }
 
-		function setFilter(filter) {
-			currentFilter = filter;
-			document.querySelectorAll('.filter-btn').forEach(btn => {
-				btn.classList.remove('bg-brand-600', 'text-white');
-				btn.classList.add('text-slate-600');
-			});
-			const activeBtn = document.getElementById(`filter-${filter}`);
-			if (activeBtn) {
-				activeBtn.classList.add('bg-brand-600', 'text-white');
-				activeBtn.classList.remove('text-slate-600');
-			}
-			renderDashboard();
-		}
+    function setFilter(filter) {
+      currentFilter = filter;
+      document.querySelectorAll(".filter-btn").forEach((btn) => {
+        btn.classList.remove("bg-brand-600", "text-white");
+        btn.classList.add("text-slate-600");
+      });
+      const activeBtn = document.getElementById(`filter-${filter}`);
+      if (activeBtn) {
+        activeBtn.classList.add("bg-brand-600", "text-white");
+        activeBtn.classList.remove("text-slate-600");
+      }
+      renderDashboard();
+    }
 
-		function setTaskFilter(filter) {
-			currentTaskFilter = filter;
-			['all', 'active', 'completed'].forEach(f => {
-				const btn = document.getElementById(`taskFilter-${f}`);
-				if (f === filter) {
-					btn.className = 'px-3 py-1 rounded-md font-semibold bg-brand-600 text-white';
-				} else {
-					btn.className = 'px-3 py-1 rounded-md text-slate-600 hover:text-brand-600 font-medium';
-				}
-			});
-			renderDashboard();
-		}
+    function setTaskFilter(filter) {
+      currentTaskFilter = filter;
+      ["all", "active", "completed"].forEach((f) => {
+        const btn = document.getElementById(`taskFilter-${f}`);
+        if (f === filter) {
+          btn.className =
+            "px-3 py-1 rounded-md font-semibold bg-brand-600 text-white";
+        } else {
+          btn.className =
+            "px-3 py-1 rounded-md text-slate-600 hover:text-brand-600 font-medium";
+        }
+      });
+      renderDashboard();
+    }
 
-		function handleSearch() {
-			searchQuery = document.getElementById('searchInput').value.toLowerCase();
-			renderDashboard();
-		}
+    function handleSearch() {
+      searchQuery = document.getElementById("searchInput").value.toLowerCase();
+      renderDashboard();
+    }
 
-		function updateStats() {
-			const totalProjects = projects.length;
-			let totalTasks = 0;
-			let completedTasks = 0;
-			let totalPercentageSum = 0;
+    function updateStats() {
+      const totalProjects = projects.length;
+      let totalTasks = 0;
+      let completedTasks = 0;
+      let totalPercentageSum = 0;
 
-			projects.forEach(p => {
-				const pTotal = p.tasks.length;
-				const pCompleted = p.tasks.filter(t => t.completed).length;
-				totalTasks += pTotal;
-				completedTasks += pCompleted;
-				const pProgress = pTotal > 0 ? (pCompleted / pTotal) * 100 : 0;
-				totalPercentageSum += pProgress;
-			});
+      projects.forEach((p) => {
+        const pTotal = p.tasks.length;
+        const pCompleted = p.tasks.filter((t) => t.completed).length;
+        totalTasks += pTotal;
+        completedTasks += pCompleted;
+        const pProgress = pTotal > 0 ? (pCompleted / pTotal) * 100 : 0;
+        totalPercentageSum += pProgress;
+      });
 
-			const avgProgress = totalProjects > 0 ? Math.round(totalPercentageSum / totalProjects) : 0;
+      const avgProgress =
+        totalProjects > 0 ? Math.round(totalPercentageSum / totalProjects) : 0;
 
-			document.getElementById('statTotalProjects').innerText = totalProjects;
-			document.getElementById('statTotalTasks').innerText = totalTasks;
-			document.getElementById('statCompletedTasks').innerText = completedTasks;
-			document.getElementById('statAvgProgress').innerText = avgProgress + '%';
-		}
+      document.getElementById("statTotalProjects").innerText = totalProjects;
+      document.getElementById("statTotalTasks").innerText = totalTasks;
+      document.getElementById("statCompletedTasks").innerText = completedTasks;
+      document.getElementById("statAvgProgress").innerText = avgProgress + "%";
+    }
 
-		function renderDashboard() {
-			updateStats();
-			if (activeProjectId) {
-				renderTaskDetailView();
-			} else {
-				renderProjectsTableView();
-			}
-		}
+    function renderDashboard() {
+      updateStats();
+      if (activeProjectId) {
+        renderTaskDetailView();
+      } else {
+        renderProjectsTableView();
+      }
+    }
 
-		function renderProjectsTableView() {
-			const tbody = document.getElementById('projectsTableBody');
-			const emptyState = document.getElementById('tableEmptyState');
-			tbody.innerHTML = '';
+    function renderProjectsTableView() {
+      const tbody = document.getElementById("projectsTableBody");
+      const emptyState = document.getElementById("tableEmptyState");
+      tbody.innerHTML = "";
 
-			let filtered = projects.filter(p => {
-				const total = p.tasks.length;
-				const completed = p.tasks.filter(t => t.completed).length;
-				const isCompleted = total > 0 && completed === total;
+      let filtered = projects.filter((p) => {
+        const total = p.tasks.length;
+        const completed = p.tasks.filter((t) => t.completed).length;
+        const isCompleted = total > 0 && completed === total;
 
-				if (currentFilter === 'in-progress' && isCompleted) return false;
-				if (currentFilter === 'completed' && !isCompleted) return false;
+        if (currentFilter === "in-progress" && isCompleted) return false;
+        if (currentFilter === "completed" && !isCompleted) return false;
 
-				if (searchQuery) {
-					const matchTitle = p.title.toLowerCase().includes(searchQuery);
-					const matchCategory = p.category.toLowerCase().includes(searchQuery);
-					const matchDesc = p.description.toLowerCase().includes(searchQuery);
-					const matchTask = p.tasks.some(t => t.title.toLowerCase().includes(searchQuery) || t.description.toLowerCase().includes(searchQuery));
-					return matchTitle || matchCategory || matchDesc || matchTask;
-				}
+        if (searchQuery) {
+          const matchTitle = p.title.toLowerCase().includes(searchQuery);
+          const matchCategory = p.category.toLowerCase().includes(searchQuery);
+          const matchDesc = p.description.toLowerCase().includes(searchQuery);
+          const matchTask = p.tasks.some(
+            (t) =>
+              t.title.toLowerCase().includes(searchQuery) ||
+              t.description.toLowerCase().includes(searchQuery),
+          );
+          return matchTitle || matchCategory || matchDesc || matchTask;
+        }
 
-				return true;
-			});
+        return true;
+      });
 
-			document.getElementById('projectCountLabel').innerText = `Menampilkan ${filtered.length} Projek`;
+      document.getElementById("projectCountLabel").innerText =
+        `Menampilkan ${filtered.length} Projek`;
 
-			if (filtered.length === 0) {
-				emptyState.classList.remove('hidden');
-				emptyState.classList.add('flex');
-			} else {
-				emptyState.classList.add('hidden');
-				emptyState.classList.remove('flex');
-			}
+      if (filtered.length === 0) {
+        emptyState.classList.remove("hidden");
+        emptyState.classList.add("flex");
+      } else {
+        emptyState.classList.add("hidden");
+        emptyState.classList.remove("flex");
+      }
 
-			filtered.forEach((p, index) => {
-				const totalTasks = p.tasks.length;
-				const completedTasks = p.tasks.filter(t => t.completed).length;
-				const progress = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
-				const isCompleted = totalTasks > 0 && completedTasks === totalTasks;
+      filtered.forEach((p, index) => {
+        const totalTasks = p.tasks.length;
+        const completedTasks = p.tasks.filter((t) => t.completed).length;
+        const progress =
+          totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
+        const isCompleted = totalTasks > 0 && completedTasks === totalTasks;
 
-				const tr = document.createElement('tr');
-				const bgRow = index % 2 === 0 ? 'bg-slate-50/80 hover:bg-brand-100/50' : 'bg-white hover:bg-brand-50/60';
-				tr.className = `${bgRow} cursor-pointer transition-colors group`;
-				tr.onclick = () => showProjectDetailView(p.id);
+        const tr = document.createElement("tr");
+        const bgRow =
+          index % 2 === 0
+            ? "bg-slate-50/80 hover:bg-brand-100/50"
+            : "bg-white hover:bg-brand-50/60";
+        tr.className = `${bgRow} cursor-pointer transition-colors group`;
+        tr.onclick = () => showProjectDetailView(p.id);
 
-				tr.innerHTML = `
+        tr.innerHTML = `
 					<td class="px-6 py-4">
 						<div class="font-bold text-brand-950 text-sm group-hover:text-brand-600 transition-colors">
 							${escapeHtml(p.title)}
@@ -816,14 +1172,15 @@ import Layout from '../layouts/Layout.astro';
 						</div>
 					</td>
 					<td class="px-6 py-4 whitespace-nowrap">
-						${isCompleted ? 
-							`<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-brand-100 text-brand-800 border border-brand-200">
+						${
+              isCompleted
+                ? `<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-brand-100 text-brand-800 border border-brand-200">
 								<i class="fa-solid fa-check text-[9px]"></i> Selesai
-							 </span>` :
-							`<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-600 border border-slate-200">
+							 </span>`
+                : `<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-600 border border-slate-200">
 								<i class="fa-solid fa-spinner text-[9px] animate-spin"></i> Sedang Berjalan
 							 </span>`
-						}
+            }
 					</td>
 					<td class="px-6 py-4 whitespace-nowrap text-center">
 						<div class="flex items-center justify-center gap-2">
@@ -838,112 +1195,126 @@ import Layout from '../layouts/Layout.astro';
 					</td>
 				`;
 
-				tbody.appendChild(tr);
-			});
-		}
+        tbody.appendChild(tr);
+      });
+    }
 
-		async function quickAddTask(e) {
-			e.preventDefault();
-			if (!activeProjectId) return;
-			const input = document.getElementById('quickTaskInput');
-			const title = input ? input.value.trim() : '';
-			if (!title) return;
+    async function quickAddTask(e) {
+      e.preventDefault();
+      if (!activeProjectId) return;
+      const input = document.getElementById("quickTaskInput");
+      const title = input ? input.value.trim() : "";
+      if (!title) return;
 
-			try {
-				const task = await api(`/api/projects/${activeProjectId}/tasks`, {
-					method: 'POST',
-					body: JSON.stringify({ title, description: '' }),
-				});
-				const project = projects.find(p => p.id === activeProjectId);
-				if (project) project.tasks.push(task);
-				if (input) input.value = '';
-				renderDashboard();
-			} catch (err) {
-				console.error('Gagal menyimpan task:', err);
-				alert('Gagal menyimpan task.');
-			}
-		}
+      try {
+        const task = await api(`/api/projects/${activeProjectId}/tasks`, {
+          method: "POST",
+          body: JSON.stringify({ title, description: "" }),
+        });
+        const project = projects.find((p) => p.id === activeProjectId);
+        if (project) project.tasks.push(task);
+        if (input) input.value = "";
+        renderDashboard();
+      } catch (err) {
+        console.error("Gagal menyimpan task:", err);
+        alert("Gagal menyimpan task.");
+      }
+    }
 
-		function renderTaskDetailView() {
-			const project = projects.find(p => p.id === activeProjectId);
-			if (!project) {
-				showDashboardView();
-				return;
-			}
+    function renderTaskDetailView() {
+      const project = projects.find((p) => p.id === activeProjectId);
+      if (!project) {
+        showDashboardView();
+        return;
+      }
 
-			const totalTasks = project.tasks.length;
-			const completedTasks = project.tasks.filter(t => t.completed).length;
-			const progress = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
-			const isCompleted = totalTasks > 0 && completedTasks === totalTasks;
+      const totalTasks = project.tasks.length;
+      const completedTasks = project.tasks.filter((t) => t.completed).length;
+      const progress =
+        totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
+      const isCompleted = totalTasks > 0 && completedTasks === totalTasks;
 
-			document.getElementById('detailProjectTitle').innerText = project.title;
-			document.getElementById('detailProjectCategory').innerText = project.category;
-			document.getElementById('detailProjectDesc').innerText = project.description || 'Tidak ada deskripsi projek.';
-			document.getElementById('detailProgressText').innerText = `${progress}% (${completedTasks}/${totalTasks})`;
-			document.getElementById('detailProgressBar').style.width = `${progress}%`;
-			
-			const taskCountElem = document.getElementById('detailTaskCountLabel');
-			if (taskCountElem) {
-				taskCountElem.innerText = `${completedTasks} dari ${totalTasks} task selesai`;
-			}
+      document.getElementById("detailProjectTitle").innerText = project.title;
+      document.getElementById("detailProjectCategory").innerText =
+        project.category;
+      document.getElementById("detailProjectDesc").innerText =
+        project.description || "Tidak ada deskripsi projek.";
+      document.getElementById("detailProgressText").innerText =
+        `${progress}% (${completedTasks}/${totalTasks})`;
+      document.getElementById("detailProgressBar").style.width = `${progress}%`;
 
-			const statusBadge = document.getElementById('detailProjectStatus');
-			if (isCompleted) {
-				statusBadge.innerText = 'Selesai';
-				statusBadge.className = 'px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-brand-100 text-brand-800 border border-brand-200';
-			} else {
-				statusBadge.innerText = 'Sedang Berjalan';
-				statusBadge.className = 'px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-slate-100 text-slate-600 border border-slate-200';
-			}
+      const taskCountElem = document.getElementById("detailTaskCountLabel");
+      if (taskCountElem) {
+        taskCountElem.innerText = `${completedTasks} dari ${totalTasks} task selesai`;
+      }
 
-			const container = document.getElementById('tasksListContainer');
-			const emptyState = document.getElementById('tasksEmptyState');
-			container.innerHTML = '';
+      const statusBadge = document.getElementById("detailProjectStatus");
+      if (isCompleted) {
+        statusBadge.innerText = "Selesai";
+        statusBadge.className =
+          "px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-brand-100 text-brand-800 border border-brand-200";
+      } else {
+        statusBadge.innerText = "Sedang Berjalan";
+        statusBadge.className =
+          "px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-slate-100 text-slate-600 border border-slate-200";
+      }
 
-			let filteredTasks = project.tasks.filter(t => {
-				if (currentTaskFilter === 'active' && t.completed) return false;
-				if (currentTaskFilter === 'completed' && !t.completed) return false;
-				if (searchQuery) {
-					const matchTitle = t.title.toLowerCase().includes(searchQuery);
-					const matchDesc = (t.description || '').toLowerCase().includes(searchQuery);
-					return matchTitle || matchDesc;
-				}
-				return true;
-			});
+      const container = document.getElementById("tasksListContainer");
+      const emptyState = document.getElementById("tasksEmptyState");
+      container.innerHTML = "";
 
-			if (filteredTasks.length === 0) {
-				emptyState.classList.remove('hidden');
-				emptyState.classList.add('flex');
-			} else {
-				emptyState.classList.add('hidden');
-				emptyState.classList.remove('flex');
-			}
+      let filteredTasks = project.tasks.filter((t) => {
+        if (currentTaskFilter === "active" && t.completed) return false;
+        if (currentTaskFilter === "completed" && !t.completed) return false;
+        if (searchQuery) {
+          const matchTitle = t.title.toLowerCase().includes(searchQuery);
+          const matchDesc = (t.description || "")
+            .toLowerCase()
+            .includes(searchQuery);
+          return matchTitle || matchDesc;
+        }
+        return true;
+      });
 
-			filteredTasks.forEach((task, index) => {
-				const item = document.createElement('div');
-				const bgTask = index % 2 === 0 ? 'bg-slate-50/80 hover:bg-brand-100/40' : 'bg-white hover:bg-brand-50/60';
-				item.className = `p-4 sm:px-6 ${bgTask} transition-colors flex items-start justify-between gap-4 group`;
+      if (filteredTasks.length === 0) {
+        emptyState.classList.remove("hidden");
+        emptyState.classList.add("flex");
+      } else {
+        emptyState.classList.add("hidden");
+        emptyState.classList.remove("flex");
+      }
 
-				item.innerHTML = `
+      filteredTasks.forEach((task, index) => {
+        const item = document.createElement("div");
+        const bgTask =
+          index % 2 === 0
+            ? "bg-slate-50/80 hover:bg-brand-100/40"
+            : "bg-white hover:bg-brand-50/60";
+        item.className = `p-4 sm:px-6 ${bgTask} transition-colors flex items-start justify-between gap-4 group`;
+
+        item.innerHTML = `
 					<div class="flex items-start gap-3.5 min-w-0 flex-1">
 						<label class="relative flex items-center pt-0.5 cursor-pointer">
-							<input type="checkbox" ${task.completed ? 'checked' : ''} onchange="toggleTask('${project.id}', '${task.id}')" class="w-4 h-4 rounded border-brand-300 text-brand-600 focus:ring-brand-500 cursor-pointer">
+							<input type="checkbox" ${task.completed ? "checked" : ""} onchange="toggleTask('${project.id}', '${task.id}')" class="w-4 h-4 rounded border-brand-300 text-brand-600 focus:ring-brand-500 cursor-pointer">
 						</label>
 						<div class="space-y-1 min-w-0 flex-1">
 							<div class="flex items-center gap-2 flex-wrap">
-								<h4 class="font-semibold text-xs sm:text-sm ${task.completed ? 'line-through text-slate-400 font-normal' : 'text-brand-950'}">
+								<h4 class="font-semibold text-xs sm:text-sm ${task.completed ? "line-through text-slate-400 font-normal" : "text-brand-950"}">
 									${escapeHtml(task.title)}
 								</h4>
-								${task.completed ? 
-									`<span class="px-2 py-0.5 rounded text-[9px] font-bold bg-emerald-50 text-emerald-600 border border-emerald-200">Selesai</span>` : 
-									`<span class="px-2 py-0.5 rounded text-[9px] font-bold bg-amber-50 text-amber-600 border border-amber-200">Belum Selesai</span>`
-								}
+								${
+                  task.completed
+                    ? `<span class="px-2 py-0.5 rounded text-[9px] font-bold bg-emerald-50 text-emerald-600 border border-emerald-200">Selesai</span>`
+                    : `<span class="px-2 py-0.5 rounded text-[9px] font-bold bg-amber-50 text-amber-600 border border-amber-200">Belum Selesai</span>`
+                }
 							</div>
-							${task.description ? 
-								`<p class="text-xs ${task.completed ? 'text-slate-400' : 'text-slate-600'} leading-relaxed">
+							${
+                task.description
+                  ? `<p class="text-xs ${task.completed ? "text-slate-400" : "text-slate-600"} leading-relaxed">
 									${escapeHtml(task.description)}
-								</p>` : ''
-							}
+								</p>`
+                  : ""
+              }
 						</div>
 					</div>
 					<div class="flex items-center gap-1 opacity-80 sm:opacity-0 group-hover:opacity-100 transition-opacity">
@@ -953,15 +1324,15 @@ import Layout from '../layouts/Layout.astro';
 					</div>
 				`;
 
-				container.appendChild(item);
-			});
-		}
+        container.appendChild(item);
+      });
+    }
 
-		function escapeHtml(text) {
-			if (!text) return '';
-			const div = document.createElement('div');
-			div.innerText = text;
-			return div.innerHTML;
-		}
-	</script>
+    function escapeHtml(text) {
+      if (!text) return "";
+      const div = document.createElement("div");
+      div.innerText = text;
+      return div.innerHTML;
+    }
+  </script>
 </Layout>
