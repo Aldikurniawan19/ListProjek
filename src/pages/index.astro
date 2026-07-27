@@ -643,9 +643,10 @@ import Layout from "../layouts/Layout.astro";
     </div>
   </div>
 
-    <script is:inline src="/src/lib/calendar.js"></script>
-  <script is:inline>
-    const Ghostoast = {
+    <script is:inline src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
+    <script type="module">
+    import { initCalendar } from '../lib/calendar.js';
+      const Ghostoast = {
       container: null,
       init() {
         if (!this.container) {
@@ -898,9 +899,7 @@ import Layout from "../layouts/Layout.astro";
       document.getElementById('navCalendarBtn').className = "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg bg-brand-50 text-brand-700 font-semibold text-sm transition-colors text-left";
       document.getElementById('navProjectBtn').className = "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 hover:bg-brand-50 hover:text-brand-700 font-medium text-sm transition-colors text-left";
       
-      if (typeof initCalendar === 'function') {
-        initCalendar([]);
-      }
+      initCalendar([]);
     }
 
     // Project CRUD
