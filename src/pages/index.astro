@@ -308,6 +308,178 @@ import Layout from "../layouts/Layout.astro";
         id="detailView"
         class="task-detail-view flex-col flex-1 min-h-0 space-y-4 overflow-hidden"
       >
+        <!-- Breadcrumb & Title -->
+        <div
+          class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-white p-3 rounded-xl border border-brand-100 shadow-sm shrink-0"
+        >
+          <div class="flex items-center gap-2 text-xs text-slate-500">
+            <button
+              onclick="showDashboardView()"
+              class="hover:text-brand-600 font-medium"
+            >
+              Semua Projek
+            </button>
+            <i class="fa-solid fa-chevron-right text-[10px]"></i>
+            <span
+              id="breadcrumbProjectTitle"
+              class="font-bold text-brand-700 truncate"
+            >
+              Nama Projek
+            </span>
+          </div>
+          <div class="flex items-center gap-2">
+            <button
+              onclick="deleteActiveProject()"
+              class="px-3 py-1.5 rounded-lg text-xs font-semibold text-rose-600 bg-rose-50 hover:bg-rose-100 transition-all border border-rose-100"
+            >
+              <i class="fa-regular fa-trash-can mr-1.5"></i> Hapus Projek
+            </button>
+          </div>
+        </div>
+
+        <!-- Project Header -->
+        <div
+          class="bg-white rounded-2xl border border-brand-100 shadow-sm overflow-hidden p-6 shrink-0"
+        >
+          <div class="flex flex-col sm:flex-row gap-6">
+            <div class="flex-1">
+              <div class="flex items-start justify-between">
+                <div>
+                  <div class="flex items-center gap-3">
+                    <h2
+                      id="detailProjectTitle"
+                      class="text-xl font-bold text-brand-950"
+                    >
+                      Loading...
+                    </h2>
+                    <span
+                      id="detailProjectStatus"
+                      class="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-slate-100 text-slate-600 border border-slate-200"
+                    >
+                      ...
+                    </span>
+                  </div>
+                  <p
+                    id="detailProjectCategory"
+                    class="text-xs font-bold text-brand-600 mt-1"
+                  >
+                    ...
+                  </p>
+                </div>
+              </div>
+              <p
+                id="detailProjectDesc"
+                class="text-xs text-slate-600 mt-3 leading-relaxed"
+              >
+                ...
+              </p>
+            </div>
+            <div class="w-full sm:w-56 space-y-3">
+              <div class="space-y-1">
+                <div class="flex justify-between items-center">
+                  <span class="text-xs font-semibold text-slate-700"
+                    >Progres Projek</span
+                  >
+                  <span
+                    id="detailProgressText"
+                    class="text-xs font-bold text-brand-700"
+                  >
+                    0%
+                  </span>
+                </div>
+                <div
+                  class="w-full bg-slate-100 h-3 rounded-full overflow-hidden border border-slate-200"
+                >
+                  <div
+                    id="detailProgressBar"
+                    class="bg-emerald-500 h-full rounded-full transition-all duration-300"
+                    style="width: 0%"
+                  >
+                  </div>
+                </div>
+              </div>
+              <p
+                id="detailTaskCountLabel"
+                class="text-[11px] text-slate-500 font-medium text-center"
+              >
+                Memuat task...
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tasks List -->
+        <div
+          class="bg-white rounded-2xl border border-brand-100 shadow-sm overflow-hidden flex-1 min-h-0 flex flex-col"
+        >
+          <div
+            class="p-4 border-b border-brand-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shrink-0"
+          >
+            <div
+              class="flex items-center gap-1.5 overflow-x-auto w-full sm:w-auto"
+            >
+              <button
+                id="taskFilter-all"
+                onclick="setTaskFilter('all')"
+                class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all bg-brand-600 text-white"
+              >
+                Semua
+              </button>
+              <button
+                id="taskFilter-active"
+                onclick="setTaskFilter('active')"
+                class="px-3 py-1.5 rounded-lg text-xs font-medium text-slate-600 hover:text-brand-600 transition-all"
+              >
+                Belum Selesai
+              </button>
+              <button
+                id="taskFilter-completed"
+                onclick="setTaskFilter('completed')"
+                class="px-3 py-1.5 rounded-lg text-xs font-medium text-slate-600 hover:text-brand-600 transition-all"
+              >
+                Selesai
+              </button>
+            </div>
+            <form class="w-full sm:w-auto" onsubmit="quickAddTask(event)">
+              <input
+                type="text"
+                id="quickTaskInput"
+                placeholder="+ Tambah task cepat..."
+                class="w-full px-3 py-2 bg-slate-50 border border-brand-100 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-brand-500 focus:bg-white transition-all"
+              />
+            </form>
+          </div>
+
+          <div
+            id="tasksListContainer"
+            class="overflow-y-auto flex-1 min-h-0 divide-y divide-brand-100/60"
+          >
+            <!-- Task items will be rendered here -->
+          </div>
+
+          <div
+            id="tasksEmptyState"
+            class="hidden flex-col items-center justify-center p-12 text-center"
+          >
+            <div
+              class="w-14 h-14 rounded-full bg-brand-50 border border-brand-100 text-brand-500 flex items-center justify-center text-xl mb-3"
+            >
+              <i class="fa-solid fa-list-check"></i>
+            </div>
+            <h3 class="text-sm font-bold text-brand-950">
+              Belum Ada Task
+            </h3>
+            <p class="text-xs text-slate-500 mt-1 max-w-xs">
+              Mulai tambahkan pekerjaan atau sub-task untuk projek ini.
+            </p>
+            <button
+              onclick="openModal('taskModal')"
+              class="mt-4 bg-brand-600 text-white px-4 py-2 rounded-lg text-xs font-semibold"
+            >
+              + Tambah Task Baru
+            </button>
+          </div>
+        </div>
       </div>
 
       <!-- VIEW 3: CALENDAR VIEW -->
@@ -628,6 +800,8 @@ import Layout from "../layouts/Layout.astro";
     let calendar;
 
     document.addEventListener("DOMContentLoaded", () => {
+      document.getElementById("detailView").style.display = "none";
+      document.getElementById("calendarView").style.display = "none";
       fetchProjects();
     });
 
@@ -672,8 +846,8 @@ import Layout from "../layouts/Layout.astro";
     function showDashboardView() {
       activeProjectId = null;
       document.getElementById("listView").style.display = "flex";
-      document.getElementById("detailView").classList.remove("active-view");
-      document.getElementById("calendarView").classList.remove("active-view");
+      document.getElementById("detailView").style.display = "none";
+      document.getElementById("calendarView").style.display = "none";
       const stats = document.getElementById("statsOverview");
       if (stats) stats.style.display = "grid";
       document.getElementById("viewTitle").innerText = "Daftar Projek Utama";
@@ -691,8 +865,8 @@ import Layout from "../layouts/Layout.astro";
     function showProjectDetailView(id) {
       activeProjectId = id;
       document.getElementById("listView").style.display = "none";
-      document.getElementById("detailView").classList.add("active-view");
-      document.getElementById("calendarView").classList.remove("active-view");
+      document.getElementById("detailView").style.display = "flex";
+      document.getElementById("calendarView").style.display = "none";
       const stats = document.getElementById("statsOverview");
       if (stats) stats.style.display = "none";
       document.getElementById("viewTitle").innerText = "Detail Task Projek";
@@ -711,8 +885,8 @@ import Layout from "../layouts/Layout.astro";
     function showCalendarView() {
       activeProjectId = null;
       document.getElementById("listView").style.display = "none";
-      document.getElementById("detailView").classList.remove("active-view");
-      document.getElementById("calendarView").classList.add("active-view");
+      document.getElementById("detailView").style.display = "none";
+      document.getElementById("calendarView").style.display = "flex";
       const stats = document.getElementById("statsOverview");
       if (stats) stats.style.display = "none";
       document.getElementById("viewTitle").innerText = "Kalender & Jadwal";
