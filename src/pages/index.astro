@@ -54,6 +54,14 @@ import Layout from "../layouts/Layout.astro";
           <i class="fa-solid fa-folder-open text-brand-600 w-5 text-center"></i>
           Daftar Projek
         </button>
+        <button
+          onclick="showCalendarView()"
+          id="navCalendarBtn"
+          class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 hover:bg-brand-50 hover:text-brand-700 font-medium text-sm transition-colors text-left"
+        >
+          <i class="fa-solid fa-calendar-days text-slate-400 w-5 text-center"></i>
+          Kalender & Jadwal
+        </button>
       </nav>
     </div>
   </aside>
@@ -300,210 +308,16 @@ import Layout from "../layouts/Layout.astro";
         id="detailView"
         class="task-detail-view flex-col flex-1 min-h-0 space-y-4 overflow-hidden"
       >
-        <!-- On-Page Modern Navigation Bar (Fixed) -->
-        <div class="flex items-center justify-between gap-3 flex-wrap shrink-0">
-          <button
-            onclick="showDashboardView()"
-            class="inline-flex items-center gap-2.5 px-4 py-2 rounded-xl bg-white hover:bg-brand-50 text-slate-700 hover:text-brand-600 border border-brand-100 text-xs font-semibold shadow-2xs hover:shadow-xs transition-all group cursor-pointer"
-          >
-            <i
-              class="fa-solid fa-arrow-left text-xs transition-transform group-hover:-translate-x-1 text-brand-600"
-            ></i>
-            <span>Kembali ke Daftar Projek</span>
-          </button>
-          <div
-            class="flex items-center gap-2 text-xs text-slate-500 font-medium bg-white px-3.5 py-1.5 rounded-xl border border-brand-100/80 shadow-2xs"
-          >
-            <span
-              class="hover:text-brand-600 cursor-pointer transition-colors"
-              onclick="showDashboardView()">Daftar Projek</span
-            >
-            <i class="fa-solid fa-chevron-right text-[10px] text-slate-300"></i>
-            <span
-              id="breadcrumbProjectTitle"
-              class="font-bold text-brand-950 truncate max-w-[200px]"
-              >Detail Projek</span
-            >
-          </div>
-        </div>
+      </div>
 
-        <!-- Compact Project Summary Bar (Fixed) -->
-        <div
-          class="bg-white p-5 rounded-2xl border border-brand-100 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4 shrink-0"
-        >
-          <div class="space-y-1 min-w-0">
-            <div class="flex items-center gap-2 flex-wrap">
-              <span
-                id="detailProjectCategory"
-                class="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-brand-50 text-brand-700 border border-brand-200"
-              >
-                Kategori
-              </span>
-              <span
-                id="detailProjectStatus"
-                class="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-slate-100 text-slate-600 border border-slate-200"
-              >
-                Status
-              </span>
-            </div>
-            <h2
-              id="detailProjectTitle"
-              class="text-xl font-bold text-brand-950 leading-tight"
-            >
-              Judul Projek
-            </h2>
-            <p
-              id="detailProjectDesc"
-              class="text-xs text-slate-500 line-clamp-2"
-            >
-              Deskripsi projek...
-            </p>
-          </div>
-
-          <div class="flex items-center gap-4 shrink-0">
-            <div class="w-36 sm:w-44 hidden sm:block">
-              <div
-                class="flex justify-between text-[11px] font-medium text-slate-500 mb-1"
-              >
-                <span>Progres Task</span>
-                <span id="detailProgressText" class="font-bold text-emerald-600"
-                  >0%</span
-                >
-              </div>
-              <div
-                class="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden border border-slate-100"
-              >
-                <div
-                  id="detailProgressBar"
-                  class="bg-emerald-500 h-full rounded-full transition-all duration-300"
-                  style="width: 0%"
-                >
-                </div>
-              </div>
-            </div>
-            <div class="flex items-center gap-2">
-              <button
-                onclick="openModal('taskModal')"
-                class="bg-brand-600 hover:bg-brand-700 text-white px-3.5 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 transition-all shadow-sm shadow-brand-500/20"
-              >
-                <i class="fa-solid fa-plus"></i>
-                <span>Tambah Task</span>
-              </button>
-              <button
-                onclick="deleteActiveProject()"
-                title="Hapus Projek Ini"
-                class="text-slate-400 hover:text-red-600 hover:bg-red-50 p-2 rounded-xl border border-brand-100 transition-colors"
-              >
-                <i class="fa-regular fa-trash-can text-sm"></i>
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <!-- MAIN TASK LIST CONTAINER -->
-        <div
-          class="bg-white rounded-2xl border border-brand-100 shadow-sm overflow-hidden flex-1 min-h-0 flex flex-col"
-        >
-          <!-- Task List Header & Filters (Fixed) -->
-          <div
-            class="p-4 sm:p-5 border-b border-brand-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-50/50 shrink-0"
-          >
-            <div class="flex items-center gap-2.5">
-              <div
-                class="w-8 h-8 rounded-lg bg-brand-600 text-white flex items-center justify-center text-xs font-bold shadow-sm"
-              >
-                <i class="fa-solid fa-list-check"></i>
-              </div>
-              <div>
-                <h3 class="text-sm font-bold text-brand-950">
-                  Daftar Task Projek
-                </h3>
-                <p
-                  class="text-[11px] text-slate-500 font-medium"
-                  id="detailTaskCountLabel"
-                >
-                  0 task tersimpan
-                </p>
-              </div>
-            </div>
-
-            <!-- Task Filter Pills -->
-            <div
-              class="flex items-center gap-1 bg-white p-1 rounded-xl border border-brand-100 shadow-2xs self-start sm:self-auto"
-            >
-              <button
-                onclick="setTaskFilter('all')"
-                id="taskFilter-all"
-                class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all bg-brand-600 text-white"
-              >
-                Semua Task
-              </button>
-              <button
-                onclick="setTaskFilter('active')"
-                id="taskFilter-active"
-                class="px-3 py-1.5 rounded-lg text-xs font-medium text-slate-600 hover:text-brand-600 transition-all"
-              >
-                Belum Selesai
-              </button>
-              <button
-                onclick="setTaskFilter('completed')"
-                id="taskFilter-completed"
-                class="px-3 py-1.5 rounded-lg text-xs font-medium text-slate-600 hover:text-brand-600 transition-all"
-              >
-                Selesai
-              </button>
-            </div>
-          </div>
-
-          <!-- Quick Add Task Bar (Fixed) -->
-          <!-- <div class="p-3.5 border-b border-brand-100 bg-white shrink-0">
-            <form
-              onsubmit="quickAddTask(event)"
-              class="flex items-center gap-2"
-            >
-              <div class="relative flex-1">
-                <i
-                  class="fa-solid fa-plus absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"
-                ></i>
-                <input
-                  type="text"
-                  id="quickTaskInput"
-                  placeholder="Tambah task baru secara cepat..."
-                  class="w-full pl-9 pr-4 py-2 bg-slate-50 border border-brand-100 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-brand-500 focus:bg-white transition-all"
-                />
-              </div>
-              <button
-                type="submit"
-                class="bg-brand-600 hover:bg-brand-700 text-white px-4 py-2 rounded-xl text-xs font-semibold transition-all shrink-0"
-              >
-                Tambah
-              </button>
-            </form>
-          </div> -->
-
-          <!-- Task List Items (Scrollable) -->
-          <div
-            id="tasksListContainer"
-            class="divide-y divide-brand-50 overflow-y-auto flex-1 min-h-0"
-          >
-          </div>
-
-          <!-- Empty State -->
-          <div
-            id="tasksEmptyState"
-            class="hidden p-12 text-center flex-col items-center justify-center overflow-y-auto flex-1 min-h-0"
-          >
-            <div
-              class="w-14 h-14 rounded-2xl bg-brand-50 border border-brand-100 text-brand-600 flex items-center justify-center text-xl mb-3 shadow-xs"
-            >
-              <i class="fa-solid fa-clipboard-check"></i>
-            </div>
-            <h4 class="text-sm font-bold text-brand-950">Belum Ada Task</h4>
-            <p class="text-xs text-slate-500 mt-1 max-w-xs">
-              Tambahkan task pertama Anda di atas untuk mulai mencatat progres
-              projek ini.
-            </p>
-          </div>
+      <!-- VIEW 3: CALENDAR VIEW -->
+      <div
+        id="calendarView"
+        class="task-detail-view flex-col flex-1 min-h-0 space-y-4 overflow-hidden"
+      >
+        <div class="bg-white p-5 rounded-2xl border border-brand-100 shadow-sm flex-1 min-h-0 flex flex-col">
+          <h2 class="text-lg font-bold text-brand-950 mb-4">Kalender Kegiatan</h2>
+          <p class="text-sm text-slate-500">Fitur kalender akan segera tersedia di sini.</p>
         </div>
       </div>
     </main>
@@ -856,36 +670,30 @@ import Layout from "../layouts/Layout.astro";
 
     function showDashboardView() {
       activeProjectId = null;
-      const main = document.getElementById("mainContent");
-      main.className =
-        "flex-1 p-4 md:p-6 overflow-hidden flex flex-col min-h-0 space-y-4";
+      document.getElementById("listView").style.display = "flex";
+      document.getElementById("detailView").classList.remove("active-view");
+      document.getElementById("calendarView").classList.remove("active-view");
       const stats = document.getElementById("statsOverview");
       if (stats) stats.style.display = "grid";
-      const listView = document.getElementById("listView");
-      listView.style.display = "flex";
-      listView.className =
-        "flex-1 min-h-0 flex flex-col space-y-4 overflow-hidden";
-      document.getElementById("detailView").classList.remove("active-view");
       document.getElementById("viewTitle").innerText = "Daftar Projek Utama";
       document.getElementById("mainActionBtn").onclick = () =>
         openModal("projectModal");
       document.getElementById("mainActionBtn").querySelector("span").innerText =
         "Projek Baru";
+      
+      document.getElementById('navProjectBtn').className = "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg bg-brand-50 text-brand-700 font-semibold text-sm transition-colors text-left";
+      document.getElementById('navCalendarBtn').className = "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 hover:bg-brand-50 hover:text-brand-700 font-medium text-sm transition-colors text-left";
+
       renderDashboard();
     }
 
     function showProjectDetailView(id) {
       activeProjectId = id;
-      const main = document.getElementById("mainContent");
-      main.className =
-        "flex-1 p-4 md:p-6 overflow-hidden flex flex-col min-h-0 space-y-4";
+      document.getElementById("listView").style.display = "none";
+      document.getElementById("detailView").classList.add("active-view");
+      document.getElementById("calendarView").classList.remove("active-view");
       const stats = document.getElementById("statsOverview");
       if (stats) stats.style.display = "none";
-      document.getElementById("listView").style.display = "none";
-      const detailView = document.getElementById("detailView");
-      detailView.classList.add("active-view");
-      detailView.className =
-        "task-detail-view active-view flex-col flex-1 min-h-0 space-y-4 overflow-hidden";
       document.getElementById("viewTitle").innerText = "Detail Task Projek";
       document.getElementById("mainActionBtn").onclick = () =>
         openModal("taskModal");
@@ -894,10 +702,26 @@ import Layout from "../layouts/Layout.astro";
 
       const project = projects.find((p) => p.id === id);
       if (project) {
-        const bcTitle = document.getElementById("breadcrumbProjectTitle");
-        if (bcTitle) bcTitle.innerText = project.title;
+        document.getElementById("breadcrumbProjectTitle").innerText = project.title;
       }
       renderDashboard();
+    }
+
+    function showCalendarView() {
+      activeProjectId = null;
+      document.getElementById("listView").style.display = "none";
+      document.getElementById("detailView").classList.remove("active-view");
+      document.getElementById("calendarView").classList.add("active-view");
+      const stats = document.getElementById("statsOverview");
+      if (stats) stats.style.display = "none";
+      document.getElementById("viewTitle").innerText = "Kalender & Jadwal";
+      document.getElementById("mainActionBtn").onclick = () =>
+        alert("Fitur tambah jadwal belum tersedia.");
+      document.getElementById("mainActionBtn").querySelector("span").innerText =
+        "Tambah Jadwal";
+
+      document.getElementById('navCalendarBtn').className = "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg bg-brand-50 text-brand-700 font-semibold text-sm transition-colors text-left";
+      document.getElementById('navProjectBtn').className = "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 hover:bg-brand-50 hover:text-brand-700 font-medium text-sm transition-colors text-left";
     }
 
     // Project CRUD
