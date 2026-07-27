@@ -24,3 +24,10 @@ model Task {
   projectId   String
   project     Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
 }
+
+model Event {
+  id    String   @id @default(cuid())
+  title String
+  start DateTime
+  end   DateTime?
+}
