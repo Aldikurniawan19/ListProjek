@@ -645,7 +645,6 @@ import Layout from "../layouts/Layout.astro";
 
     <script is:inline src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
     <script type="module">
-    import { initCalendar } from '../lib/calendar.js';
       const Ghostoast = {
       container: null,
       init() {
@@ -900,6 +899,36 @@ import Layout from "../layouts/Layout.astro";
       document.getElementById('navProjectBtn').className = "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 hover:bg-brand-50 hover:text-brand-700 font-medium text-sm transition-colors text-left";
       
       initCalendar([]);
+    }
+
+    function initCalendar(events) {
+      const calendarEl = document.getElementById('calendar');
+      if (calendarEl && !calendar) {
+        calendar = new FullCalendar.Calendar(calendarEl, {
+          initialView: 'dayGridMonth',
+          headerToolbar: {
+            left: 'prev,next today',
+            center: 'title',
+            right: 'dayGridMonth,timeGridWeek,timeGridDay'
+          },
+          events: events,
+          editable: true,
+          selectable: true,
+          dateClick: function(info) {
+            const title = prompt('Masukkan judul jadwal:');
+            if (title) {
+              const newEvent = {
+                title: title,
+                start: info.dateStr,
+                allDay: true
+              };
+              calendar.addEvent(newEvent);
+              // Di sini Anda bisa menambahkan logika untuk menyimpan acara ke database
+            }
+          }
+        });
+        calendar.render();
+      }
     }
 
     // Project CRUD
