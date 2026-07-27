@@ -315,9 +315,8 @@ import Layout from "../layouts/Layout.astro";
         id="calendarView"
         class="task-detail-view flex-col flex-1 min-h-0 space-y-4 overflow-hidden"
       >
-        <div class="bg-white p-5 rounded-2xl border border-brand-100 shadow-sm flex-1 min-h-0 flex flex-col">
-          <h2 class="text-lg font-bold text-brand-950 mb-4">Kalender Kegiatan</h2>
-          <p class="text-sm text-slate-500">Fitur kalender akan segera tersedia di sini.</p>
+        <div class="bg-white p-4 rounded-2xl border border-brand-100 shadow-sm flex-1 min-h-0 flex flex-col">
+          <div id="calendar" class="flex-1"></div>
         </div>
       </div>
     </main>
@@ -472,6 +471,7 @@ import Layout from "../layouts/Layout.astro";
     </div>
   </div>
 
+    <script is:inline src="/src/lib/calendar.js"></script>
   <script is:inline>
     const Ghostoast = {
       container: null,
@@ -625,6 +625,7 @@ import Layout from "../layouts/Layout.astro";
     let currentFilter = "all";
     let currentTaskFilter = "all";
     let searchQuery = "";
+    let calendar;
 
     document.addEventListener("DOMContentLoaded", () => {
       fetchProjects();
@@ -722,6 +723,10 @@ import Layout from "../layouts/Layout.astro";
 
       document.getElementById('navCalendarBtn').className = "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg bg-brand-50 text-brand-700 font-semibold text-sm transition-colors text-left";
       document.getElementById('navProjectBtn').className = "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 hover:bg-brand-50 hover:text-brand-700 font-medium text-sm transition-colors text-left";
+      
+      if (typeof initCalendar === 'function') {
+        initCalendar([]);
+      }
     }
 
     // Project CRUD
