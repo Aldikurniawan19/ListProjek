@@ -907,9 +907,9 @@ import Layout from "../layouts/Layout.astro";
         calendar = new FullCalendar.Calendar(calendarEl, {
           initialView: 'dayGridMonth',
           headerToolbar: {
-            left: 'prev,next today',
+            left: 'prev',
             center: 'title',
-            right: 'dayGridMonth,timeGridWeek,timeGridDay'
+            right: 'next'
           },
           events: events,
           editable: true,
@@ -925,7 +925,14 @@ import Layout from "../layouts/Layout.astro";
               calendar.addEvent(newEvent);
               // Di sini Anda bisa menambahkan logika untuk menyimpan acara ke database
             }
-          }
+          },
+          eventColor: '#4F46E5',
+          eventTextColor: '#ffffff',
+          dayHeaderFormat: { weekday: 'short' },
+          buttonText: {
+            today: 'Hari Ini'
+          },
+          
         });
         calendar.render();
       }
