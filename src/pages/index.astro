@@ -497,10 +497,10 @@ import Layout from "../layouts/Layout.astro";
   <!-- MODAL 1: Tambah Projek Baru -->
   <div
     id="projectModal"
-    class="fixed inset-0 bg-brand-950/40 z-50 flex items-center justify-center p-4 hidden backdrop-blur-sm"
+    class="fixed inset-0 bg-brand-950/40 z-50 flex items-center justify-center p-4 hidden backdrop-blur-sm modal"
   >
     <div
-      class="bg-white rounded-2xl border border-brand-100 shadow-xl w-full max-w-md overflow-hidden"
+      class="bg-white rounded-2xl border border-brand-100 shadow-xl w-full max-w-md overflow-hidden modal-content"
     >
       <div
         class="px-6 py-4 border-b border-brand-100 flex items-center justify-between bg-brand-50/50"
@@ -579,10 +579,10 @@ import Layout from "../layouts/Layout.astro";
   <!-- MODAL 2: Tambah Task -->
   <div
     id="taskModal"
-    class="fixed inset-0 bg-brand-950/40 z-50 flex items-center justify-center p-4 hidden backdrop-blur-sm"
+    class="fixed inset-0 bg-brand-950/40 z-50 flex items-center justify-center p-4 hidden backdrop-blur-sm modal"
   >
     <div
-      class="bg-white rounded-2xl border border-brand-100 shadow-xl w-full max-w-lg overflow-hidden"
+      class="bg-white rounded-2xl border border-brand-100 shadow-xl w-full max-w-lg overflow-hidden modal-content"
     >
       <div
         class="px-6 py-4 border-b border-brand-100 flex items-center justify-between bg-brand-50/50"
@@ -643,8 +643,35 @@ import Layout from "../layouts/Layout.astro";
     </div>
   </div>
 
-    <script is:inline src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
-    <script is:inline>
+    
+<div id="modal-container"></div>
+
+<script is:inline src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
+<script is:inline>
+  // Your existing script continues here...
+</script>
+
+<style is:global>
+  :root {
+    --fc-border-color: #dbeafe;
+    --fc-daygrid-event-dot-width: 8px;
+    --fc-list-event-dot-width: 10px;
+    --fc-event-border-color: #2563eb;
+    --fc-event-text-color: #ffffff;
+    --fc-event-bg-color: #2563eb;
+    --fc-button-bg-color: #2563eb;
+    --fc-button-text-color: #ffffff;
+    --fc-button-hover-bg-color: #1d4ed8;
+    --fc-today-bg-color: #eff6ff;
+  }
+
+  .fc-button {
+    padding: 0.5rem 1rem !important;
+    font-size: 0.875rem !important;
+    border-radius: 0.5rem !important;
+  }
+</style>
+
       const Ghostoast = {
       container: null,
       init() {
@@ -833,14 +860,23 @@ import Layout from "../layouts/Layout.astro";
     }
 
     function openModal(modalId) {
-      document.getElementById(modalId).classList.remove("hidden");
+      const modal = document.getElementById(modalId);
+      if (modal) {
+        modal.classList.remove('hidden');
+        setTimeout(() => modal.classList.add('open'), 10);
+      }
     }
 
     function closeModal(modalId) {
-      document.getElementById(modalId).classList.add("hidden");
-      if (modalId === "projectModal")
-        document.getElementById("projectForm").reset();
-      if (modalId === "taskModal") document.getElementById("taskForm").reset();
+      const modal = document.getElementById(modalId);
+      if (modal) {
+        modal.classList.remove('open');
+        setTimeout(() => {
+          modal.classList.add('hidden');
+          if (modalId === "projectModal") document.getElementById("projectForm").reset();
+          if (modalId === "taskModal") document.getElementById("taskForm").reset();
+        }, 300);
+      }
     }
 
     function showDashboardView() {

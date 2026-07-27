@@ -50,9 +50,19 @@
 				from { width: 100%; }
 				to { width: 0%; }
 			}
+      .modal-content {
+        transition: transform 0.3s ease-out, opacity 0.3s ease-out;
+        transform: scale(0.95);
+        opacity: 0;
+      }
+      .modal.open .modal-content {
+        transform: scale(1);
+        opacity: 1;
+      }
 		</style>
 	</head>
 	<body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col md:flex-row antialiased">
 		<slot />
+		<div id="modal-container"></div>
 	</body>
 </html>
