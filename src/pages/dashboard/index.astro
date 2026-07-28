@@ -5,7 +5,7 @@
   class="flex-1 min-h-0 flex flex-col space-y-4 overflow-hidden"
 >
   <div
-    class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-white p-3 rounded-xl border border-brand-100 shadow-sm shrink-0"
+    class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-white dark:bg-slate-900 p-3 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-sm shrink-0 transition-colors duration-200"
   >
     <div class="flex items-center gap-1 overflow-x-auto w-full sm:w-auto">
       <button
@@ -18,31 +18,31 @@
       <button
         onclick="setFilter('in-progress')"
         id="filter-in-progress"
-        class="filter-btn px-4 py-1.5 rounded-lg text-xs font-medium text-slate-600 hover:bg-brand-50 hover:text-brand-600 transition-all"
+        class="filter-btn px-4 py-1.5 rounded-lg text-xs font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white transition-all"
       >
         Sedang Berjalan
       </button>
       <button
         onclick="setFilter('completed')"
         id="filter-completed"
-        class="filter-btn px-4 py-1.5 rounded-lg text-xs font-medium text-slate-600 hover:bg-brand-50 hover:text-brand-600 transition-all"
+        class="filter-btn px-4 py-1.5 rounded-lg text-xs font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white transition-all"
       >
         Selesai
       </button>
     </div>
     <span
-      class="text-xs text-slate-500 px-2 font-medium"
+      class="text-xs text-slate-500 dark:text-slate-400 px-2 font-medium"
       id="projectCountLabel">Menampilkan 0 Projek</span
     >
   </div>
 
   <div
-    class="bg-white rounded-2xl border border-brand-100 shadow-sm overflow-hidden flex-1 min-h-0 flex flex-col"
+    class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm overflow-hidden flex-1 min-h-0 flex flex-col transition-colors duration-200"
   >
     <div class="overflow-y-auto overflow-x-auto flex-1 min-h-0">
       <table class="w-full text-left border-collapse">
         <thead
-          class="bg-white border-b border-brand-200 text-brand-950 uppercase text-[11px] tracking-wider font-bold sticky top-0 z-10 shadow-2xs"
+          class="bg-slate-50/80 dark:bg-slate-800/80 border-b border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 uppercase text-[11px] tracking-wider font-bold sticky top-0 z-10 shadow-2xs"
         >
           <tr>
             <th class="px-6 py-4">Nama Projek & Deskripsi</th>
@@ -55,7 +55,7 @@
         </thead>
         <tbody
           id="projectsTableBody"
-          class="divide-y divide-brand-50 text-xs"
+          class="divide-y divide-slate-100 dark:divide-slate-800 text-xs"
         >
         </tbody>
       </table>
@@ -66,14 +66,14 @@
       class="hidden flex-col items-center justify-center p-12 text-center"
     >
       <div
-        class="w-14 h-14 rounded-full bg-brand-50 border border-brand-100 text-brand-500 flex items-center justify-center text-xl mb-3"
+        class="w-14 h-14 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-brand-600 dark:text-brand-400 flex items-center justify-center text-xl mb-3"
       >
         <i class="fa-solid fa-folder-open"></i>
       </div>
-      <h3 class="text-sm font-bold text-brand-950">
+      <h3 class="text-sm font-bold text-slate-900 dark:text-white">
         Tidak Ada Projek Ditemukan
       </h3>
-      <p class="text-xs text-slate-500 mt-1 max-w-xs">
+      <p class="text-xs text-slate-500 dark:text-slate-400 mt-1 max-w-xs">
         Belum ada projek yang ditambahkan atau pencarian Anda tidak
         ditemukan.
       </p>

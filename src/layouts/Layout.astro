@@ -14,6 +14,7 @@
 		<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 		<script is:inline>
 			tailwind.config = {
+				darkMode: 'class',
 				theme: {
 					extend: {
 						fontFamily: {
@@ -36,12 +37,23 @@
 						}
 					}
 				}
-			}
+			};
+
+			(function() {
+				const savedTheme = localStorage.getItem('theme');
+				if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+					document.documentElement.classList.add('dark');
+				} else {
+					document.documentElement.classList.remove('dark');
+				}
+			})();
 		</script>
 		<style is:global>
 			::-webkit-scrollbar { width: 6px; height: 6px; }
 			::-webkit-scrollbar-track { background: #f1f5f9; }
+			.dark ::-webkit-scrollbar-track { background: #0f172a; }
 			::-webkit-scrollbar-thumb { background: #bfdbfe; border-radius: 4px; }
+			.dark ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
 			::-webkit-scrollbar-thumb:hover { background: #2563eb; }
 			table { border-collapse: separate; border-spacing: 0; }
 			.task-detail-view { display: none; }
@@ -144,6 +156,10 @@
         letter-spacing: -0.02em !important;
       }
 
+      .dark .fc-toolbar-title {
+        color: #f8fafc !important;
+      }
+
       .fc .fc-button {
         padding: 0.5rem 1rem !important;
         font-size: 0.8125rem !important;
@@ -157,11 +173,23 @@
         transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
       }
 
+      .dark .fc .fc-button {
+        background: #1e293b !important;
+        color: #cbd5e1 !important;
+        border-color: #334155 !important;
+      }
+
       .fc .fc-button:hover {
         background: #f1f5f9 !important;
         color: #1e293b !important;
         border-color: #cbd5e1 !important;
         transform: translateY(-1px);
+      }
+
+      .dark .fc .fc-button:hover {
+        background: #334155 !important;
+        color: #ffffff !important;
+        border-color: #475569 !important;
       }
 
       .fc .fc-button-primary:not(:disabled).fc-button-active, 
@@ -172,14 +200,31 @@
         box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3) !important;
       }
 
+      .fc-theme-standard .fc-scrollgrid {
+        border-color: #e2e8f0 !important;
+        border-radius: 1rem !important;
+        overflow: hidden;
+      }
+
+      .dark .fc-theme-standard .fc-scrollgrid {
+        border-color: #334155 !important;
+        background-color: #0f172a !important;
+      }
+
       .fc-theme-standard td, .fc-theme-standard th {
         border-color: #f1f5f9 !important;
       }
 
-      .fc-col-header-cell {
-        background: #f8fafc !important;
-        padding: 0.75rem 0 !important;
-        border-bottom: 1px solid #e2e8f0 !important;
+      .dark .fc-theme-standard td, .dark .fc-theme-standard th {
+        border-color: #1e293b !important;
+      }
+
+      .fc-col-header, .fc-col-header-cell, .fc-scrollgrid-sync-table {
+        background-color: #f8fafc !important;
+      }
+
+      .dark .fc-col-header, .dark .fc-col-header-cell, .dark .fc-scrollgrid-sync-table {
+        background-color: #0f172a !important;
       }
 
       .fc-col-header-cell-cushion {
@@ -188,14 +233,28 @@
         text-transform: uppercase !important;
         letter-spacing: 0.05em !important;
         color: #64748b !important;
+        padding: 0.65rem 0 !important;
+      }
+
+      .dark .fc-col-header-cell-cushion {
+        color: #94a3b8 !important;
       }
 
       .fc-daygrid-day {
+        background-color: #ffffff !important;
         transition: background-color 0.2s ease !important;
+      }
+
+      .dark .fc-daygrid-day {
+        background-color: #0f172a !important;
       }
 
       .fc-daygrid-day:hover {
         background-color: #f8fafc !important;
+      }
+
+      .dark .fc-daygrid-day:hover {
+        background-color: #1e293b !important;
       }
 
       .fc-daygrid-day-number {
@@ -208,8 +267,21 @@
         transition: all 0.2s ease;
       }
 
+      .dark .fc-daygrid-day-number {
+        color: #cbd5e1 !important;
+      }
+
+      .dark .fc-day-other .fc-daygrid-day-number {
+        color: #475569 !important;
+        opacity: 0.6;
+      }
+
       .fc-day-today {
         background-color: rgba(239, 246, 255, 0.7) !important;
+      }
+
+      .dark .fc-day-today {
+        background-color: rgba(30, 58, 138, 0.25) !important;
       }
 
       .fc-day-today .fc-daygrid-day-number {
@@ -230,8 +302,7 @@
         padding: 0.35rem 0.6rem !important;
         font-size: 0.75rem !important;
         font-weight: 600 !important;
-        background: linear-gradient(135deg, #2563eb, #4f46e5) !important;
-        box-shadow: 0 2px 8px rgba(37, 99, 235, 0.25) !important;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
         cursor: pointer !important;
         transition: transform 0.15s ease, box-shadow 0.15s ease !important;
         margin-top: 2px !important;
@@ -249,7 +320,7 @@
       }
 		</style>
 	</head>
-	<body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col md:flex-row antialiased">
+	<body class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 font-sans min-h-screen flex flex-col md:flex-row antialiased transition-colors duration-200">
 		<slot />
 		<div id="modal-container"></div>
 	</body>

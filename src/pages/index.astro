@@ -42,7 +42,35 @@ import Toast from "../components/Toast.astro";
     document.addEventListener("DOMContentLoaded", () => {
       showDashboardView();
       fetchProjects();
+      updateThemeIcon();
     });
+
+    function toggleTheme() {
+      const isDark = document.documentElement.classList.toggle("dark");
+      localStorage.setItem("theme", isDark ? "dark" : "light");
+      updateThemeIcon();
+      if (window.Ghostoast) {
+        Ghostoast.info(
+          `Berhasil berpindah ke Mode ${isDark ? "Gelap (Dark)" : "Terang (Light)"}.`,
+          "Tema Diperbarui"
+        );
+      }
+    }
+
+    function updateThemeIcon() {
+      const knob = document.getElementById("themeToggleKnob");
+      const knobIcon = document.getElementById("themeToggleKnobIcon");
+      if (knob && knobIcon) {
+        const isDark = document.documentElement.classList.contains("dark");
+        if (isDark) {
+          knob.classList.add("translate-x-7");
+          knobIcon.className = "fa-solid fa-moon text-[10px] text-indigo-400";
+        } else {
+          knob.classList.remove("translate-x-7");
+          knobIcon.className = "fa-solid fa-sun text-[10px] text-amber-500";
+        }
+      }
+    }
 
     async function fetchProjects() {
       try {
@@ -56,8 +84,8 @@ import Toast from "../components/Toast.astro";
 
     function updateSidebarNav(activeNavId) {
       const navBtns = [
-        { id: "navProjectBtn", defaultIconClass: "fa-solid fa-folder-open text-slate-400 w-5 text-center", activeIconClass: "fa-solid fa-folder-open text-white w-5 text-center" },
-        { id: "navCalendarBtn", defaultIconClass: "fa-solid fa-calendar-days text-slate-400 w-5 text-center", activeIconClass: "fa-solid fa-calendar-days text-white w-5 text-center" }
+        { id: "navProjectBtn", defaultIconClass: "fa-solid fa-folder-open text-slate-400 dark:text-slate-500 w-5 text-center", activeIconClass: "fa-solid fa-folder-open text-white w-5 text-center" },
+        { id: "navCalendarBtn", defaultIconClass: "fa-solid fa-calendar-days text-slate-400 dark:text-slate-500 w-5 text-center", activeIconClass: "fa-solid fa-calendar-days text-white w-5 text-center" }
       ];
 
       navBtns.forEach(nav => {
@@ -68,7 +96,7 @@ import Toast from "../components/Toast.astro";
             btn.className = "w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl bg-brand-600 text-white font-semibold text-sm shadow-md shadow-brand-500/25 transition-all text-left";
             if (icon) icon.className = nav.activeIconClass;
           } else {
-            btn.className = "w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-600 hover:bg-slate-100/80 hover:text-slate-900 font-medium text-sm transition-all text-left";
+            btn.className = "w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/80 hover:text-slate-900 dark:hover:text-white font-medium text-sm transition-all text-left";
             if (icon) icon.className = nav.defaultIconClass;
           }
         }
@@ -114,12 +142,31 @@ import Toast from "../components/Toast.astro";
       amber: 'from-amber-500 via-orange-600 to-yellow-600',
     };
 
+    const themeSolidColors = {
+      blue: '#2563eb',
+      purple: '#9333ea',
+      emerald: '#059669',
+      rose: '#e11d48',
+      amber: '#d97706',
+    };
+
     function setMockupTheme(theme) {
       currentMockupTheme = theme;
       const banner = document.getElementById("mockupCardBanner");
       if (banner && themeGradients[theme]) {
         banner.className = `bg-gradient-to-br ${themeGradients[theme]} p-6 text-white relative overflow-hidden transition-all duration-300`;
       }
+
+      document.querySelectorAll(".color-theme-btn").forEach((btn) => {
+        const icon = btn.querySelector(".theme-check-icon");
+        if (btn.dataset.theme === theme) {
+          if (icon) icon.classList.remove("hidden");
+          btn.classList.add("ring-2", "ring-brand-500", "ring-offset-2", "dark:ring-offset-slate-900", "scale-110");
+        } else {
+          if (icon) icon.classList.add("hidden");
+          btn.classList.remove("ring-2", "ring-brand-500", "ring-offset-2", "dark:ring-offset-slate-900", "scale-110");
+        }
+      });
     }
 
     async function fetchEvents() {
@@ -131,18 +178,33 @@ import Toast from "../components/Toast.astro";
         const countBadge = document.getElementById("eventCountBadge");
         if (countBadge) countBadge.innerText = `${data.length} Acara`;
 
-        return data.map(e => ({
-          id: e.id,
-          title: e.title,
-          start: e.start,
-          end: e.end,
-          allDay: true
-        }));
+        return data.map(e => {
+          const colorKey = e.color || 'blue';
+          const bgColor = themeSolidColors[colorKey] || themeSolidColors.blue;
+          return {
+            id: e.id,
+            title: e.title,
+            start: e.start,
+            end: e.end,
+            allDay: true,
+            backgroundColor: bgColor,
+            borderColor: 'transparent',
+            extendedProps: { color: colorKey }
+          };
+        });
       } catch (err) {
         console.error("Gagal mengambil data events:", err);
         return [];
       }
     }
+
+    const themeGradientsMap = {
+      blue: 'linear-gradient(135deg, #2563eb, #4f46e5)',
+      purple: 'linear-gradient(135deg, #9333ea, #c026d3)',
+      emerald: 'linear-gradient(135deg, #059669, #0d9488)',
+      rose: 'linear-gradient(135deg, #e11d48, #ea580c)',
+      amber: 'linear-gradient(135deg, #d97706, #ca8a04)',
+    };
 
     async function showCalendarView() {
       updateSidebarNav("navCalendarBtn");
@@ -152,7 +214,12 @@ import Toast from "../components/Toast.astro";
       const mainBtn = document.getElementById("mainActionBtn");
       if (mainBtn) mainBtn.style.display = "none";
       const events = await fetchEvents();
-      initCalendar(events);
+      if (calendar) {
+        calendar.removeAllEvents();
+        calendar.addEventSource(events);
+      } else {
+        initCalendar(events);
+      }
     }
     
     function renderDashboard() {
@@ -270,20 +337,15 @@ import Toast from "../components/Toast.astro";
       try {
         const newEvent = await api("/api/events", {
           method: "POST",
-          body: JSON.stringify({ title, start, end }),
+          body: JSON.stringify({ title, start, end, color: currentMockupTheme }),
         });
 
-        if (calendar) {
-          calendar.addEvent({
-            id: newEvent.id,
-            title: newEvent.title,
-            start: newEvent.start,
-            end: newEvent.end,
-            allDay: true
-          });
-        }
-
+        // Instantly refresh all events from DB into calendar
         const eventsList = await fetchEvents();
+        if (calendar) {
+          calendar.removeAllEvents();
+          calendar.addEventSource(eventsList);
+        }
 
         closeEventModal();
         if (window.Ghostoast) {
@@ -306,11 +368,11 @@ import Toast from "../components/Toast.astro";
     async function deleteEvent(eventId) {
       try {
         await api(`/api/events/${eventId}`, { method: "DELETE" });
+        const eventsList = await fetchEvents();
         if (calendar) {
-          const eventObj = calendar.getEventById(eventId);
-          if (eventObj) eventObj.remove();
+          calendar.removeAllEvents();
+          calendar.addEventSource(eventsList);
         }
-        await fetchEvents();
         if (window.Ghostoast) {
           Ghostoast.success("Acara berhasil dihapus dari database.", "Acara Dihapus");
         }
@@ -349,6 +411,13 @@ import Toast from "../components/Toast.astro";
             events: events,
             editable: true,
             selectable: true,
+            eventDidMount: function(info) {
+              const colorKey = info.event.extendedProps.color || 'blue';
+              const gradient = themeGradientsMap[colorKey] || themeGradientsMap.blue;
+              info.el.style.background = gradient;
+              info.el.style.borderColor = 'transparent';
+              info.el.style.color = '#ffffff';
+            },
             dateClick: function(info) {
               openEventModal(info.dateStr);
             },
@@ -536,12 +605,12 @@ import Toast from "../components/Toast.astro";
       currentFilter = filter;
       document.querySelectorAll(".filter-btn").forEach((btn) => {
         btn.classList.remove("bg-brand-600", "text-white");
-        btn.classList.add("text-slate-600");
+        btn.classList.add("text-slate-600", "dark:text-slate-400");
       });
       const activeBtn = document.getElementById(`filter-${filter}`);
       if (activeBtn) {
         activeBtn.classList.add("bg-brand-600", "text-white");
-        activeBtn.classList.remove("text-slate-600");
+        activeBtn.classList.remove("text-slate-600", "dark:text-slate-400");
       }
       renderDashboard();
     }
@@ -553,10 +622,10 @@ import Toast from "../components/Toast.astro";
         if (!btn) return;
         if (f === filter) {
           btn.className =
-            "px-3 py-1.5 rounded-lg text-xs font-semibold transition-all bg-brand-600 text-white";
+            "px-3 py-1.5 rounded-lg text-xs font-semibold transition-all bg-brand-600 text-white shadow-sm";
         } else {
           btn.className =
-            "px-3 py-1.5 rounded-lg text-xs font-medium text-slate-600 hover:text-brand-600 transition-all";
+            "px-3 py-1.5 rounded-lg text-xs font-medium text-slate-600 dark:text-slate-400 hover:text-brand-600 dark:hover:text-brand-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all";
         }
       });
       renderDashboard();
@@ -656,54 +725,54 @@ import Toast from "../components/Toast.astro";
         const tr = document.createElement("tr");
         const bgRow =
           index % 2 === 0
-            ? "bg-slate-50/80 hover:bg-brand-100/50"
-            : "bg-white hover:bg-brand-50/60";
+            ? "bg-slate-50/60 dark:bg-slate-900/60 hover:bg-slate-100 dark:hover:bg-slate-800/80"
+            : "bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800/80";
         tr.className = `${bgRow} cursor-pointer transition-colors group`;
         tr.onclick = () => showProjectDetailView(p.id);
 
         tr.innerHTML = `
 					<td class="px-6 py-4">
-						<div class="font-bold text-brand-950 text-sm group-hover:text-brand-600 transition-colors">
+						<div class="font-bold text-slate-900 dark:text-white text-sm group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors">
 							${escapeHtml(p.title)}
 						</div>
-						<div class="text-slate-500 text-xs line-clamp-1 mt-0.5">
+						<div class="text-slate-500 dark:text-slate-400 text-xs line-clamp-1 mt-0.5 font-normal">
 							${escapeHtml(p.description)}
 						</div>
 					</td>
 					<td class="px-6 py-4 whitespace-nowrap">
-						<span class="px-2.5 py-1 rounded-md text-[11px] font-bold bg-brand-50 text-brand-700 border border-brand-100">
+						<span class="px-2.5 py-1 rounded-md text-[11px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
 							${escapeHtml(p.category)}
 						</span>
 					</td>
-					<td class="px-6 py-4 whitespace-nowrap font-medium text-slate-700">
+					<td class="px-6 py-4 whitespace-nowrap font-medium text-slate-700 dark:text-slate-300">
 						<i class="fa-regular fa-check-square mr-1 text-brand-500"></i> ${completedTasks} / ${totalTasks} Task
 					</td>
 					<td class="px-6 py-4 whitespace-nowrap">
 						<div class="flex items-center gap-2">
-							<div class="w-full bg-slate-100 h-3 rounded-full overflow-hidden border border-slate-100">
+							<div class="w-full bg-slate-100 dark:bg-slate-800 h-3 rounded-full overflow-hidden border border-slate-200 dark:border-slate-700">
 								<div class="bg-emerald-500 h-full rounded-full transition-all duration-300" style="width: ${progress}%"></div>
 							</div>
-							<span class="font-bold text-xs text-brand-700 w-9 text-right">${progress}%</span>
+							<span class="font-bold text-xs text-brand-700 dark:text-brand-400 w-9 text-right">${progress}%</span>
 						</div>
 					</td>
 					<td class="px-6 py-4 whitespace-nowrap">
 						${
               isCompleted
-                ? `<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-brand-100 text-brand-800 border border-brand-200">
+                ? `<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800">
 								<i class="fa-solid fa-check text-[9px]"></i> Selesai
 							 </span>`
-                : `<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-600 border border-slate-200">
+                : `<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700">
 								<i class="fa-solid fa-spinner text-[9px] animate-spin"></i> Sedang Berjalan
 							 </span>`
             }
 					</td>
 					<td class="px-6 py-4 whitespace-nowrap text-center">
 						<div class="flex items-center justify-center gap-2">
-							<button onclick="event.stopPropagation(); showProjectDetailView('${p.id}')" class="px-3 py-1.5 bg-brand-50 hover:bg-brand-600 text-brand-700 hover:text-white rounded-lg font-semibold transition-all border border-brand-100 flex items-center gap-1.5">
+							<button onclick="event.stopPropagation(); showProjectDetailView('${p.id}')" class="px-3 py-1.5 bg-slate-100 dark:bg-slate-800 hover:bg-brand-600 hover:text-white dark:hover:bg-brand-600 text-slate-700 dark:text-slate-300 rounded-lg font-semibold transition-all border border-slate-200 dark:border-slate-700 flex items-center gap-1.5">
 								<span>Buka Task</span>
 								<i class="fa-solid fa-chevron-right text-[10px]"></i>
 							</button>
-							<button onclick="deleteProject('${p.id}', event)" title="Hapus Projek" class="text-slate-300 hover:text-brand-600 p-1.5 rounded-lg transition-colors">
+							<button onclick="deleteProject('${p.id}', event)" title="Hapus Projek" class="text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 p-1.5 rounded-lg transition-colors">
 								<i class="fa-regular fa-trash-can"></i>
 							</button>
 						</div>
@@ -765,10 +834,10 @@ import Toast from "../components/Toast.astro";
       const statusElem = document.getElementById("detailProjectStatus");
       if (statusElem) {
         if (isCompleted) {
-          statusElem.className = "px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-100 text-emerald-800 border border-emerald-200";
+          statusElem.className = "px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800";
           statusElem.innerText = "Selesai";
         } else {
-          statusElem.className = "px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-slate-100 text-slate-600 border border-slate-200";
+          statusElem.className = "px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700";
           statusElem.innerText = "Sedang Berjalan";
         }
       }
@@ -813,7 +882,8 @@ import Toast from "../components/Toast.astro";
 
       filteredTasks.forEach((t) => {
         const item = document.createElement("div");
-        item.className = "p-4 flex items-center justify-between gap-4 hover:bg-slate-50/70 transition-colors group";
+        item.className =
+          "p-4 sm:px-5 flex items-center justify-between gap-4 border-l-4 border-l-transparent hover:border-l-brand-600 dark:hover:border-l-brand-400 hover:bg-slate-100/70 dark:hover:bg-slate-800/80 transition-all group cursor-pointer";
 
         item.innerHTML = `
           <div class="flex items-start gap-3.5 flex-1 min-w-0">
@@ -821,23 +891,27 @@ import Toast from "../components/Toast.astro";
               type="checkbox"
               ${t.completed ? "checked" : ""}
               onchange="toggleTask('${project.id}', '${t.id}')"
-              class="w-4 h-4 rounded border-slate-300 text-brand-600 focus:ring-brand-500 mt-0.5 cursor-pointer accent-brand-600"
+              class="w-4 h-4 rounded border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-brand-600 focus:ring-brand-500 mt-0.5 cursor-pointer accent-brand-600 shrink-0"
             />
             <div class="flex-1 min-w-0">
-              <h4 class="text-xs font-bold text-slate-800 ${t.completed ? "line-through text-slate-400" : ""} leading-snug">
+              <h4 class="text-xs sm:text-sm font-bold text-slate-900 dark:text-white ${t.completed ? "line-through text-slate-400 dark:text-slate-500 font-normal" : ""} leading-snug">
                 ${escapeHtml(t.title)}
               </h4>
-              ${t.description ? `<p class="text-[11px] text-slate-500 mt-0.5 line-clamp-2 font-normal">${escapeHtml(t.description)}</p>` : ""}
+              ${t.description ? `<p class="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 mt-1 line-clamp-2 font-normal">${escapeHtml(t.description)}</p>` : ""}
             </div>
           </div>
 
-          <div class="flex items-center gap-3">
-            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full ${t.completed ? "bg-emerald-50 text-emerald-700 border border-emerald-200" : "bg-slate-100 text-slate-600 border border-slate-200"}">
+          <div class="flex items-center gap-3 shrink-0">
+            <span class="text-[10px] font-bold px-2.5 py-1 rounded-full ${
+              t.completed
+                ? "bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60"
+                : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700"
+            }">
               ${t.completed ? "Selesai" : "Belum Selesai"}
             </span>
             <button
               onclick="deleteTask('${project.id}', '${t.id}')"
-              class="text-slate-300 hover:text-rose-600 p-1.5 rounded-lg transition-colors"
+              class="text-slate-400 dark:text-slate-500 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/50 p-2 rounded-xl transition-all"
               title="Hapus Task"
             >
               <i class="fa-regular fa-trash-can text-xs"></i>
