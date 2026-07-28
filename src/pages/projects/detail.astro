@@ -134,14 +134,14 @@
           Selesai
         </button>
       </div>
-      <form class="w-full sm:w-auto" onsubmit="quickAddTask(event)">
-        <input
-          type="text"
-          id="quickTaskInput"
-          placeholder="+ Tambah task cepat..."
-          class="w-full px-3 py-2 bg-slate-50 border border-brand-100 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-brand-500 focus:bg-white transition-all"
-        />
-      </form>
+      <button
+        type="button"
+        onclick="openModal('taskModal')"
+        class="px-4 py-2 bg-brand-600 hover:bg-brand-700 active:scale-95 text-white rounded-xl text-xs font-bold shadow-md shadow-brand-500/20 transition-all flex items-center gap-2"
+      >
+        <i class="fa-solid fa-plus text-xs"></i>
+        <span>Tambah Task Baru</span>
+      </button>
     </div>
 
     <div

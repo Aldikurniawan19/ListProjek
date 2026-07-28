@@ -8,6 +8,7 @@ import ProjectDetail from "./projects/detail.astro";
 import Calendar from "./calendar/index.astro";
 import ProjectModal from "../components/ProjectModal.astro";
 import TaskModal from "../components/TaskModal.astro";
+import EventModal from "../components/EventModal.astro";
 import Toast from "../components/Toast.astro";
 ---
 <Layout>
@@ -26,6 +27,7 @@ import Toast from "../components/Toast.astro";
   </div>
   <ProjectModal />
   <TaskModal />
+  <EventModal />
   <Toast />
   <script is:inline src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
   <script is:inline>
@@ -52,6 +54,27 @@ import Toast from "../components/Toast.astro";
       }
     }
 
+    function updateSidebarNav(activeNavId) {
+      const navBtns = [
+        { id: "navProjectBtn", defaultIconClass: "fa-solid fa-folder-open text-slate-400 w-5 text-center", activeIconClass: "fa-solid fa-folder-open text-white w-5 text-center" },
+        { id: "navCalendarBtn", defaultIconClass: "fa-solid fa-calendar-days text-slate-400 w-5 text-center", activeIconClass: "fa-solid fa-calendar-days text-white w-5 text-center" }
+      ];
+
+      navBtns.forEach(nav => {
+        const btn = document.getElementById(nav.id);
+        if (btn) {
+          const icon = btn.querySelector("i");
+          if (nav.id === activeNavId) {
+            btn.className = "w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl bg-brand-600 text-white font-semibold text-sm shadow-md shadow-brand-500/25 transition-all text-left";
+            if (icon) icon.className = nav.activeIconClass;
+          } else {
+            btn.className = "w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-600 hover:bg-slate-100/80 hover:text-slate-900 font-medium text-sm transition-all text-left";
+            if (icon) icon.className = nav.defaultIconClass;
+          }
+        }
+      });
+    }
+
     function showView(viewId) {
       document.getElementById("listView").style.display = "none";
       document.getElementById("detailView").style.display = "none";
@@ -60,28 +83,76 @@ import Toast from "../components/Toast.astro";
     }
 
     function showDashboardView() {
+      updateSidebarNav("navProjectBtn");
       activeProjectId = null;
       showView("listView");
       document.getElementById("statsOverview").style.display = "grid";
       document.getElementById("viewTitle").innerText = "Daftar Projek Utama";
-      // ... (other UI updates for dashboard)
+      const mainBtn = document.getElementById("mainActionBtn");
+      if (mainBtn) mainBtn.style.display = "flex";
       renderDashboard();
     }
 
     function showProjectDetailView(id) {
+      updateSidebarNav("navProjectBtn");
       activeProjectId = id;
       showView("detailView");
       document.getElementById("statsOverview").style.display = "none";
       document.getElementById("viewTitle").innerText = "Detail Task Projek";
-      // ... (other UI updates for project detail)
+      const mainBtn = document.getElementById("mainActionBtn");
+      if (mainBtn) mainBtn.style.display = "none";
       renderDashboard();
     }
 
-    function showCalendarView() {
+    let currentMockupTheme = 'blue';
+
+    const themeGradients = {
+      blue: 'from-brand-600 via-indigo-600 to-violet-700',
+      purple: 'from-purple-600 via-fuchsia-600 to-pink-700',
+      emerald: 'from-emerald-600 via-teal-600 to-cyan-700',
+      rose: 'from-rose-600 via-red-600 to-orange-700',
+      amber: 'from-amber-500 via-orange-600 to-yellow-600',
+    };
+
+    function setMockupTheme(theme) {
+      currentMockupTheme = theme;
+      const banner = document.getElementById("mockupCardBanner");
+      if (banner && themeGradients[theme]) {
+        banner.className = `bg-gradient-to-br ${themeGradients[theme]} p-6 text-white relative overflow-hidden transition-all duration-300`;
+      }
+    }
+
+    async function fetchEvents() {
+      try {
+        const res = await fetch("/api/events");
+        if (!res.ok) throw new Error("Gagal mengambil data acara");
+        const data = await res.json();
+        
+        const countBadge = document.getElementById("eventCountBadge");
+        if (countBadge) countBadge.innerText = `${data.length} Acara`;
+
+        return data.map(e => ({
+          id: e.id,
+          title: e.title,
+          start: e.start,
+          end: e.end,
+          allDay: true
+        }));
+      } catch (err) {
+        console.error("Gagal mengambil data events:", err);
+        return [];
+      }
+    }
+
+    async function showCalendarView() {
+      updateSidebarNav("navCalendarBtn");
       showView("calendarView");
       document.getElementById("statsOverview").style.display = "none";
       document.getElementById("viewTitle").innerText = "Kalender & Jadwal";
-      initCalendar([]);
+      const mainBtn = document.getElementById("mainActionBtn");
+      if (mainBtn) mainBtn.style.display = "none";
+      const events = await fetchEvents();
+      initCalendar(events);
     }
     
     function renderDashboard() {
@@ -92,7 +163,6 @@ import Toast from "../components/Toast.astro";
         renderProjectsTableView();
       }
     }
-    // ... (paste all your other functions like toggleSidebar, openModal, saveProject, etc. here)
 
     async function api(url, options = {}) {
       const res = await fetch(url, {
@@ -130,39 +200,188 @@ import Toast from "../components/Toast.astro";
         }, 300);
       }
     }
+
+    function openEventModal(selectedDate = "") {
+      const modal = document.getElementById("eventModal");
+      if (!modal) return;
+      
+      const form = document.getElementById("eventForm");
+      if (form) form.reset();
+      
+      setMockupTheme('blue');
+      const todayStr = selectedDate || new Date().toISOString().split("T")[0];
+      const startDateInput = document.getElementById("eventStartDate");
+      if (startDateInput) startDateInput.value = todayStr;
+      
+      updateMockupPreview();
+
+      modal.classList.remove("hidden", "mockup-closing");
+      setTimeout(() => modal.classList.add("open"), 10);
+    }
+
+    function closeEventModal() {
+      const modal = document.getElementById("eventModal");
+      if (!modal) return;
+
+      modal.classList.remove("open");
+      modal.classList.add("mockup-closing");
+
+      setTimeout(() => {
+        modal.classList.add("hidden");
+        modal.classList.remove("mockup-closing");
+        const form = document.getElementById("eventForm");
+        if (form) form.reset();
+      }, 450);
+    }
+
+    function updateMockupPreview() {
+      const titleInput = document.getElementById("eventTitle");
+      const startDateInput = document.getElementById("eventStartDate");
+      const endDateInput = document.getElementById("eventEndDate");
+      
+      const mockupTitle = document.getElementById("eventMockupTitle");
+      const mockupDate = document.getElementById("eventMockupDate");
+
+      const titleVal = titleInput?.value.trim() || "Judul Acara Baru";
+      const startVal = startDateInput?.value ? new Date(startDateInput.value).toLocaleDateString("id-ID", { day: 'numeric', month: 'short', year: 'numeric' }) : "Pilih tanggal...";
+      const endVal = endDateInput?.value ? " - " + new Date(endDateInput.value).toLocaleDateString("id-ID", { day: 'numeric', month: 'short', year: 'numeric' }) : "";
+
+      if (mockupTitle) mockupTitle.innerText = titleVal;
+      if (mockupDate) mockupDate.innerHTML = `<i class="fa-regular fa-clock"></i> ${startVal}${endVal}`;
+    }
+
+    async function saveEvent(e) {
+      if (e) e.preventDefault();
+      
+      const title = document.getElementById("eventTitle")?.value.trim();
+      const start = document.getElementById("eventStartDate")?.value;
+      const end = document.getElementById("eventEndDate")?.value || null;
+
+      if (!title || !start) {
+        if (window.Ghostoast) Ghostoast.error("Judul dan tanggal mulai wajib diisi", "Form Tidak Lengkap");
+        return;
+      }
+
+      const saveBtn = document.getElementById("saveEventBtn");
+      const saveBtnText = document.getElementById("saveEventBtnText");
+      if (saveBtn) saveBtn.disabled = true;
+      if (saveBtnText) saveBtnText.innerText = "Menyimpan...";
+
+      try {
+        const newEvent = await api("/api/events", {
+          method: "POST",
+          body: JSON.stringify({ title, start, end }),
+        });
+
+        if (calendar) {
+          calendar.addEvent({
+            id: newEvent.id,
+            title: newEvent.title,
+            start: newEvent.start,
+            end: newEvent.end,
+            allDay: true
+          });
+        }
+
+        const eventsList = await fetchEvents();
+
+        closeEventModal();
+        if (window.Ghostoast) {
+          Ghostoast.success(
+            `Acara "${title}" tersimpan di database.`,
+            "Acara Berhasil Dibuat"
+          );
+        }
+      } catch (err) {
+        console.error("Gagal menyimpan acara:", err);
+        if (window.Ghostoast) {
+          Ghostoast.error("Gagal menyimpan acara ke database.", "Terjadi Kesalahan");
+        }
+      } finally {
+        if (saveBtn) saveBtn.disabled = false;
+        if (saveBtnText) saveBtnText.innerText = "Simpan Acara";
+      }
+    }
+
+    async function deleteEvent(eventId) {
+      try {
+        await api(`/api/events/${eventId}`, { method: "DELETE" });
+        if (calendar) {
+          const eventObj = calendar.getEventById(eventId);
+          if (eventObj) eventObj.remove();
+        }
+        await fetchEvents();
+        if (window.Ghostoast) {
+          Ghostoast.success("Acara berhasil dihapus dari database.", "Acara Dihapus");
+        }
+      } catch (err) {
+        console.error("Gagal menghapus acara:", err);
+        if (window.Ghostoast) {
+          Ghostoast.error("Gagal menghapus acara.", "Terjadi Kesalahan");
+        }
+      }
+    }
+
+    // Attach to global window scope so HTML inline attributes always work
+    window.fetchEvents = fetchEvents;
+    window.showCalendarView = showCalendarView;
+    window.showDashboardView = showDashboardView;
+    window.showProjectDetailView = showProjectDetailView;
+    window.updateSidebarNav = updateSidebarNav;
+    window.openEventModal = openEventModal;
+    window.closeEventModal = closeEventModal;
+    window.updateMockupPreview = updateMockupPreview;
+    window.setMockupTheme = setMockupTheme;
+    window.saveEvent = saveEvent;
+    window.deleteEvent = deleteEvent;
     
     function initCalendar(events) {
       const calendarEl = document.getElementById('calendar');
-      if (calendarEl && !calendar) {
-        calendar = new FullCalendar.Calendar(calendarEl, {
-          initialView: 'dayGridMonth',
-          headerToolbar: {
-            left: 'prev',
-            center: 'title',
-            right: 'next'
-          },
-          events: events,
-          editable: true,
-          selectable: true,
-          dateClick: function(info) {
-            const title = prompt('Masukkan judul jadwal:');
-            if (title) {
-              const newEvent = {
-                title: title,
-                start: info.dateStr,
-                allDay: true
-              };
-              calendar.addEvent(newEvent);
-            }
-          },
-          eventColor: '#4F46E5',
-          eventTextColor: '#ffffff',
-          dayHeaderFormat: { weekday: 'short' },
-          buttonText: {
-            today: 'Hari Ini'
-          },
-        });
-        calendar.render();
+      if (calendarEl) {
+        if (!calendar) {
+          calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth',
+            headerToolbar: {
+              left: 'prev,today,next',
+              center: 'title',
+              right: 'dayGridMonth,timeGridWeek'
+            },
+            events: events,
+            editable: true,
+            selectable: true,
+            dateClick: function(info) {
+              openEventModal(info.dateStr);
+            },
+            eventClick: function(info) {
+              const eventTitle = info.event.title || "Acara";
+              const eventId = info.event.id;
+              if (window.Ghostoast) {
+                Ghostoast.confirm({
+                  title: `Hapus Acara "${eventTitle}"?`,
+                  message: `Acara ini akan dihapus secara permanen dari database.`,
+                  confirmText: "Ya, Hapus Acara",
+                  onConfirm: async () => {
+                    await deleteEvent(eventId);
+                  }
+                });
+              } else {
+                deleteEvent(eventId);
+              }
+            },
+            eventColor: '#2563eb',
+            eventTextColor: '#ffffff',
+            dayHeaderFormat: { weekday: 'short' },
+            buttonText: {
+              today: 'Hari Ini',
+              month: 'Bulan',
+              week: 'Minggu'
+            },
+          });
+          calendar.render();
+        } else {
+          calendar.removeAllEvents();
+          calendar.addEventSource(events);
+        }
       }
     }
 
@@ -372,27 +591,40 @@ import Toast from "../components/Toast.astro";
       document.getElementById("statAvgProgress").innerText = avgProgress + "%";
     }
 
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
     function renderProjectsTableView() {
       const tbody = document.getElementById("projectsTableBody");
       const emptyState = document.getElementById("tableEmptyState");
+      if (!tbody) return;
       tbody.innerHTML = "";
 
       let filtered = projects.filter((p) => {
-        const total = p.tasks.length;
-        const completed = p.tasks.filter((t) => t.completed).length;
+        const tasks = p.tasks || [];
+        const total = tasks.length;
+        const completed = tasks.filter((t) => t.completed).length;
         const isCompleted = total > 0 && completed === total;
 
         if (currentFilter === "in-progress" && isCompleted) return false;
         if (currentFilter === "completed" && !isCompleted) return false;
 
         if (searchQuery) {
-          const matchTitle = p.title.toLowerCase().includes(searchQuery);
-          const matchCategory = p.category.toLowerCase().includes(searchQuery);
-          const matchDesc = p.description.toLowerCase().includes(searchQuery);
-          const matchTask = p.tasks.some(
+          const q = searchQuery.toLowerCase();
+          const matchTitle = (p.title || "").toLowerCase().includes(q);
+          const matchCategory = (p.category || "").toLowerCase().includes(q);
+          const matchDesc = (p.description || "").toLowerCase().includes(q);
+          const matchTask = tasks.some(
             (t) =>
-              t.title.toLowerCase().includes(searchQuery) ||
-              t.description.toLowerCase().includes(searchQuery),
+              (t.title || "").toLowerCase().includes(q) ||
+              (t.description || "").toLowerCase().includes(q),
           );
           return matchTitle || matchCategory || matchDesc || matchTask;
         }
@@ -400,20 +632,23 @@ import Toast from "../components/Toast.astro";
         return true;
       });
 
-      document.getElementById("projectCountLabel").innerText =
-        `Menampilkan ${filtered.length} Projek`;
+      const countLabel = document.getElementById("projectCountLabel");
+      if (countLabel) countLabel.innerText = `Menampilkan ${filtered.length} Projek`;
 
-      if (filtered.length === 0) {
-        emptyState.classList.remove("hidden");
-        emptyState.classList.add("flex");
-      } else {
-        emptyState.classList.add("hidden");
-        emptyState.classList.remove("flex");
+      if (emptyState) {
+        if (filtered.length === 0) {
+          emptyState.classList.remove("hidden");
+          emptyState.classList.add("flex");
+        } else {
+          emptyState.classList.add("hidden");
+          emptyState.classList.remove("flex");
+        }
       }
 
       filtered.forEach((p, index) => {
-        const totalTasks = p.tasks.length;
-        const completedTasks = p.tasks.filter((t) => t.completed).length;
+        const tasks = p.tasks || [];
+        const totalTasks = tasks.length;
+        const completedTasks = tasks.filter((t) => t.completed).length;
         const progress =
           totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
         const isCompleted = totalTasks > 0 && completedTasks === totalTasks;
@@ -508,25 +743,110 @@ import Toast from "../components/Toast.astro";
         return;
       }
 
-      const totalTasks = project.tasks.length;
-      const completedTasks = project.tasks.filter((t) => t.completed).length;
+      const tasks = project.tasks || [];
+      const totalTasks = tasks.length;
+      const completedTasks = tasks.filter((t) => t.completed).length;
       const progress =
         totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
       const isCompleted = totalTasks > 0 && completedTasks === totalTasks;
 
-      document.getElementById("detailProjectTitle").innerText = project.title;
-      document.getElementById("detailProjectCategory").innerText =
-        project.category;
-      document.getElementById("detailProjectDesc").innerText =
-        project.description || "Tidak ada deskripsi projek.";
-      document.getElementById("detailProgressText").innerText =
-        `${progress}% (${completedTasks}/${totalTasks})`;
-      document.getElementById("detailProgressBar").style.width = `${progress}%`;
+      const titleElem = document.getElementById("detailProjectTitle");
+      if (titleElem) titleElem.innerText = project.title;
+
+      const breadcrumbElem = document.getElementById("breadcrumbProjectTitle");
+      if (breadcrumbElem) breadcrumbElem.innerText = project.title;
+
+      const categoryElem = document.getElementById("detailProjectCategory");
+      if (categoryElem) categoryElem.innerText = project.category || "Umum";
+
+      const descElem = document.getElementById("detailProjectDesc");
+      if (descElem) descElem.innerText = project.description || "Tidak ada deskripsi projek.";
+
+      const statusElem = document.getElementById("detailProjectStatus");
+      if (statusElem) {
+        if (isCompleted) {
+          statusElem.className = "px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-100 text-emerald-800 border border-emerald-200";
+          statusElem.innerText = "Selesai";
+        } else {
+          statusElem.className = "px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-slate-100 text-slate-600 border border-slate-200";
+          statusElem.innerText = "Sedang Berjalan";
+        }
+      }
+
+      const progressTextElem = document.getElementById("detailProgressText");
+      if (progressTextElem) progressTextElem.innerText = `${progress}% (${completedTasks}/${totalTasks})`;
+
+      const progressBarElem = document.getElementById("detailProgressBar");
+      if (progressBarElem) progressBarElem.style.width = `${progress}%`;
 
       const taskCountElem = document.getElementById("detailTaskCountLabel");
-      if (taskCountElem) {
-        taskCountElem.innerText = `${completedTasks} dari ${totalTasks} task selesai`;
+      if (taskCountElem) taskCountElem.innerText = `${completedTasks} dari ${totalTasks} task selesai`;
+
+      // Render Task List
+      const tasksContainer = document.getElementById("tasksListContainer");
+      const emptyState = document.getElementById("tasksEmptyState");
+
+      if (!tasksContainer) return;
+      tasksContainer.innerHTML = "";
+
+      let filteredTasks = tasks.filter((t) => {
+        if (currentTaskFilter === "active" && t.completed) return false;
+        if (currentTaskFilter === "completed" && !t.completed) return false;
+        if (searchQuery) {
+          const q = searchQuery.toLowerCase();
+          const matchTitle = (t.title || "").toLowerCase().includes(q);
+          const matchDesc = (t.description || "").toLowerCase().includes(q);
+          return matchTitle || matchDesc;
+        }
+        return true;
+      });
+
+      if (emptyState) {
+        if (filteredTasks.length === 0) {
+          emptyState.classList.remove("hidden");
+          emptyState.classList.add("flex");
+        } else {
+          emptyState.classList.add("hidden");
+          emptyState.classList.remove("flex");
+        }
       }
+
+      filteredTasks.forEach((t) => {
+        const item = document.createElement("div");
+        item.className = "p-4 flex items-center justify-between gap-4 hover:bg-slate-50/70 transition-colors group";
+
+        item.innerHTML = `
+          <div class="flex items-start gap-3.5 flex-1 min-w-0">
+            <input
+              type="checkbox"
+              ${t.completed ? "checked" : ""}
+              onchange="toggleTask('${project.id}', '${t.id}')"
+              class="w-4 h-4 rounded border-slate-300 text-brand-600 focus:ring-brand-500 mt-0.5 cursor-pointer accent-brand-600"
+            />
+            <div class="flex-1 min-w-0">
+              <h4 class="text-xs font-bold text-slate-800 ${t.completed ? "line-through text-slate-400" : ""} leading-snug">
+                ${escapeHtml(t.title)}
+              </h4>
+              ${t.description ? `<p class="text-[11px] text-slate-500 mt-0.5 line-clamp-2 font-normal">${escapeHtml(t.description)}</p>` : ""}
+            </div>
+          </div>
+
+          <div class="flex items-center gap-3">
+            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full ${t.completed ? "bg-emerald-50 text-emerald-700 border border-emerald-200" : "bg-slate-100 text-slate-600 border border-slate-200"}">
+              ${t.completed ? "Selesai" : "Belum Selesai"}
+            </span>
+            <button
+              onclick="deleteTask('${project.id}', '${t.id}')"
+              class="text-slate-300 hover:text-rose-600 p-1.5 rounded-lg transition-colors"
+              title="Hapus Task"
+            >
+              <i class="fa-regular fa-trash-can text-xs"></i>
+            </button>
+          </div>
+        `;
+
+        tasksContainer.appendChild(item);
+      });
     }
   
   </script>
