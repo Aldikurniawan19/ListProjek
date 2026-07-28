@@ -1,0 +1,42 @@
+---
+---
+<header
+  class="h-16 bg-white border-b border-brand-100 px-4 md:px-8 flex items-center justify-between gap-4 shrink-0 z-10"
+>
+  <div class="flex items-center gap-3">
+    <button
+      onclick="toggleSidebar()"
+      class="md:hidden p-2 text-slate-500 hover:text-brand-600 hover:bg-brand-50 rounded-lg"
+    >
+      <i class="fa-solid fa-bars text-lg"></i>
+    </button>
+    <div class="flex items-center gap-2">
+      <h2 id="viewTitle" class="text-lg font-bold text-brand-950">
+        Daftar Projek Utama
+      </h2>
+    </div>
+  </div>
+
+  <div class="flex items-center gap-3">
+    <div class="relative w-48 sm:w-64">
+      <i
+        class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"
+      ></i>
+      <input
+        type="text"
+        id="searchInput"
+        oninput="handleSearch()"
+        placeholder="Cari projek atau task..."
+        class="w-full pl-9 pr-4 py-2 bg-slate-50 border border-brand-100 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-brand-500 focus:bg-white transition-all"
+      />
+    </div>
+    <button
+      id="mainActionBtn"
+      onclick="openModal('projectModal')"
+      class="bg-brand-600 hover:bg-brand-700 text-white px-4 py-2 rounded-lg text-xs font-semibold flex items-center gap-2 transition-all shadow-sm shadow-brand-500/20 whitespace-nowrap"
+    >
+      <i class="fa-solid fa-plus"></i>
+      <span>Projek Baru</span>
+    </button>
+  </div>
+</header>

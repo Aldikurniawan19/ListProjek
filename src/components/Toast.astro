@@ -1,0 +1,151 @@
+---
+---
+<div id="modal-container"></div>
+<script is:inline>
+  const Ghostoast = {
+      container: null,
+      init() {
+        if (!this.container) {
+          this.container = document.createElement("div");
+          this.container.id = "ghostoastContainer";
+          this.container.className =
+            "fixed bottom-6 right-6 z-50 flex flex-col gap-3 max-w-sm w-full pointer-events-none px-4 sm:px-0";
+          document.body.appendChild(this.container);
+        }
+      },
+      show({ type = "info", title = "", message = "", duration = 3500 }) {
+        this.init();
+        const toast = document.createElement("div");
+        toast.className =
+          "pointer-events-auto transform translate-y-4 opacity-0 transition-all duration-300 ease-out bg-slate-900/90 text-white backdrop-blur-xl border border-slate-700/60 p-4 rounded-2xl shadow-2xl flex items-start gap-3.5 relative overflow-hidden group";
+
+        const icons = {
+          success: {
+            icon: "fa-circle-check",
+            color: "text-emerald-400 bg-emerald-500/10 border-emerald-500/30",
+          },
+          error: {
+            icon: "fa-circle-xmark",
+            color: "text-rose-400 bg-rose-500/10 border-rose-500/30",
+          },
+          info: {
+            icon: "fa-circle-info",
+            color: "text-sky-400 bg-sky-500/10 border-sky-500/30",
+          },
+          warning: {
+            icon: "fa-triangle-exclamation",
+            color: "text-amber-400 bg-amber-500/10 border-amber-500/30",
+          },
+        };
+
+        const config = icons[type] || icons.info;
+
+        toast.innerHTML = `
+					<div class="w-9 h-9 rounded-xl ${config.color} border flex items-center justify-center shrink-0 text-base shadow-sm">
+						<i class="fa-solid ${config.icon}"></i>
+					</div>
+					<div class="flex-1 min-w-0 pr-2">
+						${title ? `<h4 class="font-bold text-xs text-slate-100 mb-0.5 tracking-tight">${escapeHtml(title)}</h4>` : ""}
+						<p class="text-xs text-slate-300 leading-relaxed font-normal">${escapeHtml(message)}</p>
+					</div>
+					<button onclick="Ghostoast.dismiss(this.parentElement)" class="text-slate-400 hover:text-white transition-colors p-1 rounded-lg hover:bg-slate-800">
+						<i class="fa-solid fa-xmark text-xs"></i>
+					</button>
+					<div class="absolute bottom-0 left-0 right-0 h-0.5 bg-slate-800">
+						<div class="h-full ${type === "success" ? "bg-emerald-400" : type === "error" ? "bg-rose-400" : type === "warning" ? "bg-amber-400" : "bg-sky-400"}" style="animation: ghostoastProgress ${duration}ms linear forwards"></div>
+					</div>
+				`;
+
+        this.container.appendChild(toast);
+
+        requestAnimationFrame(() => {
+          toast.classList.remove("translate-y-4", "opacity-0");
+          toast.classList.add("translate-y-0", "opacity-100");
+        });
+
+        const timer = setTimeout(() => {
+          this.dismiss(toast);
+        }, duration);
+
+        toast.dataset.timer = timer;
+      },
+      dismiss(toast) {
+        if (!toast || toast.classList.contains("dismissing")) return;
+        toast.classList.add("dismissing");
+        if (toast.dataset.timer) clearTimeout(parseInt(toast.dataset.timer));
+        toast.classList.remove("translate-y-0", "opacity-100");
+        toast.classList.add("translate-y-2", "opacity-0", "scale-95");
+        setTimeout(() => {
+          if (toast.parentElement) toast.parentElement.removeChild(toast);
+        }, 300);
+      },
+      success(message, title = "Berhasil") {
+        this.show({ type: "success", title, message });
+      },
+      error(message, title = "Gagal") {
+        this.show({ type: "error", title, message });
+      },
+      info(message, title = "Informasi") {
+        this.show({ type: "info", title, message });
+      },
+      warning(message, title = "Peringatan") {
+        this.show({ type: "warning", title, message });
+      },
+      confirm({
+        title = "Konfirmasi Hapus",
+        message = "Apakah Anda yakin ingin menghapus data ini?",
+        confirmText = "Ya, Hapus",
+        onConfirm,
+      }) {
+        let confirmModal = document.getElementById("ghostoastConfirmModal");
+        if (!confirmModal) {
+          confirmModal = document.createElement("div");
+          confirmModal.id = "ghostoastConfirmModal";
+          confirmModal.className =
+            "fixed inset-0 bg-brand-950/40 z-50 flex items-center justify-center p-4 hidden backdrop-blur-sm transition-opacity duration-200";
+          confirmModal.innerHTML = `
+						<div class="bg-white rounded-2xl border border-brand-100 shadow-2xl w-full max-w-sm overflow-hidden transform transition-all p-6 text-center space-y-4">
+							<div class="w-14 h-14 rounded-2xl bg-rose-50 border border-rose-100 text-rose-500 flex items-center justify-center text-2xl mx-auto shadow-xs">
+								<i class="fa-solid fa-triangle-exclamation"></i>
+							</div>
+							<div class="space-y-1">
+								<h3 id="confirmModalTitle" class="font-bold text-brand-950 text-base leading-snug">Hapus Data?</h3>
+								<p id="confirmModalMessage" class="text-xs text-slate-500 leading-relaxed">Tindakan ini tidak dapat dibatalkan.</p>
+							</div>
+							<div class="flex items-center justify-center gap-2.5 pt-2">
+								<button id="confirmModalCancelBtn" class="flex-1 px-4 py-2.5 rounded-xl text-xs font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 transition-all cursor-pointer">
+									Batal
+								</button>
+								<button id="confirmModalActionBtn" class="flex-1 px-4 py-2.5 rounded-xl text-xs font-semibold text-white bg-rose-600 hover:bg-rose-700 shadow-sm shadow-rose-500/20 transition-all flex items-center justify-center gap-1.5 cursor-pointer">
+									<i class="fa-solid fa-trash-can text-xs"></i>
+									<span id="confirmModalActionText">Ya, Hapus</span>
+								</button>
+							</div>
+						</div>
+					`;
+          document.body.appendChild(confirmModal);
+        }
+
+        document.getElementById("confirmModalTitle").innerText = title;
+        document.getElementById("confirmModalMessage").innerText = message;
+        document.getElementById("confirmModalActionText").innerText =
+          confirmText;
+
+        const cancelBtn = document.getElementById("confirmModalCancelBtn");
+        const actionBtn = document.getElementById("confirmModalActionBtn");
+
+        const close = () => {
+          confirmModal.classList.add("hidden");
+        };
+
+        cancelBtn.onclick = () => close();
+
+        actionBtn.onclick = async () => {
+          close();
+          if (onConfirm) await onConfirm();
+        };
+
+        confirmModal.classList.remove("hidden");
+      },
+    };
+</script>

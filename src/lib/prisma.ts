@@ -6,9 +6,11 @@ let prisma: PrismaClient;
 
 export function getPrisma(): PrismaClient {
   if (!prisma) {
-    const pool = new pg.Pool({
-      connectionString: process.env.DATABASE_URL,
-    });
+    const connectionString = import.meta.env.DATABASE_URL ?? process.env.DATABASE_URL;
+    if (!connectionString) {
+      throw new Error('DATABASE_URL is not set in environment variables');
+    }
+    const pool = new pg.Pool({ connectionString });
     const adapter = new PrismaPg(pool);
     prisma = new PrismaClient({ adapter });
   }
