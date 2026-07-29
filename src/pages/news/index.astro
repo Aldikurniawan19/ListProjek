@@ -1,0 +1,88 @@
+---
+---
+<div id="newsView" class="hidden flex-1 flex-col space-y-5 overflow-y-auto pr-1 pb-6">
+  <!-- Header Banner -->
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 sm:p-6 rounded-2xl bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white shadow-xl relative overflow-hidden border border-slate-800 shrink-0">
+    <!-- Ambient Blur -->
+    <div class="absolute -top-24 -right-24 w-64 h-64 bg-brand-500/20 rounded-full blur-3xl pointer-events-none"></div>
+    
+    <div class="space-y-1.5 z-10">
+      <div class="flex items-center gap-2 flex-wrap">
+        <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-rose-500/20 text-rose-300 border border-rose-500/30 flex items-center gap-1.5">
+          <span class="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse"></span>
+          BERITA TERKINI
+        </span>
+        <span id="newsLastUpdated" class="text-[11px] text-slate-300/80 font-medium">
+          <i class="fa-regular fa-clock mr-1"></i> Update tiap 15 mnt
+        </span>
+      </div>
+      <h2 class="text-xl sm:text-2xl font-bold tracking-tight text-white">Portal Berita Trending</h2>
+      <p class="text-xs text-slate-300 max-w-xl leading-relaxed">
+        Kumpulan berita hangat terkini dari berbagai sumber terpercaya, diperbarui secara otomatis setiap 15 menit.
+      </p>
+    </div>
+    
+    <div class="flex items-center gap-2 z-10 shrink-0">
+      <button
+        onclick="fetchNewsData(true)"
+        id="refreshNewsBtn"
+        title="Paksa Refresh Berita"
+        class="px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-semibold backdrop-blur-md border border-white/15 transition-all flex items-center gap-2 cursor-pointer"
+      >
+        <i id="refreshNewsIcon" class="fa-solid fa-arrows-rotate text-xs"></i>
+        <span>Refresh Berita</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Search & Category Filters -->
+  <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 shrink-0">
+    <!-- Category Tabs -->
+    <div class="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar">
+      <button onclick="setNewsCategory('all')" id="newsCat-all" class="news-cat-btn px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-brand-600 text-white shadow-sm transition-all whitespace-nowrap cursor-pointer">
+        Semua Berita
+      </button>
+      <button onclick="setNewsCategory('top')" id="newsCat-top" class="news-cat-btn px-3.5 py-1.5 rounded-xl text-xs font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all whitespace-nowrap cursor-pointer">
+        Utama
+      </button>
+      <button onclick="setNewsCategory('technology')" id="newsCat-technology" class="news-cat-btn px-3.5 py-1.5 rounded-xl text-xs font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all whitespace-nowrap cursor-pointer">
+        Teknologi & AI
+      </button>
+      <button onclick="setNewsCategory('sports')" id="newsCat-sports" class="news-cat-btn px-3.5 py-1.5 rounded-xl text-xs font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all whitespace-nowrap cursor-pointer">
+        Olahraga
+      </button>
+      <button onclick="setNewsCategory('entertainment')" id="newsCat-entertainment" class="news-cat-btn px-3.5 py-1.5 rounded-xl text-xs font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all whitespace-nowrap cursor-pointer">
+        Hiburan
+      </button>
+      <button onclick="setNewsCategory('business')" id="newsCat-business" class="news-cat-btn px-3.5 py-1.5 rounded-xl text-xs font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all whitespace-nowrap cursor-pointer">
+        Bisnis & Politik
+      </button>
+    </div>
+
+    <!-- Search Input -->
+    <div class="relative min-w-[220px]">
+      <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+      <input
+        type="text"
+        id="newsSearchInput"
+        oninput="handleNewsSearch()"
+        placeholder="Cari judul berita..."
+        class="w-full pl-9 pr-3.5 py-2 text-xs bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-brand-500 transition-all placeholder:text-slate-400 dark:placeholder:text-slate-500"
+      />
+    </div>
+  </div>
+
+  <!-- News Grid -->
+  <div id="newsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+    <!-- Skeleton loader placeholder will be injected here during loading -->
+  </div>
+
+  <!-- Empty State -->
+  <div id="newsEmptyState" class="hidden flex-col items-center justify-center p-12 text-center bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-3">
+    <div class="w-14 h-14 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-400 flex items-center justify-center text-2xl">
+      <i class="fa-regular fa-newspaper"></i>
+    </div>
+    <h3 class="font-bold text-slate-900 dark:text-white text-base">Tidak Ada Berita Ditemukan</h3>
+    <p class="text-xs text-slate-500 dark:text-slate-400 max-w-sm">Coba ubah kata kunci pencarian atau pilih kategori berita lainnya.</p>
+  </div>
+</div>

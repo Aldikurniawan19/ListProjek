@@ -6,6 +6,7 @@ import Stats from '~/components/Stats.astro';
 import Dashboard from './dashboard/index.astro';
 import ProjectDetail from './projects/detail.astro';
 import Calendar from './calendar/index.astro';
+import NewsPortal from './news/index.astro';
 import ProjectModal from '~/components/ProjectModal.astro';
 import TaskModal from '~/components/TaskModal.astro';
 import EventModal from '~/components/EventModal.astro';
@@ -44,6 +45,7 @@ const user = data.user;
       <Dashboard />
       <ProjectDetail />
       <Calendar />
+      <NewsPortal />
     </main>
   </div>
   <ProjectModal />
@@ -112,7 +114,8 @@ const user = data.user;
     function updateSidebarNav(activeNavId) {
       const navBtns = [
         { id: "navProjectBtn", defaultIconClass: "fa-solid fa-folder-open text-slate-400 dark:text-slate-500 w-5 text-center", activeIconClass: "fa-solid fa-folder-open text-white w-5 text-center" },
-        { id: "navCalendarBtn", defaultIconClass: "fa-solid fa-calendar-days text-slate-400 dark:text-slate-500 w-5 text-center", activeIconClass: "fa-solid fa-calendar-days text-white w-5 text-center" }
+        { id: "navCalendarBtn", defaultIconClass: "fa-solid fa-calendar-days text-slate-400 dark:text-slate-500 w-5 text-center", activeIconClass: "fa-solid fa-calendar-days text-white w-5 text-center" },
+        { id: "navNewsBtn", defaultIconClass: "fa-solid fa-newspaper text-slate-400 dark:text-slate-500 w-5 text-center", activeIconClass: "fa-solid fa-newspaper text-white w-5 text-center" }
       ];
 
       navBtns.forEach(nav => {
@@ -134,7 +137,11 @@ const user = data.user;
       document.getElementById("listView").style.display = "none";
       document.getElementById("detailView").style.display = "none";
       document.getElementById("calendarView").style.display = "none";
-      document.getElementById(viewId).style.display = "flex";
+      const newsView = document.getElementById("newsView");
+      if (newsView) newsView.style.display = "none";
+
+      const targetView = document.getElementById(viewId);
+      if (targetView) targetView.style.display = "flex";
     }
 
     function showDashboardView() {
@@ -411,11 +418,199 @@ const user = data.user;
       }
     }
 
+    let allNewsArticles = [];
+    let currentNewsCategory = "all";
+    let newsSearchQuery = "";
+
+    async function showNewsView() {
+      updateSidebarNav("navNewsBtn");
+      showView("newsView");
+      document.getElementById("statsOverview").style.display = "none";
+      document.getElementById("viewTitle").innerText = "Portal Berita Trending";
+      const mainBtn = document.getElementById("mainActionBtn");
+      if (mainBtn) mainBtn.style.display = "none";
+      fetchNewsData();
+    }
+
+    async function fetchNewsData(forceRefresh = false) {
+      const grid = document.getElementById("newsGrid");
+      const refreshIcon = document.getElementById("refreshNewsIcon");
+      const refreshBtn = document.getElementById("refreshNewsBtn");
+
+      if (refreshIcon) refreshIcon.classList.add("animate-spin");
+      if (refreshBtn) refreshBtn.disabled = true;
+
+      if (grid && (!allNewsArticles || allNewsArticles.length === 0 || forceRefresh)) {
+        grid.innerHTML = Array(6).fill(0).map(() => `
+          <div class="animate-pulse bg-white dark:bg-slate-900 rounded-2xl p-4 border border-slate-200 dark:border-slate-800 space-y-3">
+            <div class="h-44 bg-slate-200 dark:bg-slate-800 rounded-xl"></div>
+            <div class="h-4 bg-slate-200 dark:bg-slate-800 rounded w-3/4"></div>
+            <div class="h-3 bg-slate-200 dark:bg-slate-800 rounded w-full"></div>
+            <div class="h-3 bg-slate-200 dark:bg-slate-800 rounded w-2/3"></div>
+          </div>
+        `).join('');
+      }
+
+      try {
+        const url = forceRefresh ? '/api/news?refresh=true' : '/api/news';
+        const res = await fetch(url);
+        const data = await res.json();
+        
+        allNewsArticles = data.results || [];
+        
+        const updatedLabel = document.getElementById("newsLastUpdated");
+        if (updatedLabel) {
+          if (data.source === 'cache') {
+            updatedLabel.innerHTML = `<i class="fa-regular fa-clock mr-1 text-sky-400"></i> Cache (${data.nextUpdateInMinutes}m tersisa)`;
+          } else {
+            updatedLabel.innerHTML = `<i class="fa-solid fa-check mr-1 text-emerald-400"></i> Berita Terkini (Live)`;
+          }
+        }
+
+        if (forceRefresh && window.Ghostoast) {
+          Ghostoast.success("Data berita berhasil diperbarui.", "Portal Berita");
+        }
+
+        renderNewsGrid();
+      } catch (err) {
+        console.error("Gagal mengambil berita:", err);
+        if (window.Ghostoast) {
+          Ghostoast.error("Gagal memuat berita terkini.", "Terjadi Kesalahan");
+        }
+      } finally {
+        if (refreshIcon) refreshIcon.classList.remove("animate-spin");
+        if (refreshBtn) refreshBtn.disabled = false;
+      }
+    }
+
+    function setNewsCategory(cat) {
+      currentNewsCategory = cat;
+      document.querySelectorAll(".news-cat-btn").forEach(btn => {
+        btn.classList.remove("bg-brand-600", "text-white", "font-semibold");
+        btn.classList.add("text-slate-600", "dark:text-slate-400", "font-medium");
+      });
+      const activeBtn = document.getElementById(`newsCat-${cat}`);
+      if (activeBtn) {
+        activeBtn.classList.add("bg-brand-600", "text-white", "font-semibold");
+        activeBtn.classList.remove("text-slate-600", "dark:text-slate-400", "font-medium");
+      }
+      renderNewsGrid();
+    }
+
+    function handleNewsSearch() {
+      const input = document.getElementById("newsSearchInput");
+      newsSearchQuery = input ? input.value.toLowerCase().trim() : '';
+      renderNewsGrid();
+    }
+
+    function renderNewsGrid() {
+      const grid = document.getElementById("newsGrid");
+      const emptyState = document.getElementById("newsEmptyState");
+      if (!grid) return;
+
+      let filtered = allNewsArticles.filter(item => {
+        if (currentNewsCategory !== 'all') {
+          const itemCats = (item.category || []).map(c => String(c).toLowerCase());
+          if (!itemCats.includes(currentNewsCategory.toLowerCase())) {
+            return false;
+          }
+        }
+
+        if (newsSearchQuery) {
+          const matchTitle = (item.title || '').toLowerCase().includes(newsSearchQuery);
+          const matchDesc = (item.description || '').toLowerCase().includes(newsSearchQuery);
+          const matchSource = (item.source_name || '').toLowerCase().includes(newsSearchQuery);
+          return matchTitle || matchDesc || matchSource;
+        }
+
+        return true;
+      });
+
+      if (filtered.length === 0) {
+        grid.innerHTML = '';
+        if (emptyState) {
+          emptyState.classList.remove("hidden");
+          emptyState.classList.add("flex");
+        }
+        return;
+      }
+
+      if (emptyState) {
+        emptyState.classList.add("hidden");
+        emptyState.classList.remove("flex");
+      }
+
+      grid.innerHTML = filtered.map(item => {
+        const title = escapeHtml(item.title);
+        const desc = escapeHtml(item.description);
+        const sourceName = escapeHtml(item.source_name);
+        const categoryTag = item.category?.[0] ? escapeHtml(String(item.category[0]).toUpperCase()) : 'BERITA';
+        const formattedDate = new Date(item.pubDate).toLocaleDateString('id-ID', {
+          day: 'numeric',
+          month: 'short',
+          year: 'numeric'
+        });
+
+        return `
+          <div class="group bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800/80 overflow-hidden shadow-sm hover:shadow-xl hover:border-brand-500/30 dark:hover:border-brand-500/30 transition-all duration-300 flex flex-col justify-between">
+            <div class="relative overflow-hidden aspect-video bg-slate-100 dark:bg-slate-800">
+              <img
+                src="${escapeHtml(item.image_url)}"
+                alt="${title}"
+                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1504711434969-e33886168f5c?auto=format&fit=crop&w=800&q=80';"
+              />
+              <div class="absolute top-3 left-3 flex items-center gap-2">
+                <span class="px-2.5 py-1 rounded-lg text-[10px] font-bold bg-slate-900/80 backdrop-blur-md text-white border border-white/20 uppercase tracking-wider">
+                  ${categoryTag}
+                </span>
+              </div>
+            </div>
+
+            <div class="p-5 flex-1 flex flex-col justify-between space-y-4">
+              <div class="space-y-2">
+                <div class="flex items-center gap-2 text-slate-400 text-[11px] font-medium">
+                  <span class="text-brand-600 dark:text-brand-400 font-bold flex items-center gap-1">
+                    <i class="fa-solid fa-newspaper text-[10px]"></i>
+                    ${sourceName}
+                  </span>
+                  <span>•</span>
+                  <span>${formattedDate}</span>
+                </div>
+                <h3 class="font-bold text-slate-900 dark:text-white text-sm line-clamp-2 group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors leading-snug">
+                  ${title}
+                </h3>
+                <p class="text-slate-500 dark:text-slate-400 text-xs line-clamp-3 leading-relaxed font-normal">
+                  ${desc}
+                </p>
+              </div>
+
+              <div class="pt-3 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
+                <a
+                  href="${escapeHtml(item.link)}"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="inline-flex items-center gap-1.5 text-xs font-semibold text-brand-600 dark:text-brand-400 hover:text-brand-700 dark:hover:text-brand-300 transition-colors group/link"
+                >
+                  <span>Baca Selengkapnya</span>
+                  <i class="fa-solid fa-arrow-up-right-from-square text-[10px] transition-transform group-hover/link:translate-x-0.5 group-hover/link:-translate-y-0.5"></i>
+                </a>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
     // Attach to global window scope so HTML inline attributes always work
     window.fetchEvents = fetchEvents;
     window.showCalendarView = showCalendarView;
     window.showDashboardView = showDashboardView;
     window.showProjectDetailView = showProjectDetailView;
+    window.showNewsView = showNewsView;
+    window.fetchNewsData = fetchNewsData;
+    window.setNewsCategory = setNewsCategory;
+    window.handleNewsSearch = handleNewsSearch;
     window.updateSidebarNav = updateSidebarNav;
     window.openEventModal = openEventModal;
     window.closeEventModal = closeEventModal;
