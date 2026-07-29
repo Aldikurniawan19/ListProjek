@@ -5,6 +5,9 @@ import path from 'node:path';
 export default defineConfig({
   output: 'server',
   adapter: node({ mode: 'middleware' }),
+  security: {
+    checkOrigin: false,
+  },
   vite: {
     resolve: {
       alias: {
@@ -13,4 +16,3 @@ export default defineConfig({
     },
   },
 });
-

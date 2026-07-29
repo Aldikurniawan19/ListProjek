@@ -147,7 +147,14 @@ import Toast from '~/components/Toast.astro';
           method: 'POST',
           body: formData,
         });
-        const data = await res.json();
+        let data = {};
+        const contentType = res.headers.get('content-type');
+        if (contentType && contentType.includes('application/json')) {
+          data = await res.json();
+        } else {
+          const text = await res.text();
+          throw new Error(text || 'Terjadi kesalahan pada server.');
+        }
         
         if (!res.ok) {
           throw new Error(data.error || 'Kredensial login tidak valid.');
