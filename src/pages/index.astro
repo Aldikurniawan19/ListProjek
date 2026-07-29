@@ -1,18 +1,39 @@
 ---
-import Layout from "../layouts/Layout.astro";
-import Sidebar from "../components/Sidebar.astro";
-import Header from "../components/Header.astro";
-import Stats from "../components/Stats.astro";
-import Dashboard from "./dashboard/index.astro";
-import ProjectDetail from "./projects/detail.astro";
-import Calendar from "./calendar/index.astro";
-import ProjectModal from "../components/ProjectModal.astro";
-import TaskModal from "../components/TaskModal.astro";
-import EventModal from "../components/EventModal.astro";
-import Toast from "../components/Toast.astro";
+import Layout from '~/layouts/Layout.astro';
+import Sidebar from '~/components/Sidebar.astro';
+import Header from '~/components/Header.astro';
+import Stats from '~/components/Stats.astro';
+import Dashboard from './dashboard/index.astro';
+import ProjectDetail from './projects/detail.astro';
+import Calendar from './calendar/index.astro';
+import ProjectModal from '~/components/ProjectModal.astro';
+import TaskModal from '~/components/TaskModal.astro';
+import EventModal from '~/components/EventModal.astro';
+import Toast from '~/components/Toast.astro';
+import { supabase } from '~/lib/supabase';
+
+const accessToken = Astro.cookies.get('sb-access-token');
+const refreshToken = Astro.cookies.get('sb-refresh-token');
+
+if (!accessToken || !refreshToken) {
+  return Astro.redirect('/auth/login');
+}
+
+const { data, error } = await supabase.auth.setSession({
+  refresh_token: refreshToken.value,
+  access_token: accessToken.value,
+});
+
+if (error) {
+  Astro.cookies.delete('sb-access-token', { path: '/' });
+  Astro.cookies.delete('sb-refresh-token', { path: '/' });
+  return Astro.redirect('/auth/login');
+}
+
+const user = data.user;
 ---
 <Layout>
-  <Sidebar />
+  <Sidebar user={user} />
   <div class="flex-1 flex flex-col min-w-0 h-screen md:ml-64 overflow-hidden">
     <Header />
     <main
@@ -43,6 +64,12 @@ import Toast from "../components/Toast.astro";
       showDashboardView();
       fetchProjects();
       updateThemeIcon();
+
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.has("login") && window.Ghostoast) {
+        Ghostoast.success("Selamat datang kembali di dashboard Anda!", "Login Berhasil");
+        window.history.replaceState({}, document.title, window.location.pathname);
+      }
     });
 
     function toggleTheme() {

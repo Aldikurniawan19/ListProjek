@@ -1,4 +1,14 @@
 ---
+interface Props {
+  user?: {
+    email?: string;
+    id?: string;
+  };
+}
+
+const { user } = Astro.props;
+const userEmail = user?.email || 'Pengguna';
+const userInitial = userEmail.charAt(0).toUpperCase();
 ---
 <div
   id="sidebarOverlay"
@@ -10,54 +20,88 @@
   id="sidebar"
   class="fixed inset-y-0 left-0 w-64 bg-white dark:bg-slate-900 border-r border-slate-200/80 dark:border-slate-800 z-30 transform -translate-x-full md:translate-x-0 transition-all duration-200 ease-in-out flex flex-col shrink-0"
 >
-  <div>
-    <div
-      class="h-16 flex items-center px-6 border-b border-slate-100 dark:border-slate-800 justify-between"
-    >
-      <div class="flex items-center gap-3">
-        <div
-          class="w-9 h-9 rounded-xl bg-gradient-to-tr from-brand-600 to-indigo-600 flex items-center justify-center text-white font-bold text-lg shadow-md shadow-brand-500/25"
-        >
-          <i class="fa-solid fa-list-check"></i>
-        </div>
-        <div>
-          <h1 class="font-bold text-slate-900 dark:text-white text-base leading-tight">
-            ProgresTask
-          </h1>
-          <p
-            class="text-[10px] font-bold text-brand-600 dark:text-brand-400 tracking-wider uppercase"
-          >
-            Manajemen Projek
-          </p>
-        </div>
-      </div>
-      <button
-        onclick="toggleSidebar()"
-        class="md:hidden text-slate-400 dark:text-slate-500 hover:text-slate-800 dark:hover:text-white"
+  <div class="flex-1 flex flex-col justify-between overflow-y-auto">
+    <div>
+      <div
+        class="h-16 flex items-center px-6 border-b border-slate-100 dark:border-slate-800 justify-between"
       >
-        <i class="fa-solid fa-xmark text-lg"></i>
-      </button>
+        <div class="flex items-center gap-3">
+          <div
+            class="w-9 h-9 rounded-xl bg-gradient-to-tr from-brand-600 to-indigo-600 flex items-center justify-center text-white font-bold text-lg shadow-md shadow-brand-500/25"
+          >
+            <i class="fa-solid fa-list-check"></i>
+          </div>
+          <div>
+            <h1 class="font-bold text-slate-900 dark:text-white text-base leading-tight">
+              ProgresTask
+            </h1>
+            <p
+              class="text-[10px] font-bold text-brand-600 dark:text-brand-400 tracking-wider uppercase"
+            >
+              Manajemen Projek
+            </p>
+          </div>
+        </div>
+        <button
+          onclick="toggleSidebar()"
+          class="md:hidden text-slate-400 dark:text-slate-500 hover:text-slate-800 dark:hover:text-white"
+        >
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <nav class="p-4 space-y-1.5">
+        <button
+          type="button"
+          onclick="showDashboardView()"
+          id="navProjectBtn"
+          class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl bg-brand-600 text-white font-semibold text-sm shadow-md shadow-brand-500/25 transition-all text-left"
+        >
+          <i class="fa-solid fa-folder-open text-white w-5 text-center"></i>
+          <span>Daftar Projek</span>
+        </button>
+        <button
+          type="button"
+          onclick="showCalendarView()"
+          id="navCalendarBtn"
+          class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100/80 dark:hover:bg-slate-800/80 hover:text-slate-900 dark:hover:text-white font-medium text-sm transition-all text-left"
+        >
+          <i class="fa-solid fa-calendar-days text-slate-400 dark:text-slate-500 w-5 text-center"></i>
+          <span>Kalender & Jadwal</span>
+        </button>
+      </nav>
     </div>
 
-    <nav class="p-4 space-y-1.5">
-      <button
-        type="button"
-        onclick="showDashboardView()"
-        id="navProjectBtn"
-        class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl bg-brand-600 text-white font-semibold text-sm shadow-md shadow-brand-500/25 transition-all text-left"
-      >
-        <i class="fa-solid fa-folder-open text-white w-5 text-center"></i>
-        <span>Daftar Projek</span>
-      </button>
-      <button
-        type="button"
-        onclick="showCalendarView()"
-        id="navCalendarBtn"
-        class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100/80 dark:hover:bg-slate-800/80 hover:text-slate-900 dark:hover:text-white font-medium text-sm transition-all text-left"
-      >
-        <i class="fa-solid fa-calendar-days text-slate-400 dark:text-slate-500 w-5 text-center"></i>
-        <span>Kalender & Jadwal</span>
-      </button>
-    </nav>
+    <!-- User Profile & Integrated Logout Button on the Right -->
+    <div class="p-4 border-t border-slate-100 dark:border-slate-800 mt-auto">
+      <div class="flex items-center justify-between gap-2.5 px-3 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-700/60">
+        <!-- Profile Info -->
+        <div class="flex items-center gap-2.5 min-w-0 flex-1">
+          <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-brand-600 to-indigo-600 flex items-center justify-center text-white font-bold text-sm shadow-sm shrink-0">
+            {userInitial}
+          </div>
+          <div class="min-w-0 flex-1">
+            <p class="text-xs font-bold text-slate-900 dark:text-white truncate" title={userEmail}>
+              {userEmail}
+            </p>
+            <span class="inline-flex items-center gap-1 text-[10px] font-medium text-emerald-600 dark:text-emerald-400">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+              Online
+            </span>
+          </div>
+        </div>
+
+        <!-- Logout Button on the Right -->
+        <form action="/api/auth/logout" method="POST" class="shrink-0">
+          <button
+            type="submit"
+            title="Keluar (Logout)"
+            class="w-8.5 h-8.5 rounded-xl flex items-center justify-center text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/60 transition-all border border-transparent hover:border-rose-200/60 dark:hover:border-rose-900/50 cursor-pointer"
+          >
+            <i class="fa-solid fa-right-from-bracket text-sm"></i>
+          </button>
+        </form>
+      </div>
+    </div>
   </div>
 </aside>

@@ -7,6 +7,14 @@ datasource db {
   provider = "postgresql"
 }
 
+model User {
+  id        String    @id @default(cuid())
+  email     String    @unique
+  password  String
+  projects  Project[]
+  events    Event[]
+}
+
 model Project {
   id          String   @id @default(cuid())
   title       String
@@ -14,6 +22,8 @@ model Project {
   description String   @default("Tidak ada deskripsi projek.")
   createdAt   DateTime @default(now())
   tasks       Task[]
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
 }
 
 model Task {
@@ -26,8 +36,12 @@ model Task {
 }
 
 model Event {
-  id    String   @id @default(cuid())
-  title String
-  start DateTime
-  end   DateTime?
+  id      String    @id @default(cuid())
+  title   String
+  start   DateTime
+  end     DateTime?
+  color   String?   @default("blue")
+  userId  String
+  user    User      @relation(fields: [userId], references: [id])
 }
+

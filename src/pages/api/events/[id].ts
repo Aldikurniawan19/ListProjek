@@ -1,5 +1,5 @@
 import type { APIRoute } from 'astro';
-import { getPrisma } from '../../../lib/prisma';
+import { getPrisma } from '~/lib/prisma';
 
 export const DELETE: APIRoute = async ({ params }) => {
   try {
@@ -12,10 +12,9 @@ export const DELETE: APIRoute = async ({ params }) => {
     }
 
     const prisma = getPrisma();
-    await prisma.$executeRawUnsafe(
-      `DELETE FROM "Event" WHERE "id" = $1`,
-      id
-    );
+    await prisma.event.delete({
+      where: { id },
+    });
 
     return new Response(JSON.stringify({ message: 'Acara berhasil dihapus' }), {
       status: 200,

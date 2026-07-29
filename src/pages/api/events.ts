@@ -1,38 +1,54 @@
 import type { APIRoute } from 'astro';
-import { getPrisma } from '../../lib/prisma';
+import { getPrisma } from '~/lib/prisma';
+import { supabase } from '~/lib/supabase';
 
-// Helper to ensure Event table exists in PostgreSQL with color column
-async function ensureEventTable(prisma: any) {
-  await prisma.$executeRawUnsafe(`
-    CREATE TABLE IF NOT EXISTS "Event" (
-      "id" TEXT NOT NULL PRIMARY KEY,
-      "title" TEXT NOT NULL,
-      "start" TIMESTAMP(3) NOT NULL,
-      "end" TIMESTAMP(3),
-      "color" TEXT DEFAULT 'blue'
-    );
-  `);
+async function getAuthUser(cookies: any, bodyUserId?: string, queryUserId?: string) {
+  if (queryUserId) return { id: queryUserId, email: '' };
+  if (bodyUserId) return { id: bodyUserId, email: '' };
 
-  // Ensure color column exists if table was created previously without color column
-  try {
-    await prisma.$executeRawUnsafe(`
-      ALTER TABLE "Event" ADD COLUMN IF NOT EXISTS "color" TEXT DEFAULT 'blue';
-    `);
-  } catch (e) {
-    // Ignore error if column already exists
+  const accessToken = cookies.get('sb-access-token');
+  const refreshToken = cookies.get('sb-refresh-token');
+
+  if (!accessToken?.value || !refreshToken?.value) {
+    return null;
   }
+
+  const { data, error } = await supabase.auth.setSession({
+    refresh_token: refreshToken.value,
+    access_token: accessToken.value,
+  });
+
+  if (error || !data.user) {
+    return null;
+  }
+
+  return { id: data.user.id, email: data.user.email || '' };
 }
 
-export const GET: APIRoute = async () => {
+export const GET: APIRoute = async ({ url, cookies }) => {
   try {
     const prisma = getPrisma();
-    await ensureEventTable(prisma);
+    const queryUserId = url.searchParams.get('userId');
+    const authUser = await getAuthUser(cookies, undefined, queryUserId || undefined);
 
-    const events = await prisma.$queryRawUnsafe<any[]>(`
-      SELECT "id", "title", "start", "end", "color" FROM "Event" ORDER BY "start" ASC
-    `);
+    if (!authUser) {
+      return new Response(JSON.stringify({ error: 'Pengguna tidak terotentikasi' }), {
+        status: 401,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
 
-    return new Response(JSON.stringify(events), {
+    const events = await prisma.event.findMany({
+      where: { userId: authUser.id },
+      orderBy: { start: 'asc' },
+    });
+
+    const formattedEvents = events.map((e: any) => ({
+      ...e,
+      color: e.color || 'blue',
+    }));
+
+    return new Response(JSON.stringify(formattedEvents), {
       status: 200,
       headers: { 'Content-Type': 'application/json' },
     });
@@ -45,11 +61,9 @@ export const GET: APIRoute = async () => {
   }
 };
 
-export const POST: APIRoute = async ({ request }) => {
+export const POST: APIRoute = async ({ request, cookies }) => {
   try {
     const prisma = getPrisma();
-    await ensureEventTable(prisma);
-
     const body = await request.json();
 
     if (!body.title || !body.start) {
@@ -59,39 +73,41 @@ export const POST: APIRoute = async ({ request }) => {
       });
     }
 
-    const id = 'evt_' + Math.random().toString(36).substring(2, 9) + Date.now().toString(36);
-    const startDate = new Date(body.start).toISOString();
-    const endDate = body.end ? new Date(body.end).toISOString() : null;
-    const color = body.color || 'blue';
+    const authUser = await getAuthUser(cookies, body.userId);
 
-    if (endDate) {
-      await prisma.$executeRawUnsafe(
-        `INSERT INTO "Event" ("id", "title", "start", "end", "color") VALUES ($1, $2, $3::timestamp, $4::timestamp, $5)`,
-        id,
-        body.title,
-        startDate,
-        endDate,
-        color
-      );
-    } else {
-      await prisma.$executeRawUnsafe(
-        `INSERT INTO "Event" ("id", "title", "start", "color") VALUES ($1, $2, $3::timestamp, $4)`,
-        id,
-        body.title,
-        startDate,
-        color
-      );
+    if (!authUser) {
+      return new Response(JSON.stringify({ error: 'Pengguna tidak terotentikasi' }), {
+        status: 401,
+        headers: { 'Content-Type': 'application/json' },
+      });
     }
 
-    const newEvent = {
-      id,
-      title: body.title,
-      start: startDate,
-      end: endDate,
-      color,
-    };
+    // Ensure User record exists in Prisma database
+    let existingUser = await prisma.user.findUnique({ where: { id: authUser.id } });
+    if (!existingUser) {
+      existingUser = await prisma.user.create({
+        data: {
+          id: authUser.id,
+          email: authUser.email || `user_${authUser.id}@placeholder.com`,
+          password: '',
+        },
+      });
+    }
 
-    return new Response(JSON.stringify(newEvent), {
+    const startDate = new Date(body.start);
+    const endDate = body.end ? new Date(body.end) : null;
+    const color = body.color || 'blue';
+
+    const newEvent = await prisma.event.create({
+      data: {
+        title: body.title,
+        start: startDate,
+        end: endDate,
+        userId: authUser.id,
+      },
+    });
+
+    return new Response(JSON.stringify({ ...newEvent, color }), {
       status: 201,
       headers: { 'Content-Type': 'application/json' },
     });
