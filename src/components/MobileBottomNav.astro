@@ -1,0 +1,127 @@
+---
+---
+<!-- Mobile Floating Bottom Dock Navigation (Visible on Mobile screens < md) -->
+<nav
+  id="mobileBottomNav"
+  class="fixed bottom-3 inset-x-3 z-40 bg-slate-900/90 dark:bg-slate-950/95 backdrop-blur-xl border border-slate-700/60 dark:border-slate-800/80 shadow-2xl shadow-slate-950/50 rounded-2xl p-1.5 flex items-center justify-around md:hidden transition-all duration-300"
+>
+  <!-- Nav Item 1: Projek -->
+  <button
+    type="button"
+    onclick="showDashboardView()"
+    id="mobileNavProjectBtn"
+    class="mobile-nav-item flex flex-col items-center justify-center py-1 px-2 rounded-xl text-brand-400 font-semibold transition-all active:scale-90"
+  >
+    <i class="fa-solid fa-folder-open text-base mb-0.5"></i>
+    <span class="text-[10px] tracking-tight">Projek</span>
+  </button>
+
+  <!-- Nav Item 2: Web Online -->
+  <button
+    type="button"
+    onclick="showDeployedView()"
+    id="mobileNavDeployedBtn"
+    class="mobile-nav-item flex flex-col items-center justify-center py-1 px-2 rounded-xl text-slate-400 hover:text-slate-200 transition-all active:scale-90"
+  >
+    <i class="fa-solid fa-globe text-base mb-0.5"></i>
+    <span class="text-[10px] tracking-tight">Web Live</span>
+  </button>
+
+  <!-- Central Quick Add FAB -->
+  <div class="relative -top-3">
+    <button
+      type="button"
+      onclick="toggleMobileQuickMenu()"
+      id="mobileQuickAddBtn"
+      class="w-12 h-12 rounded-full bg-gradient-to-tr from-brand-600 via-indigo-600 to-violet-600 flex items-center justify-center text-white text-lg shadow-lg shadow-brand-500/40 ring-4 ring-slate-900 dark:ring-slate-950 active:scale-95 transition-all"
+      title="Tambah Baru"
+    >
+      <i id="mobileQuickAddIcon" class="fa-solid fa-plus transition-transform duration-300"></i>
+    </button>
+
+    <!-- Quick Action Popover Sheet -->
+    <div
+      id="mobileQuickMenu"
+      class="hidden absolute bottom-16 left-1/2 -translate-x-1/2 w-48 bg-slate-900/95 dark:bg-slate-900 border border-slate-700/80 rounded-2xl shadow-2xl p-2 z-50 backdrop-blur-xl animate-in fade-in slide-in-from-bottom-2 duration-200"
+    >
+      <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider px-2 py-1 border-b border-slate-800 mb-1">
+        Aksi Cepat
+      </div>
+      <button
+        onclick="closeMobileQuickMenu(); openModal('projectModal')"
+        class="w-full flex items-center gap-2.5 px-3 py-2 text-xs text-white hover:bg-slate-800 rounded-xl transition-all text-left"
+      >
+        <i class="fa-solid fa-folder-plus text-brand-400"></i>
+        <span>Projek Baru</span>
+      </button>
+      <button
+        onclick="closeMobileQuickMenu(); openModal('deployedWebModal')"
+        class="w-full flex items-center gap-2.5 px-3 py-2 text-xs text-white hover:bg-slate-800 rounded-xl transition-all text-left"
+      >
+        <i class="fa-solid fa-globe text-emerald-400"></i>
+        <span>Web Online</span>
+      </button>
+      <button
+        onclick="closeMobileQuickMenu(); openModal('eventModal')"
+        class="w-full flex items-center gap-2.5 px-3 py-2 text-xs text-white hover:bg-slate-800 rounded-xl transition-all text-left"
+      >
+        <i class="fa-solid fa-calendar-plus text-purple-400"></i>
+        <span>Acara Kalender</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Nav Item 3: Kalender -->
+  <button
+    type="button"
+    onclick="showCalendarView()"
+    id="mobileNavCalendarBtn"
+    class="mobile-nav-item flex flex-col items-center justify-center py-1 px-2 rounded-xl text-slate-400 hover:text-slate-200 transition-all active:scale-90"
+  >
+    <i class="fa-solid fa-calendar-days text-base mb-0.5"></i>
+    <span class="text-[10px] tracking-tight">Kalender</span>
+  </button>
+
+  <!-- Nav Item 4: Berita -->
+  <button
+    type="button"
+    onclick="showNewsView()"
+    id="mobileNavNewsBtn"
+    class="mobile-nav-item flex flex-col items-center justify-center py-1 px-2 rounded-xl text-slate-400 hover:text-slate-200 transition-all active:scale-90"
+  >
+    <i class="fa-solid fa-newspaper text-base mb-0.5"></i>
+    <span class="text-[10px] tracking-tight">Berita</span>
+  </button>
+</nav>
+
+<script is:inline>
+  function toggleMobileQuickMenu() {
+    const menu = document.getElementById('mobileQuickMenu');
+    const icon = document.getElementById('mobileQuickAddIcon');
+    if (menu) {
+      const isHidden = menu.classList.contains('hidden');
+      if (isHidden) {
+        menu.classList.remove('hidden');
+        if (icon) icon.classList.add('rotate-45');
+      } else {
+        closeMobileQuickMenu();
+      }
+    }
+  }
+
+  function closeMobileQuickMenu() {
+    const menu = document.getElementById('mobileQuickMenu');
+    const icon = document.getElementById('mobileQuickAddIcon');
+    if (menu) menu.classList.add('hidden');
+    if (icon) icon.classList.remove('rotate-45');
+  }
+
+  // Close popup if clicked outside
+  document.addEventListener('click', (e) => {
+    const fab = document.getElementById('mobileQuickAddBtn');
+    const menu = document.getElementById('mobileQuickMenu');
+    if (menu && fab && !fab.contains(e.target) && !menu.contains(e.target)) {
+      closeMobileQuickMenu();
+    }
+  });
+</script>

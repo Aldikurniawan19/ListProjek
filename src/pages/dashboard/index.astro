@@ -5,33 +5,33 @@
   class="flex-1 min-h-0 flex flex-col space-y-4 overflow-hidden"
 >
   <div
-    class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-white dark:bg-slate-900 p-3 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-sm shrink-0 transition-colors duration-200"
+    class="flex flex-row items-center justify-between gap-2.5 bg-white dark:bg-slate-900 p-2.5 sm:p-3 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-sm shrink-0 transition-colors duration-200"
   >
-    <div class="flex items-center gap-1 overflow-x-auto w-full sm:w-auto">
+    <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar flex-1 min-w-0">
       <button
         onclick="setFilter('all')"
         id="filter-all"
-        class="filter-btn px-4 py-1.5 rounded-lg text-xs font-semibold transition-all bg-brand-600 text-white"
+        class="filter-btn px-3 py-1 rounded-lg text-[11px] font-semibold transition-all bg-brand-600 text-white whitespace-nowrap cursor-pointer"
       >
         Semua Projek
       </button>
       <button
         onclick="setFilter('in-progress')"
         id="filter-in-progress"
-        class="filter-btn px-4 py-1.5 rounded-lg text-xs font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white transition-all"
+        class="filter-btn px-3 py-1 rounded-lg text-[11px] font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white transition-all whitespace-nowrap cursor-pointer"
       >
         Sedang Berjalan
       </button>
       <button
         onclick="setFilter('completed')"
         id="filter-completed"
-        class="filter-btn px-4 py-1.5 rounded-lg text-xs font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white transition-all"
+        class="filter-btn px-3 py-1 rounded-lg text-[11px] font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white transition-all whitespace-nowrap cursor-pointer"
       >
         Selesai
       </button>
     </div>
     <span
-      class="text-xs text-slate-500 dark:text-slate-400 px-2 font-medium"
+      class="text-[11px] text-slate-500 dark:text-slate-400 px-2 font-medium whitespace-nowrap"
       id="projectCountLabel">Menampilkan 0 Projek</span
     >
   </div>
@@ -39,26 +39,32 @@
   <div
     class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm overflow-hidden flex-1 min-h-0 flex flex-col transition-colors duration-200"
   >
-    <div class="overflow-y-auto overflow-x-auto flex-1 min-h-0">
-      <table class="w-full text-left border-collapse">
-        <thead
-          class="bg-slate-50/80 dark:bg-slate-800/80 border-b border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 uppercase text-[11px] tracking-wider font-bold sticky top-0 z-10 shadow-2xs"
-        >
-          <tr>
-            <th class="px-6 py-4">Nama Projek & Deskripsi</th>
-            <th class="px-6 py-4">Kategori</th>
-            <th class="px-6 py-4">Jumlah Task</th>
-            <th class="px-6 py-4 w-48">Progres Kerja</th>
-            <th class="px-6 py-4">Status</th>
-            <th class="px-6 py-4 text-center">Aksi</th>
-          </tr>
-        </thead>
-        <tbody
-          id="projectsTableBody"
-          class="divide-y divide-slate-100 dark:divide-slate-800 text-xs"
-        >
-        </tbody>
-      </table>
+    <div class="overflow-y-auto flex-1 min-h-0">
+      <!-- Mobile View: Clean Modern Project Cards -->
+      <div id="projectsMobileList" class="md:hidden divide-y divide-slate-100 dark:divide-slate-800"></div>
+
+      <!-- Desktop View: Full Table -->
+      <div class="hidden md:block overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+          <thead
+            class="bg-slate-50/80 dark:bg-slate-800/80 border-b border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 uppercase text-[10px] tracking-wider font-bold sticky top-0 z-10 shadow-2xs"
+          >
+            <tr>
+              <th class="px-4 py-3">Nama Projek & Deskripsi</th>
+              <th class="px-4 py-3">Kategori</th>
+              <th class="px-4 py-3">Jumlah Task</th>
+              <th class="px-4 py-3 w-40">Progres Kerja</th>
+              <th class="px-4 py-3">Status</th>
+              <th class="px-4 py-3 text-center">Aksi</th>
+            </tr>
+          </thead>
+          <tbody
+            id="projectsTableBody"
+            class="divide-y divide-slate-100 dark:divide-slate-800 text-xs"
+          >
+          </tbody>
+        </table>
+      </div>
     </div>
 
     <div

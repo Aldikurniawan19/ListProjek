@@ -12,6 +12,7 @@ import TaskModal from '~/components/TaskModal.astro';
 import EventModal from '~/components/EventModal.astro';
 import DeployedWebModal from '~/components/DeployedWebModal.astro';
 import DeployedView from '~/components/DeployedView.astro';
+import MobileBottomNav from '~/components/MobileBottomNav.astro';
 import Toast from '~/components/Toast.astro';
 import { supabase } from '~/lib/supabase';
 
@@ -41,7 +42,7 @@ const user = data.user;
     <Header />
     <main
       id="mainContent"
-      class="flex-1 p-4 md:p-6 overflow-hidden flex flex-col min-h-0 space-y-4"
+      class="flex-1 p-3 sm:p-4 md:p-6 pb-20 md:pb-6 overflow-hidden flex flex-col min-h-0 space-y-4"
     >
       <Stats />
       <Dashboard />
@@ -50,7 +51,7 @@ const user = data.user;
       <Calendar />
       <NewsPortal />
     </main>
-    <footer class="py-2.5 px-4 md:px-6 border-t border-slate-200/70 dark:border-slate-800/80 bg-white/70 dark:bg-slate-900/70 backdrop-blur-md shrink-0 text-slate-500 dark:text-slate-400 text-[11px] font-medium flex flex-col sm:flex-row items-center justify-between gap-1.5 z-20">
+    <footer class="hidden md:flex py-2.5 px-4 md:px-6 border-t border-slate-200/70 dark:border-slate-800/80 bg-white/70 dark:bg-slate-900/70 backdrop-blur-md shrink-0 text-slate-500 dark:text-slate-400 text-[11px] font-medium flex-col sm:flex-row items-center justify-between gap-1.5 z-20">
       <div class="flex items-center gap-2">
         <span class="font-bold text-slate-700 dark:text-slate-300">ListProjek</span>
         <span class="text-slate-300 dark:text-slate-700">•</span>
@@ -65,6 +66,7 @@ const user = data.user;
   <TaskModal />
   <EventModal />
   <DeployedWebModal />
+  <MobileBottomNav />
   <Toast />
   <script is:inline src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
   <script is:inline>
@@ -100,11 +102,11 @@ const user = data.user;
       if (knob && knobIcon) {
         const isDark = document.documentElement.classList.contains("dark");
         if (isDark) {
-          knob.classList.add("translate-x-7");
-          knobIcon.className = "fa-solid fa-moon text-[10px] text-indigo-400";
+          knob.classList.add("translate-x-6");
+          knobIcon.className = "fa-solid fa-moon text-[9px] text-indigo-400";
         } else {
-          knob.classList.remove("translate-x-7");
-          knobIcon.className = "fa-solid fa-sun text-[10px] text-amber-500";
+          knob.classList.remove("translate-x-6");
+          knobIcon.className = "fa-solid fa-sun text-[9px] text-amber-500";
         }
       }
     }
@@ -122,10 +124,10 @@ const user = data.user;
 
     function updateSidebarNav(activeNavId) {
       const navBtns = [
-        { id: "navProjectBtn", defaultIconClass: "fa-solid fa-folder-open text-slate-400 dark:text-slate-500 w-5 text-center", activeIconClass: "fa-solid fa-folder-open text-white w-5 text-center" },
-        { id: "navDeployedBtn", defaultIconClass: "fa-solid fa-globe text-slate-400 dark:text-slate-500 w-5 text-center", activeIconClass: "fa-solid fa-globe text-white w-5 text-center" },
-        { id: "navCalendarBtn", defaultIconClass: "fa-solid fa-calendar-days text-slate-400 dark:text-slate-500 w-5 text-center", activeIconClass: "fa-solid fa-calendar-days text-white w-5 text-center" },
-        { id: "navNewsBtn", defaultIconClass: "fa-solid fa-newspaper text-slate-400 dark:text-slate-500 w-5 text-center", activeIconClass: "fa-solid fa-newspaper text-white w-5 text-center" }
+        { id: "navProjectBtn", mobileId: "mobileNavProjectBtn", defaultIconClass: "fa-solid fa-folder-open text-slate-400 dark:text-slate-500 w-5 text-center", activeIconClass: "fa-solid fa-folder-open text-white w-5 text-center" },
+        { id: "navDeployedBtn", mobileId: "mobileNavDeployedBtn", defaultIconClass: "fa-solid fa-globe text-slate-400 dark:text-slate-500 w-5 text-center", activeIconClass: "fa-solid fa-globe text-white w-5 text-center" },
+        { id: "navCalendarBtn", mobileId: "mobileNavCalendarBtn", defaultIconClass: "fa-solid fa-calendar-days text-slate-400 dark:text-slate-500 w-5 text-center", activeIconClass: "fa-solid fa-calendar-days text-white w-5 text-center" },
+        { id: "navNewsBtn", mobileId: "mobileNavNewsBtn", defaultIconClass: "fa-solid fa-newspaper text-slate-400 dark:text-slate-500 w-5 text-center", activeIconClass: "fa-solid fa-newspaper text-white w-5 text-center" }
       ];
 
       navBtns.forEach(nav => {
@@ -138,6 +140,15 @@ const user = data.user;
           } else {
             btn.className = "w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/80 hover:text-slate-900 dark:hover:text-white font-medium text-sm transition-all text-left";
             if (icon) icon.className = nav.defaultIconClass;
+          }
+        }
+
+        const mobileBtn = document.getElementById(nav.mobileId);
+        if (mobileBtn) {
+          if (nav.id === activeNavId) {
+            mobileBtn.className = "mobile-nav-item flex flex-col items-center justify-center py-1 px-2 rounded-xl text-brand-400 font-bold transition-all scale-105";
+          } else {
+            mobileBtn.className = "mobile-nav-item flex flex-col items-center justify-center py-1 px-2 rounded-xl text-slate-400 hover:text-slate-200 transition-all";
           }
         }
       });
@@ -656,6 +667,16 @@ const user = data.user;
     window.setDeployedFilter = setDeployedFilter;
     window.renderDeployedTable = renderDeployedTable;
     window.trackWebHit = trackWebHit;
+    window.saveProject = saveProject;
+    window.saveTask = saveTask;
+    window.quickAddTask = quickAddTask;
+    window.toggleTask = toggleTask;
+    window.deleteTask = deleteTask;
+    window.deleteProject = deleteProject;
+    window.deleteActiveProject = deleteActiveProject;
+    window.openModal = openModal;
+    window.closeModal = closeModal;
+    window.toggleTheme = toggleTheme;
     
     function initCalendar(events) {
       const calendarEl = document.getElementById('calendar');
@@ -732,15 +753,20 @@ const user = data.user;
           method: "POST",
           body: JSON.stringify({ title, category, description }),
         });
+        if (!project.tasks) project.tasks = [];
         projects.unshift(project);
         closeModal("projectModal");
+        try {
+          showProjectDetailView(project.id);
+        } catch (renderErr) {
+          console.error("Gagal merender detail projek:", renderErr);
+        }
         if (window.Ghostoast) {
           Ghostoast.success(
             `Projek "${title}" berhasil dibuat.`,
             "Projek Disimpan",
           );
         }
-        showProjectDetailView(project.id);
       } catch (err) {
         console.error("Gagal menyimpan projek:", err);
         if (window.Ghostoast) {
@@ -776,6 +802,7 @@ const user = data.user;
           method: "POST",
           body: JSON.stringify({ title, category, description, liveUrl }),
         });
+        if (!project.tasks) project.tasks = [];
         projects.unshift(project);
         closeModal("deployedWebModal");
         if (window.Ghostoast) {
@@ -813,9 +840,11 @@ const user = data.user;
 
     function renderDeployedTable() {
       const tbody = document.getElementById("deployedTableBody");
+      const mobileList = document.getElementById("deployedMobileList");
       const emptyState = document.getElementById("deployedEmptyState");
       if (!tbody) return;
       tbody.innerHTML = "";
+      if (mobileList) mobileList.innerHTML = "";
 
       const deployedProjects = projects.filter(p => p.liveUrl || (p.category && p.category.includes("Web Live")));
 
@@ -842,7 +871,7 @@ const user = data.user;
       });
 
       const countLabel = document.getElementById("deployedCountLabel");
-      if (countLabel) countLabel.innerText = `Menampilkan ${filtered.length} Web Online`;
+      if (countLabel) countLabel.innerText = `${filtered.length} Web Online`;
 
       if (emptyState) {
         if (filtered.length === 0) {
@@ -855,16 +884,17 @@ const user = data.user;
       }
 
       filtered.forEach((p, index) => {
+        const rawUrl = p.liveUrl || "#";
+        const formattedUrl = formatExternalUrl(rawUrl);
+        const visitorHits = p.visitorCount || 0;
+
+        // === Desktop Table Row ===
         const tr = document.createElement("tr");
         const bgRow =
           index % 2 === 0
             ? "bg-slate-50/60 dark:bg-slate-900/60 hover:bg-slate-100 dark:hover:bg-slate-800/80"
             : "bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800/80";
         tr.className = `${bgRow} transition-colors group`;
-
-        const rawUrl = p.liveUrl || "#";
-        const formattedUrl = formatExternalUrl(rawUrl);
-        const visitorHits = p.visitorCount || 0;
 
         tr.innerHTML = `
           <td class="px-6 py-4">
@@ -921,8 +951,65 @@ const user = data.user;
             </div>
           </td>
         `;
-
         tbody.appendChild(tr);
+
+        // === Mobile Card ===
+        if (mobileList) {
+          const card = document.createElement("div");
+          card.className = "p-3.5 space-y-2.5 hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors";
+
+          card.innerHTML = `
+            <div class="flex items-start justify-between gap-2">
+              <div class="min-w-0 flex-1">
+                <h4 class="text-sm font-bold text-slate-900 dark:text-white truncate">${escapeHtml(p.title)}</h4>
+                <a
+                  href="${escapeHtml(formattedUrl)}"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onclick="trackWebHit('${p.id}')"
+                  class="inline-flex items-center gap-1 mt-0.5 text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 hover:underline truncate max-w-full"
+                >
+                  <i class="fa-solid fa-globe text-[10px] shrink-0"></i>
+                  <span class="truncate">${escapeHtml(rawUrl)}</span>
+                  <i class="fa-solid fa-arrow-up-right-from-square text-[8px] shrink-0"></i>
+                </a>
+              </div>
+              <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 shrink-0">
+                <span class="w-1 h-1 rounded-full bg-emerald-500 animate-pulse"></span> Live
+              </span>
+            </div>
+            <div class="flex items-center justify-between gap-2">
+              <div class="flex items-center gap-2 flex-wrap">
+                <span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
+                  <i class="fa-solid fa-server mr-0.5 text-slate-400 text-[9px]"></i> ${escapeHtml(p.category || 'Vercel App')}
+                </span>
+                <span class="text-[10px] font-semibold text-slate-500 dark:text-slate-400 flex items-center gap-1">
+                  <i class="fa-solid fa-chart-line text-brand-500 text-[9px]"></i> ${visitorHits} Akses
+                </span>
+              </div>
+              <div class="flex items-center gap-1.5 shrink-0">
+                <a
+                  href="${escapeHtml(formattedUrl)}"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onclick="trackWebHit('${p.id}')"
+                  class="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-semibold text-[10px] shadow-xs transition-all flex items-center gap-1"
+                >
+                  <span>Kunjungi</span>
+                  <i class="fa-solid fa-arrow-up-right-from-square text-[8px]"></i>
+                </a>
+                <button
+                  onclick="deleteProject('${p.id}', event)"
+                  title="Hapus Web Online"
+                  class="text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 p-1.5 rounded-lg transition-colors"
+                >
+                  <i class="fa-regular fa-trash-can text-xs"></i>
+                </button>
+              </div>
+            </div>
+          `;
+          mobileList.appendChild(card);
+        }
       });
     }
 
@@ -999,15 +1086,22 @@ const user = data.user;
           body: JSON.stringify({ title, description }),
         });
         const project = projects.find((p) => p.id === activeProjectId);
-        if (project) project.tasks.push(task);
+        if (project) {
+          if (!project.tasks) project.tasks = [];
+          project.tasks.push(task);
+        }
         closeModal("taskModal");
+        try {
+          renderDashboard();
+        } catch (renderErr) {
+          console.error("Gagal merender dashboard:", renderErr);
+        }
         if (window.Ghostoast) {
           Ghostoast.success(
             `Task "${title}" berhasil ditambahkan.`,
             "Task Dibuat",
           );
         }
-        renderDashboard();
       } catch (err) {
         console.error("Gagal menyimpan task:", err);
         if (window.Ghostoast) {
@@ -1117,8 +1211,9 @@ const user = data.user;
       let totalPercentageSum = 0;
 
       internalProjects.forEach((p) => {
-        const pTotal = p.tasks.length;
-        const pCompleted = p.tasks.filter((t) => t.completed).length;
+        const tasks = p.tasks || [];
+        const pTotal = tasks.length;
+        const pCompleted = tasks.filter((t) => t.completed).length;
         totalTasks += pTotal;
         completedTasks += pCompleted;
         const pProgress = pTotal > 0 ? (pCompleted / pTotal) * 100 : 0;
@@ -1156,9 +1251,11 @@ const user = data.user;
 
     function renderProjectsTableView() {
       const tbody = document.getElementById("projectsTableBody");
+      const mobileList = document.getElementById("projectsMobileList");
       const emptyState = document.getElementById("tableEmptyState");
-      if (!tbody) return;
-      tbody.innerHTML = "";
+
+      if (tbody) tbody.innerHTML = "";
+      if (mobileList) mobileList.innerHTML = "";
 
       let filtered = projects.filter((p) => {
         // Exclude live deployed websites from internal task management table
@@ -1218,57 +1315,93 @@ const user = data.user;
         tr.onclick = () => showProjectDetailView(p.id);
 
         tr.innerHTML = `
-					<td class="px-6 py-4">
-						<div class="font-bold text-slate-900 dark:text-white text-sm group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors flex items-center gap-2">
+					<td class="px-4 py-3">
+						<div class="font-bold text-slate-900 dark:text-white text-xs sm:text-sm group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors flex items-center gap-2">
 							<span>${escapeHtml(p.title)}</span>
-							${p.liveUrl ? `<span class="px-1.5 py-0.5 rounded text-[10px] font-bold bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800">Deployed</span>` : ''}
+							${p.liveUrl ? `<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 whitespace-nowrap">Deployed</span>` : ''}
 						</div>
-						<div class="text-slate-500 dark:text-slate-400 text-xs line-clamp-1 mt-0.5 font-normal">
+						<div class="text-slate-500 dark:text-slate-400 text-[11px] sm:text-xs line-clamp-1 mt-0.5 font-normal">
 							${escapeHtml(p.description)}
 						</div>
-						${p.liveUrl ? `<div class="mt-1 flex items-center gap-2"><a href="${escapeHtml(p.liveUrl)}" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()" class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[11px] font-semibold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/80 hover:underline"><i class="fa-solid fa-globe text-[10px]"></i> ${escapeHtml(p.liveUrl)}</a></div>` : ''}
+						${p.liveUrl ? `<div class="mt-1 flex items-center gap-2"><a href="${escapeHtml(p.liveUrl)}" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()" class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[10px] font-semibold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/80 hover:underline"><i class="fa-solid fa-globe text-[9px]"></i> ${escapeHtml(p.liveUrl)}</a></div>` : ''}
 					</td>
-					<td class="px-6 py-4 whitespace-nowrap">
-						<span class="px-2.5 py-1 rounded-md text-[11px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
+					<td class="px-4 py-3 whitespace-nowrap">
+						<span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 whitespace-nowrap">
 							${escapeHtml(p.category)}
 						</span>
 					</td>
-					<td class="px-6 py-4 whitespace-nowrap font-medium text-slate-700 dark:text-slate-300">
+					<td class="px-4 py-3 whitespace-nowrap text-xs font-medium text-slate-700 dark:text-slate-300">
 						<i class="fa-regular fa-check-square mr-1 text-brand-500"></i> ${completedTasks} / ${totalTasks} Task
 					</td>
-					<td class="px-6 py-4 whitespace-nowrap">
+					<td class="px-4 py-3 whitespace-nowrap">
 						<div class="flex items-center gap-2">
-							<div class="w-full bg-slate-100 dark:bg-slate-800 h-3 rounded-full overflow-hidden border border-slate-200 dark:border-slate-700">
+							<div class="w-full bg-slate-100 dark:bg-slate-800 h-2.5 rounded-full overflow-hidden border border-slate-200 dark:border-slate-700">
 								<div class="bg-emerald-500 h-full rounded-full transition-all duration-300" style="width: ${progress}%"></div>
 							</div>
-							<span class="font-bold text-xs text-brand-700 dark:text-brand-400 w-9 text-right">${progress}%</span>
+							<span class="font-bold text-[11px] text-brand-700 dark:text-brand-400 w-8 text-right">${progress}%</span>
 						</div>
 					</td>
-					<td class="px-6 py-4 whitespace-nowrap">
+					<td class="px-4 py-3 whitespace-nowrap">
 						${
               isCompleted
-                ? `<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800">
-								<i class="fa-solid fa-check text-[9px]"></i> Selesai
+                ? `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold whitespace-nowrap bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800">
+								<i class="fa-solid fa-check text-[8px]"></i> Selesai
 							 </span>`
-                : `<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700">
-								<i class="fa-solid fa-spinner text-[9px] animate-spin"></i> Sedang Berjalan
+                : `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold whitespace-nowrap bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700">
+								<i class="fa-solid fa-spinner text-[8px] animate-spin"></i> Sedang Berjalan
 							 </span>`
             }
 					</td>
-					<td class="px-6 py-4 whitespace-nowrap text-center">
-						<div class="flex items-center justify-center gap-2">
-							<button onclick="event.stopPropagation(); showProjectDetailView('${p.id}')" class="px-3 py-1.5 bg-slate-100 dark:bg-slate-800 hover:bg-brand-600 hover:text-white dark:hover:bg-brand-600 text-slate-700 dark:text-slate-300 rounded-lg font-semibold transition-all border border-slate-200 dark:border-slate-700 flex items-center gap-1.5">
+					<td class="px-4 py-3 whitespace-nowrap text-center">
+						<div class="flex items-center justify-center gap-1.5">
+							<button onclick="event.stopPropagation(); showProjectDetailView('${p.id}')" class="px-2.5 py-1 bg-slate-100 dark:bg-slate-800 hover:bg-brand-600 hover:text-white dark:hover:bg-brand-600 text-slate-700 dark:text-slate-300 rounded-lg text-[11px] font-semibold transition-all border border-slate-200 dark:border-slate-700 flex items-center gap-1">
 								<span>Buka Task</span>
-								<i class="fa-solid fa-chevron-right text-[10px]"></i>
+								<i class="fa-solid fa-chevron-right text-[9px]"></i>
 							</button>
-							<button onclick="deleteProject('${p.id}', event)" title="Hapus Projek" class="text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 p-1.5 rounded-lg transition-colors">
-								<i class="fa-regular fa-trash-can"></i>
+							<button onclick="deleteProject('${p.id}', event)" title="Hapus Projek" class="text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 p-1 rounded-lg transition-colors">
+								<i class="fa-regular fa-trash-can text-xs"></i>
 							</button>
 						</div>
 					</td>
 				`;
 
-        tbody.appendChild(tr);
+        if (tbody) tbody.appendChild(tr);
+
+        if (mobileList) {
+          const card = document.createElement("div");
+          card.className = "p-3.5 bg-white dark:bg-slate-900 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors flex flex-col gap-2";
+          card.onclick = () => showProjectDetailView(p.id);
+          card.innerHTML = `
+            <div class="flex items-start justify-between gap-2">
+              <div class="min-w-0 flex-1">
+                <div class="flex items-center gap-1.5 flex-wrap">
+                  <span class="text-xs font-bold text-slate-900 dark:text-white truncate">${escapeHtml(p.title)}</span>
+                  <span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700">${escapeHtml(p.category)}</span>
+                  ${p.liveUrl ? `<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800">Deployed</span>` : ''}
+                </div>
+                ${p.description ? `<p class="text-[11px] text-slate-500 dark:text-slate-400 mt-1 line-clamp-1 font-normal">${escapeHtml(p.description)}</p>` : ''}
+              </div>
+              <span class="px-2 py-0.5 rounded-full text-[9px] font-bold shrink-0 ${isCompleted ? 'bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700'}">
+                ${isCompleted ? 'Selesai' : 'Sedang Berjalan'}
+              </span>
+            </div>
+            <div class="flex items-center justify-between gap-3 pt-2 border-t border-slate-100 dark:border-slate-800/80 text-[11px]">
+              <div class="flex items-center gap-2 flex-1 min-w-0">
+                <div class="w-full bg-slate-100 dark:bg-slate-800 h-2 rounded-full overflow-hidden border border-slate-200 dark:border-slate-700 flex-1">
+                  <div class="bg-emerald-500 h-full rounded-full transition-all duration-300" style="width: ${progress}%"></div>
+                </div>
+                <span class="font-bold text-brand-600 dark:text-brand-400 text-[10px] shrink-0">${progress}%</span>
+              </div>
+              <span class="text-[10px] text-slate-500 dark:text-slate-400 font-medium shrink-0">
+                <i class="fa-regular fa-check-square mr-1 text-brand-500"></i>${completedTasks}/${totalTasks} Task
+              </span>
+              <button onclick="deleteProject('${p.id}', event)" title="Hapus Projek" class="text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 p-1 rounded-lg transition-colors shrink-0">
+                <i class="fa-regular fa-trash-can text-xs"></i>
+              </button>
+            </div>
+          `;
+          mobileList.appendChild(card);
+        }
       });
     }
 
@@ -1301,9 +1434,10 @@ const user = data.user;
         return;
       }
 
-      const tasks = project.tasks || [];
-      const totalTasks = tasks.length;
-      const completedTasks = tasks.filter((t) => t.completed).length;
+      const totalTasks = project.tasks ? project.tasks.length : 0;
+      const completedTasks = project.tasks
+        ? project.tasks.filter((t) => t.completed).length
+        : 0;
       const progress =
         totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
       const isCompleted = totalTasks > 0 && completedTasks === totalTasks;
@@ -1323,10 +1457,10 @@ const user = data.user;
       const statusElem = document.getElementById("detailProjectStatus");
       if (statusElem) {
         if (isCompleted) {
-          statusElem.className = "px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800";
+          statusElem.className = "px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 whitespace-nowrap";
           statusElem.innerText = "Selesai";
         } else {
-          statusElem.className = "px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700";
+          statusElem.className = "px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 whitespace-nowrap";
           statusElem.innerText = "Sedang Berjalan";
         }
       }
@@ -1381,7 +1515,7 @@ const user = data.user;
       if (!tasksContainer) return;
       tasksContainer.innerHTML = "";
 
-      let filteredTasks = tasks.filter((t) => {
+      let filteredTasks = (project.tasks || []).filter((t) => {
         if (currentTaskFilter === "active" && t.completed) return false;
         if (currentTaskFilter === "completed" && !t.completed) return false;
         if (searchQuery) {
@@ -1406,10 +1540,10 @@ const user = data.user;
       filteredTasks.forEach((t) => {
         const item = document.createElement("div");
         item.className =
-          "p-4 sm:px-5 flex items-center justify-between gap-4 border-l-4 border-l-transparent hover:border-l-brand-600 dark:hover:border-l-brand-400 hover:bg-slate-100/70 dark:hover:bg-slate-800/80 transition-all group cursor-pointer";
+          "p-3 sm:p-4 sm:px-5 flex items-center justify-between gap-2.5 sm:gap-4 border-l-4 border-l-transparent hover:border-l-brand-600 dark:hover:border-l-brand-400 hover:bg-slate-100/70 dark:hover:bg-slate-800/80 transition-all group cursor-pointer";
 
         item.innerHTML = `
-          <div class="flex items-start gap-3.5 flex-1 min-w-0">
+          <div class="flex items-start gap-2.5 sm:gap-3.5 flex-1 min-w-0">
             <input
               type="checkbox"
               ${t.completed ? "checked" : ""}
@@ -1420,12 +1554,12 @@ const user = data.user;
               <h4 class="text-xs sm:text-sm font-bold text-slate-900 dark:text-white ${t.completed ? "line-through text-slate-400 dark:text-slate-500 font-normal" : ""} leading-snug">
                 ${escapeHtml(t.title)}
               </h4>
-              ${t.description ? `<p class="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 mt-1 line-clamp-2 font-normal">${escapeHtml(t.description)}</p>` : ""}
+              ${t.description ? `<p class="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 mt-0.5 sm:mt-1 line-clamp-1 sm:line-clamp-2 font-normal">${escapeHtml(t.description)}</p>` : ""}
             </div>
           </div>
 
-          <div class="flex items-center gap-3 shrink-0">
-            <span class="text-[10px] font-bold px-2.5 py-1 rounded-full ${
+          <div class="flex items-center gap-1.5 sm:gap-3 shrink-0">
+            <span class="hidden sm:inline-flex text-[10px] font-bold px-2.5 py-1 rounded-full ${
               t.completed
                 ? "bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60"
                 : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700"
@@ -1434,7 +1568,7 @@ const user = data.user;
             </span>
             <button
               onclick="deleteTask('${project.id}', '${t.id}')"
-              class="text-slate-400 dark:text-slate-500 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/50 p-2 rounded-xl transition-all"
+              class="text-slate-400 dark:text-slate-500 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/50 p-1.5 sm:p-2 rounded-xl transition-all"
               title="Hapus Task"
             >
               <i class="fa-regular fa-trash-can text-xs"></i>

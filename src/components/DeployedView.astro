@@ -6,87 +6,89 @@
   style="display: none;"
 >
   <!-- Header Banner -->
-  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 sm:p-6 rounded-2xl bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-sm border border-slate-200/80 dark:border-slate-800 shrink-0 transition-colors duration-200">
-    <div class="space-y-1.5">
+  <div class="flex flex-row items-center justify-between gap-3 p-3.5 sm:p-6 rounded-2xl bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-sm border border-slate-200/80 dark:border-slate-800 shrink-0 transition-colors duration-200">
+    <div class="space-y-1 min-w-0 flex-1">
       <div class="flex items-center gap-2 flex-wrap">
-        <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-900/50 flex items-center gap-1.5">
+        <span class="px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-bold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-900/50 flex items-center gap-1">
           <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-          LIVE WEBSITES & DEPLOYMENT
-        </span>
-        <span class="text-[11px] text-slate-500 dark:text-slate-400 font-medium">
-          <i class="fa-solid fa-chart-line mr-1 text-emerald-500"></i> Real-time Hit Tracker Enabled
+          LIVE WEBSITES
         </span>
       </div>
-      <h2 class="text-xl sm:text-2xl font-bold tracking-tight text-slate-900 dark:text-white">Web Online & Portofolio Deployed</h2>
-      <p class="text-xs text-slate-500 dark:text-slate-400 max-w-xl leading-relaxed">
-        Kelola daftar website & aplikasi yang sudah aktif di-deploy (Vercel, Netlify, Custom Domain), akses link live secara instan, serta pantau trafik pengunjung.
+      <h2 class="text-base sm:text-2xl font-bold tracking-tight text-slate-900 dark:text-white truncate">Web Online & Portofolio</h2>
+      <p class="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 max-w-xl leading-relaxed hidden sm:block">
+        Kelola daftar website & aplikasi yang sudah aktif di-deploy, akses link live secara instan, serta pantau trafik pengunjung.
       </p>
     </div>
     
     <div class="flex items-center gap-2 shrink-0">
       <button
         onclick="openModal('deployedWebModal')"
-        class="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white text-xs font-bold shadow-md shadow-emerald-500/20 transition-all flex items-center gap-2 cursor-pointer"
+        class="px-3 py-2 sm:px-4 sm:py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white text-xs font-bold shadow-md shadow-emerald-500/20 transition-all flex items-center gap-1.5 cursor-pointer whitespace-nowrap"
       >
         <i class="fa-solid fa-plus text-xs"></i>
-        <span>Tambah Web Online</span>
+        <span><span class="hidden sm:inline">Tambah </span>Web Online</span>
       </button>
     </div>
   </div>
 
   <!-- Table Card & Filter Container -->
   <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm overflow-hidden flex-1 min-h-0 flex flex-col transition-colors duration-200">
-    <div class="p-3.5 border-b border-slate-200/80 dark:border-slate-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shrink-0">
-      <div class="flex items-center gap-2 overflow-x-auto w-full sm:w-auto">
-        <span class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider px-1">Filter:</span>
+    <div class="p-2.5 sm:p-3.5 border-b border-slate-200/80 dark:border-slate-800 flex flex-row items-center justify-between gap-2 shrink-0">
+      <div class="flex items-center gap-1 sm:gap-2 overflow-x-auto no-scrollbar flex-1 min-w-0">
         <button
           onclick="setDeployedFilter('all')"
           id="deployedFilter-all"
-          class="deployed-filter-btn px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-brand-600 text-white shadow-xs transition-all whitespace-nowrap cursor-pointer"
+          class="deployed-filter-btn px-2.5 py-1 sm:px-3.5 sm:py-1.5 rounded-lg text-xs font-semibold bg-brand-600 text-white shadow-xs transition-all whitespace-nowrap cursor-pointer shrink-0"
         >
           Semua Web
         </button>
         <button
           onclick="setDeployedFilter('vercel')"
           id="deployedFilter-vercel"
-          class="deployed-filter-btn px-3.5 py-1.5 rounded-lg text-xs font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all whitespace-nowrap cursor-pointer"
+          class="deployed-filter-btn px-2.5 py-1 sm:px-3.5 sm:py-1.5 rounded-lg text-xs font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all whitespace-nowrap cursor-pointer shrink-0"
         >
           Vercel
         </button>
         <button
           onclick="setDeployedFilter('netlify')"
           id="deployedFilter-netlify"
-          class="deployed-filter-btn px-3.5 py-1.5 rounded-lg text-xs font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all whitespace-nowrap cursor-pointer"
+          class="deployed-filter-btn px-2.5 py-1 sm:px-3.5 sm:py-1.5 rounded-lg text-xs font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all whitespace-nowrap cursor-pointer shrink-0"
         >
-          Netlify / Lainnya
+          Lainnya
         </button>
       </div>
 
-      <span id="deployedCountLabel" class="text-xs font-semibold text-slate-500 dark:text-slate-400 px-1 whitespace-nowrap">
-        Menampilkan 0 Web Online
+      <span id="deployedCountLabel" class="text-[10px] sm:text-xs font-semibold text-slate-500 dark:text-slate-400 px-1 whitespace-nowrap shrink-0">
+        0 Web
       </span>
     </div>
 
-    <!-- Dedicated Deployed Web Table List -->
-    <div class="overflow-y-auto overflow-x-auto flex-1 min-h-0">
-      <table class="w-full text-left border-collapse">
-        <thead
-          class="bg-slate-50/80 dark:bg-slate-800/80 border-b border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 uppercase text-[11px] tracking-wider font-bold sticky top-0 z-10 shadow-2xs"
-        >
-          <tr>
-            <th class="px-6 py-4">Nama Website & URL Live</th>
-            <th class="px-6 py-4">Platform Hosting</th>
-            <th class="px-6 py-4">Status Web</th>
-            <th class="px-6 py-4">Pengunjung / Akses Hari Ini</th>
-            <th class="px-6 py-4 text-center">Aksi & Kunjungan</th>
-          </tr>
-        </thead>
-        <tbody
-          id="deployedTableBody"
-          class="divide-y divide-slate-100 dark:divide-slate-800 text-xs"
-        >
-        </tbody>
-      </table>
+    <!-- Dedicated Deployed Web List -->
+    <div class="overflow-y-auto flex-1 min-h-0">
+      <!-- Mobile View: Card Layout -->
+      <div id="deployedMobileList" class="md:hidden divide-y divide-slate-100 dark:divide-slate-800"></div>
+
+      <!-- Desktop View: Full Table -->
+      <div class="hidden md:block overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+          <thead
+            class="bg-slate-50/80 dark:bg-slate-800/80 border-b border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 uppercase text-[11px] tracking-wider font-bold sticky top-0 z-10 shadow-2xs"
+          >
+            <tr>
+              <th class="px-6 py-4">Nama Website & URL Live</th>
+              <th class="px-6 py-4">Platform Hosting</th>
+              <th class="px-6 py-4">Status Web</th>
+              <th class="px-6 py-4">Pengunjung / Akses Hari Ini</th>
+              <th class="px-6 py-4 text-center">Aksi & Kunjungan</th>
+            </tr>
+          </thead>
+          <tbody
+            id="deployedTableBody"
+            class="divide-y divide-slate-100 dark:divide-slate-800 text-xs"
+          >
+          </tbody>
+        </table>
+      </div>
     </div>
 
     <!-- Empty State -->

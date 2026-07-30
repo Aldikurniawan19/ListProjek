@@ -81,6 +81,60 @@ const { title = 'Dashboard Progres Projek' } = Astro.props;
         opacity: 1;
       }
 
+      /* Mobile Bottom Sheet Entrance & Exit Animations */
+      @keyframes bottomSheetEnter {
+        0% {
+          transform: translateY(100%);
+          opacity: 0;
+        }
+        100% {
+          transform: translateY(0);
+          opacity: 1;
+        }
+      }
+
+      @keyframes bottomSheetExit {
+        0% {
+          transform: translateY(0);
+          opacity: 1;
+        }
+        100% {
+          transform: translateY(100%);
+          opacity: 0;
+        }
+      }
+
+      @media (max-width: 639px) {
+        .modal {
+          align-items: flex-end !important;
+          padding: 0 !important;
+        }
+        .modal .modal-content {
+          border-bottom-left-radius: 0 !important;
+          border-bottom-right-radius: 0 !important;
+          border-top-left-radius: 1.5rem !important;
+          border-top-right-radius: 1.5rem !important;
+          max-height: 88vh !important;
+          width: 100% !important;
+          margin: 0 !important;
+          border-bottom: 0 !important;
+        }
+        .modal.open .modal-content {
+          animation: bottomSheetEnter 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        .modal.mockup-closing .modal-content {
+          animation: bottomSheetExit 0.3s ease-in forwards;
+        }
+      }
+
+      .no-scrollbar::-webkit-scrollbar {
+        display: none;
+      }
+      .no-scrollbar {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+      }
+      
       /* 3D Mockup Modal Exit & Entrance Animations */
       @keyframes mockupExit {
         0% {
