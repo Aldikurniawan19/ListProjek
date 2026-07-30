@@ -685,6 +685,10 @@ const user = data.user;
 
       if (!title) return;
 
+      if (window.showLoadingScreen) {
+        window.showLoadingScreen('Membuat Projek Baru', 'Menyiapkan workspace projek Anda...');
+      }
+
       try {
         const project = await api("/api/projects", {
           method: "POST",
@@ -692,14 +696,22 @@ const user = data.user;
         });
         projects.unshift(project);
         closeModal("projectModal");
-        Ghostoast.success(
-          `Projek "${title}" berhasil dibuat.`,
-          "Projek Disimpan",
-        );
+        if (window.Ghostoast) {
+          Ghostoast.success(
+            `Projek "${title}" berhasil dibuat.`,
+            "Projek Disimpan",
+          );
+        }
         showProjectDetailView(project.id);
       } catch (err) {
         console.error("Gagal menyimpan projek:", err);
-        Ghostoast.error("Gagal menyimpan projek baru.", "Terjadi Kesalahan");
+        if (window.Ghostoast) {
+          Ghostoast.error("Gagal menyimpan projek baru.", "Terjadi Kesalahan");
+        }
+      } finally {
+        if (window.hideLoadingScreen) {
+          window.hideLoadingScreen();
+        }
       }
     }
 
@@ -750,6 +762,10 @@ const user = data.user;
       const description = document.getElementById("taskDesc").value.trim();
       if (!title) return;
 
+      if (window.showLoadingScreen) {
+        window.showLoadingScreen('Menambahkan Task Baru', 'Menyimpan task ke dalam projek...');
+      }
+
       try {
         const task = await api(`/api/projects/${activeProjectId}/tasks`, {
           method: "POST",
@@ -758,14 +774,22 @@ const user = data.user;
         const project = projects.find((p) => p.id === activeProjectId);
         if (project) project.tasks.push(task);
         closeModal("taskModal");
-        Ghostoast.success(
-          `Task "${title}" berhasil ditambahkan.`,
-          "Task Dibuat",
-        );
+        if (window.Ghostoast) {
+          Ghostoast.success(
+            `Task "${title}" berhasil ditambahkan.`,
+            "Task Dibuat",
+          );
+        }
         renderDashboard();
       } catch (err) {
         console.error("Gagal menyimpan task:", err);
-        Ghostoast.error("Gagal menyimpan task baru.", "Terjadi Kesalahan");
+        if (window.Ghostoast) {
+          Ghostoast.error("Gagal menyimpan task baru.", "Terjadi Kesalahan");
+        }
+      } finally {
+        if (window.hideLoadingScreen) {
+          window.hideLoadingScreen();
+        }
       }
     }
 

@@ -134,6 +134,10 @@ import Toast from '~/components/Toast.astro';
         submitBtn.innerText = 'Memproses...';
       }
 
+      if (window.showLoadingScreen) {
+        window.showLoadingScreen('Mendaftarkan Akun', 'Sedang memproses pendaftaran Anda...');
+      }
+
       try {
         const formData = new FormData(e.target);
         const res = await fetch('/api/auth/register', {
@@ -153,14 +157,21 @@ import Toast from '~/components/Toast.astro';
           throw new Error(data.error || 'Gagal melakukan registrasi.');
         }
 
+        if (window.updateLoadingText) {
+          window.updateLoadingText('Registrasi Berhasil', 'Mengalihkan ke halaman login...');
+        }
+
         if (window.Ghostoast) {
           Ghostoast.success('Registrasi berhasil! Mengalihkan ke halaman login...', 'Akun Terbuat');
         }
 
         setTimeout(() => {
           window.location.href = '/auth/login?registered=true';
-        }, 1200);
+        }, 1000);
       } catch (err) {
+        if (window.hideLoadingScreen) {
+          window.hideLoadingScreen();
+        }
         if (window.Ghostoast) {
           Ghostoast.error(err.message, 'Gagal Registrasi');
         }

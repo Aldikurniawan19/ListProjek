@@ -101,7 +101,7 @@ const userInitial = userEmail.charAt(0).toUpperCase();
         </div>
 
         <!-- Logout Button on the Right -->
-        <form action="/api/auth/logout" method="POST" class="shrink-0">
+        <form id="logoutForm" action="/api/auth/logout" method="POST" onsubmit="handleLogout(event)" class="shrink-0">
           <button
             type="submit"
             title="Keluar (Logout)"
@@ -114,3 +114,11 @@ const userInitial = userEmail.charAt(0).toUpperCase();
     </div>
   </div>
 </aside>
+
+<script is:inline>
+  function handleLogout(e) {
+    if (window.showLoadingScreen) {
+      window.showLoadingScreen('Proses Keluar', 'Sedang mengakhiri sesi Anda...');
+    }
+  }
+</script>

@@ -141,6 +141,10 @@ import Toast from '~/components/Toast.astro';
         submitBtn.innerText = 'Memverifikasi...';
       }
 
+      if (window.showLoadingScreen) {
+        window.showLoadingScreen('Memverifikasi Akun', 'Sedang memverifikasi data login Anda...');
+      }
+
       try {
         const formData = new FormData(e.target);
         const res = await fetch('/api/auth/login', {
@@ -160,14 +164,21 @@ import Toast from '~/components/Toast.astro';
           throw new Error(data.error || 'Kredensial login tidak valid.');
         }
 
+        if (window.updateLoadingText) {
+          window.updateLoadingText('Login Berhasil', 'Mengalihkan ke dashboard...');
+        }
+
         if (window.Ghostoast) {
           Ghostoast.success('Login berhasil! Mengalihkan ke dashboard...', 'Selamat Datang');
         }
 
         setTimeout(() => {
           window.location.href = '/?login=success';
-        }, 1000);
+        }, 800);
       } catch (err) {
+        if (window.hideLoadingScreen) {
+          window.hideLoadingScreen();
+        }
         if (window.Ghostoast) {
           Ghostoast.error(err.message, 'Gagal Login');
         }

@@ -1,3 +1,12 @@
+---
+import LoadingScreen from '~/components/LoadingScreen.astro';
+
+interface Props {
+	title?: string;
+}
+
+const { title = 'Dashboard Progres Projek' } = Astro.props;
+---
 <!doctype html>
 <html lang="id">
 	<head>
@@ -6,7 +15,7 @@
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<link rel="icon" href="/favicon.ico" />
 		<meta name="generator" content={Astro.generator} />
-		<title>Dashboard Progres Projek</title>
+		<title>{title}</title>
 		<script is:inline src="https://cdn.tailwindcss.com"></script>
 		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 		<link rel="preconnect" href="https://fonts.googleapis.com">
@@ -323,5 +332,6 @@
 	<body class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 font-sans min-h-screen flex flex-col md:flex-row antialiased transition-colors duration-200">
 		<slot />
 		<div id="modal-container"></div>
+		<LoadingScreen />
 	</body>
 </html>
