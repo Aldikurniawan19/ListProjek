@@ -4,7 +4,8 @@ import Toast from '~/components/Toast.astro';
 ---
 
 <Layout title="Register - Dashboard Projek">
-  <div class="flex-1 w-full min-h-screen flex items-center justify-center p-4 sm:p-6 bg-slate-50 dark:bg-slate-950 transition-colors duration-200">
+  <div class="flex-1 w-full min-h-screen flex flex-col justify-between items-center p-4 sm:p-6 bg-slate-50 dark:bg-slate-950 transition-colors duration-200">
+    <div class="w-full"></div>
     <!-- Main Auth Card -->
     <div class="relative w-full max-w-md bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 p-6 sm:p-8 space-y-6 text-slate-800 dark:text-slate-100 rounded-2xl shadow-sm transition-all">
       
@@ -98,6 +99,9 @@ import Toast from '~/components/Toast.astro';
         </p>
       </div>
     </div>
+    <footer class="w-full max-w-md my-4 py-2.5 px-4 text-center text-slate-500 dark:text-slate-400 text-[11px] font-medium flex items-center justify-center gap-2">
+      <p>© 2026 <span class="font-semibold text-slate-700 dark:text-slate-300">ListProjek</span> by <span class="font-bold text-brand-600 dark:text-brand-400">Aldi Kurniawan</span>. All rights reserved.</p>
+    </footer>
   </div>
 
   <Toast />
