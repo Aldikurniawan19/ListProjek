@@ -4,18 +4,14 @@ import Toast from '~/components/Toast.astro';
 ---
 
 <Layout title="Login - Dashboard Projek">
-  <div class="flex-1 w-full min-h-screen flex items-center justify-center p-4 sm:p-6 relative overflow-hidden bg-slate-50 dark:bg-slate-950 transition-colors duration-200">
-    <!-- Ambient Background Blobs -->
-    <div class="absolute -top-32 -right-32 w-96 h-96 bg-brand-500/10 dark:bg-brand-500/20 rounded-full blur-3xl pointer-events-none"></div>
-    <div class="absolute -bottom-32 -left-32 w-96 h-96 bg-purple-500/10 dark:bg-purple-500/20 rounded-full blur-3xl pointer-events-none"></div>
-
+  <div class="flex-1 w-full min-h-screen flex items-center justify-center p-4 sm:p-6 bg-slate-50 dark:bg-slate-950 transition-colors duration-200">
     <!-- Main Auth Card -->
-    <div class="relative w-full max-w-md bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/80 rounded-2xl shadow-xl shadow-slate-200/50 dark:shadow-none p-6 sm:p-8 space-y-6 text-slate-800 dark:text-slate-100 backdrop-blur-xl transition-all">
+    <div class="relative w-full max-w-md bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 p-6 sm:p-8 space-y-6 text-slate-800 dark:text-slate-100 rounded-2xl shadow-sm transition-all">
       
       <!-- Top Theme Switcher & Header -->
       <div class="flex items-center justify-between">
         <div class="flex items-center gap-2.5">
-          <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-indigo-600 flex items-center justify-center text-white shadow-md shadow-brand-500/30">
+          <div class="w-10 h-10 rounded-xl bg-brand-600 flex items-center justify-center text-white shadow-sm">
             <i class="fa-solid fa-square-check text-lg"></i>
           </div>
           <div>
@@ -52,7 +48,7 @@ import Toast from '~/components/Toast.astro';
                 name="email"
                 id="email"
                 placeholder="nama@email.com"
-                class="w-full pl-9 pr-3.5 py-2.5 bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/80 text-slate-900 dark:text-white text-xs sm:text-sm rounded-xl focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-all placeholder:text-slate-400 dark:placeholder:text-slate-500"
+                class="w-full pl-9 pr-3.5 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-xs sm:text-sm rounded-xl focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-all placeholder:text-slate-400 dark:placeholder:text-slate-500"
                 required
               />
             </div>
@@ -68,7 +64,7 @@ import Toast from '~/components/Toast.astro';
                 name="password"
                 id="password"
                 placeholder="••••••••"
-                class="w-full pl-9 pr-10 py-2.5 bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/80 text-slate-900 dark:text-white text-xs sm:text-sm rounded-xl focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-all placeholder:text-slate-400 dark:placeholder:text-slate-500"
+                class="w-full pl-9 pr-10 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-xs sm:text-sm rounded-xl focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-all placeholder:text-slate-400 dark:placeholder:text-slate-500"
                 required
               />
               <button
@@ -86,7 +82,7 @@ import Toast from '~/components/Toast.astro';
         <button
           type="submit"
           id="submitBtn"
-          class="w-full py-2.5 px-4 mt-2 bg-gradient-to-r from-brand-600 to-indigo-600 hover:from-brand-500 hover:to-indigo-500 text-white font-semibold text-sm rounded-xl shadow-lg shadow-brand-500/25 hover:shadow-brand-500/40 focus:ring-2 focus:ring-brand-500 focus:ring-offset-2 dark:focus:ring-offset-slate-900 transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer"
+          class="w-full py-2.5 px-4 mt-2 bg-brand-600 hover:bg-brand-700 text-white font-semibold text-sm rounded-xl shadow-md shadow-brand-500/20 focus:ring-2 focus:ring-brand-500 focus:ring-offset-2 dark:focus:ring-offset-slate-900 transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer"
         >
           <span>Masuk</span>
           <i class="fa-solid fa-arrow-right text-xs"></i>
