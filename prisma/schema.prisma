@@ -16,14 +16,16 @@ model User {
 }
 
 model Project {
-  id          String   @id @default(cuid())
-  title       String
-  category    String   @default("Umum")
-  description String   @default("Tidak ada deskripsi projek.")
-  createdAt   DateTime @default(now())
-  tasks       Task[]
-  userId      String
-  user        User     @relation(fields: [userId], references: [id])
+  id           String   @id @default(cuid())
+  title        String
+  category     String   @default("Umum")
+  description  String   @default("Tidak ada deskripsi projek.")
+  liveUrl      String?
+  visitorCount Int      @default(0)
+  createdAt    DateTime @default(now())
+  tasks        Task[]
+  userId       String
+  user         User     @relation(fields: [userId], references: [id])
 }
 
 model Task {

@@ -3,7 +3,7 @@ interface Props {
   user?: {
     email?: string;
     id?: string;
-  };
+  } | null;
 }
 
 const { user } = Astro.props;
@@ -59,6 +59,15 @@ const userInitial = userEmail.charAt(0).toUpperCase();
         >
           <i class="fa-solid fa-folder-open text-white w-5 text-center"></i>
           <span>Daftar Projek</span>
+        </button>
+        <button
+          type="button"
+          onclick="showDeployedView()"
+          id="navDeployedBtn"
+          class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100/80 dark:hover:bg-slate-800/80 hover:text-slate-900 dark:hover:text-white font-medium text-sm transition-all text-left"
+        >
+          <i class="fa-solid fa-globe text-slate-400 dark:text-slate-500 w-5 text-center"></i>
+          <span>Web Online & Portofolio</span>
         </button>
         <button
           type="button"

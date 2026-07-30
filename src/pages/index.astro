@@ -10,6 +10,8 @@ import NewsPortal from './news/index.astro';
 import ProjectModal from '~/components/ProjectModal.astro';
 import TaskModal from '~/components/TaskModal.astro';
 import EventModal from '~/components/EventModal.astro';
+import DeployedWebModal from '~/components/DeployedWebModal.astro';
+import DeployedView from '~/components/DeployedView.astro';
 import Toast from '~/components/Toast.astro';
 import { supabase } from '~/lib/supabase';
 
@@ -25,7 +27,7 @@ const { data, error } = await supabase.auth.setSession({
   access_token: accessToken.value,
 });
 
-if (error) {
+if (error || !data.user) {
   Astro.cookies.delete('sb-access-token', { path: '/' });
   Astro.cookies.delete('sb-refresh-token', { path: '/' });
   return Astro.redirect('/auth/login');
@@ -43,6 +45,7 @@ const user = data.user;
     >
       <Stats />
       <Dashboard />
+      <DeployedView />
       <ProjectDetail />
       <Calendar />
       <NewsPortal />
@@ -51,6 +54,7 @@ const user = data.user;
   <ProjectModal />
   <TaskModal />
   <EventModal />
+  <DeployedWebModal />
   <Toast />
   <script is:inline src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
   <script is:inline>
@@ -78,12 +82,6 @@ const user = data.user;
       const isDark = document.documentElement.classList.toggle("dark");
       localStorage.setItem("theme", isDark ? "dark" : "light");
       updateThemeIcon();
-      if (window.Ghostoast) {
-        Ghostoast.info(
-          `Berhasil berpindah ke Mode ${isDark ? "Gelap (Dark)" : "Terang (Light)"}.`,
-          "Tema Diperbarui"
-        );
-      }
     }
 
     function updateThemeIcon() {
@@ -106,6 +104,7 @@ const user = data.user;
         const res = await fetch("/api/projects");
         projects = await res.json();
         renderDashboard();
+        renderDeployedTable();
       } catch (err) {
         console.error("Gagal mengambil data projek:", err);
       }
@@ -114,6 +113,7 @@ const user = data.user;
     function updateSidebarNav(activeNavId) {
       const navBtns = [
         { id: "navProjectBtn", defaultIconClass: "fa-solid fa-folder-open text-slate-400 dark:text-slate-500 w-5 text-center", activeIconClass: "fa-solid fa-folder-open text-white w-5 text-center" },
+        { id: "navDeployedBtn", defaultIconClass: "fa-solid fa-globe text-slate-400 dark:text-slate-500 w-5 text-center", activeIconClass: "fa-solid fa-globe text-white w-5 text-center" },
         { id: "navCalendarBtn", defaultIconClass: "fa-solid fa-calendar-days text-slate-400 dark:text-slate-500 w-5 text-center", activeIconClass: "fa-solid fa-calendar-days text-white w-5 text-center" },
         { id: "navNewsBtn", defaultIconClass: "fa-solid fa-newspaper text-slate-400 dark:text-slate-500 w-5 text-center", activeIconClass: "fa-solid fa-newspaper text-white w-5 text-center" }
       ];
@@ -139,6 +139,8 @@ const user = data.user;
       document.getElementById("calendarView").style.display = "none";
       const newsView = document.getElementById("newsView");
       if (newsView) newsView.style.display = "none";
+      const deployedView = document.getElementById("deployedView");
+      if (deployedView) deployedView.style.display = "none";
 
       const targetView = document.getElementById(viewId);
       if (targetView) targetView.style.display = "flex";
@@ -153,6 +155,19 @@ const user = data.user;
       const mainBtn = document.getElementById("mainActionBtn");
       if (mainBtn) mainBtn.style.display = "flex";
       renderDashboard();
+    }
+
+    let currentDeployedFilter = "all";
+
+    function showDeployedView() {
+      updateSidebarNav("navDeployedBtn");
+      activeProjectId = null;
+      showView("deployedView");
+      document.getElementById("statsOverview").style.display = "none";
+      document.getElementById("viewTitle").innerText = "Web Online & Portofolio Deployed";
+      const mainBtn = document.getElementById("mainActionBtn");
+      if (mainBtn) mainBtn.style.display = "flex";
+      renderDeployedTable();
     }
 
     function showProjectDetailView(id) {
@@ -298,6 +313,7 @@ const user = data.user;
           modal.classList.add('hidden');
           if (modalId === "projectModal") document.getElementById("projectForm").reset();
           if (modalId === "taskModal") document.getElementById("taskForm").reset();
+          if (modalId === "deployedWebModal") document.getElementById("deployedWebForm").reset();
         }, 300);
       }
     }
@@ -368,6 +384,10 @@ const user = data.user;
       if (saveBtn) saveBtn.disabled = true;
       if (saveBtnText) saveBtnText.innerText = "Menyimpan...";
 
+      if (window.showLoadingScreen) {
+        window.showLoadingScreen('Menyimpan Acara Kalender', 'Menambahkan acara ke dalam jadwal Anda...');
+      }
+
       try {
         const newEvent = await api("/api/events", {
           method: "POST",
@@ -396,6 +416,9 @@ const user = data.user;
       } finally {
         if (saveBtn) saveBtn.disabled = false;
         if (saveBtnText) saveBtnText.innerText = "Simpan Acara";
+        if (window.hideLoadingScreen) {
+          window.hideLoadingScreen();
+        }
       }
     }
 
@@ -618,6 +641,11 @@ const user = data.user;
     window.setMockupTheme = setMockupTheme;
     window.saveEvent = saveEvent;
     window.deleteEvent = deleteEvent;
+    window.saveDeployedWeb = saveDeployedWeb;
+    window.showDeployedView = showDeployedView;
+    window.setDeployedFilter = setDeployedFilter;
+    window.renderDeployedTable = renderDeployedTable;
+    window.trackWebHit = trackWebHit;
     
     function initCalendar(events) {
       const calendarEl = document.getElementById('calendar');
@@ -715,6 +743,194 @@ const user = data.user;
       }
     }
 
+    async function saveDeployedWeb(e) {
+      e.preventDefault();
+      const title = document.getElementById("deployedTitle").value.trim();
+      let liveUrl = document.getElementById("deployedLiveUrl").value.trim();
+      const platform = document.getElementById("deployedPlatform").value;
+      const description = document.getElementById("deployedDesc").value.trim();
+
+      if (!title || !liveUrl) return;
+
+      if (!/^https?:\/\//i.test(liveUrl)) {
+        liveUrl = `https://${liveUrl}`;
+      }
+
+      if (window.showLoadingScreen) {
+        window.showLoadingScreen('Menyimpan Web Online', 'Menghubungkan live URL web...');
+      }
+
+      try {
+        const category = `Web Live (${platform})`;
+        const project = await api("/api/projects", {
+          method: "POST",
+          body: JSON.stringify({ title, category, description, liveUrl }),
+        });
+        projects.unshift(project);
+        closeModal("deployedWebModal");
+        if (window.Ghostoast) {
+          Ghostoast.success(
+            `Website "${title}" berhasil ditambahkan ke daftar online.`,
+            "Web Online Tersimpan",
+          );
+        }
+        showDeployedView();
+      } catch (err) {
+        console.error("Gagal menyimpan web online:", err);
+        if (window.Ghostoast) {
+          Ghostoast.error("Gagal menyimpan web online baru.", "Terjadi Kesalahan");
+        }
+      } finally {
+        if (window.hideLoadingScreen) {
+          window.hideLoadingScreen();
+        }
+      }
+    }
+
+    function setDeployedFilter(filter) {
+      currentDeployedFilter = filter;
+      document.querySelectorAll(".deployed-filter-btn").forEach(btn => {
+        btn.classList.remove("bg-brand-600", "text-white", "font-semibold");
+        btn.classList.add("text-slate-600", "dark:text-slate-400", "font-medium");
+      });
+      const activeBtn = document.getElementById(`deployedFilter-${filter}`);
+      if (activeBtn) {
+        activeBtn.classList.add("bg-brand-600", "text-white", "font-semibold");
+        activeBtn.classList.remove("text-slate-600", "dark:text-slate-400", "font-medium");
+      }
+      renderDeployedTable();
+    }
+
+    function renderDeployedTable() {
+      const tbody = document.getElementById("deployedTableBody");
+      const emptyState = document.getElementById("deployedEmptyState");
+      if (!tbody) return;
+      tbody.innerHTML = "";
+
+      const deployedProjects = projects.filter(p => p.liveUrl || (p.category && p.category.includes("Web Live")));
+
+      let filtered = deployedProjects.filter(p => {
+        if (currentDeployedFilter === "vercel") {
+          const cat = (p.category || "").toLowerCase();
+          const url = (p.liveUrl || "").toLowerCase();
+          if (!cat.includes("vercel") && !url.includes("vercel")) return false;
+        } else if (currentDeployedFilter === "netlify") {
+          const cat = (p.category || "").toLowerCase();
+          const url = (p.liveUrl || "").toLowerCase();
+          if (cat.includes("vercel") || url.includes("vercel")) return false;
+        }
+
+        if (searchQuery) {
+          const q = searchQuery.toLowerCase();
+          const matchTitle = (p.title || "").toLowerCase().includes(q);
+          const matchUrl = (p.liveUrl || "").toLowerCase().includes(q);
+          const matchCat = (p.category || "").toLowerCase().includes(q);
+          return matchTitle || matchUrl || matchCat;
+        }
+
+        return true;
+      });
+
+      const countLabel = document.getElementById("deployedCountLabel");
+      if (countLabel) countLabel.innerText = `Menampilkan ${filtered.length} Web Online`;
+
+      if (emptyState) {
+        if (filtered.length === 0) {
+          emptyState.classList.remove("hidden");
+          emptyState.classList.add("flex");
+        } else {
+          emptyState.classList.add("hidden");
+          emptyState.classList.remove("flex");
+        }
+      }
+
+      filtered.forEach((p, index) => {
+        const tr = document.createElement("tr");
+        const bgRow =
+          index % 2 === 0
+            ? "bg-slate-50/60 dark:bg-slate-900/60 hover:bg-slate-100 dark:hover:bg-slate-800/80"
+            : "bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800/80";
+        tr.className = `${bgRow} transition-colors group`;
+
+        const rawUrl = p.liveUrl || "#";
+        const formattedUrl = formatExternalUrl(rawUrl);
+        const visitorHits = p.visitorCount || 0;
+
+        tr.innerHTML = `
+          <td class="px-6 py-4">
+            <div class="font-bold text-slate-900 dark:text-white text-sm">
+              ${escapeHtml(p.title)}
+            </div>
+            <a
+              href="${escapeHtml(formattedUrl)}"
+              target="_blank"
+              rel="noopener noreferrer"
+              onclick="trackWebHit('${p.id}')"
+              class="inline-flex items-center gap-1.5 mt-1 text-xs font-semibold text-emerald-600 dark:text-emerald-400 hover:underline"
+            >
+              <i class="fa-solid fa-globe text-[11px]"></i>
+              <span>${escapeHtml(rawUrl)}</span>
+              <i class="fa-solid fa-arrow-up-right-from-square text-[9px]"></i>
+            </a>
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap">
+            <span class="px-2.5 py-1 rounded-md text-[11px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
+              <i class="fa-solid fa-server mr-1 text-slate-400"></i> ${escapeHtml(p.category || 'Vercel App')}
+            </span>
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap">
+            <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Online / Live
+            </span>
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap font-semibold text-slate-800 dark:text-slate-200">
+            <div class="flex items-center gap-1.5">
+              <i class="fa-solid fa-chart-line text-brand-500"></i>
+              <span>${visitorHits} Akses</span>
+            </div>
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap text-center">
+            <div class="flex items-center justify-center gap-2">
+              <a
+                href="${escapeHtml(formattedUrl)}"
+                target="_blank"
+                rel="noopener noreferrer"
+                onclick="trackWebHit('${p.id}')"
+                class="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-semibold text-xs shadow-xs transition-all flex items-center gap-1.5"
+              >
+                <span>Kunjungi Web</span>
+                <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+              </a>
+              <button
+                onclick="deleteProject('${p.id}', event)"
+                title="Hapus Web Online"
+                class="text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 p-1.5 rounded-lg transition-colors"
+              >
+                <i class="fa-regular fa-trash-can"></i>
+              </button>
+            </div>
+          </td>
+        `;
+
+        tbody.appendChild(tr);
+      });
+    }
+
+    async function trackWebHit(projectId) {
+      try {
+        await fetch(`/api/projects/${projectId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ incrementVisitor: true }),
+        });
+        const p = projects.find(item => item.id === projectId);
+        if (p) p.visitorCount = (p.visitorCount || 0) + 1;
+        renderDeployedTable();
+      } catch (err) {
+        console.error("Gagal meng-increment visitor count:", err);
+      }
+    }
+
     async function deleteProject(projectId, event) {
       if (event) event.stopPropagation();
       const project = projects.find((p) => p.id === projectId);
@@ -739,6 +955,7 @@ const user = data.user;
               showDashboardView();
             } else {
               renderDashboard();
+              renderDeployedTable();
             }
           } catch (err) {
             console.error("Gagal menghapus projek:", err);
@@ -883,12 +1100,13 @@ const user = data.user;
     }
 
     function updateStats() {
-      const totalProjects = projects.length;
+      const internalProjects = projects.filter(p => !p.liveUrl && (!p.category || !p.category.includes("Web Live")));
+      const totalProjects = internalProjects.length;
       let totalTasks = 0;
       let completedTasks = 0;
       let totalPercentageSum = 0;
 
-      projects.forEach((p) => {
+      internalProjects.forEach((p) => {
         const pTotal = p.tasks.length;
         const pCompleted = p.tasks.filter((t) => t.completed).length;
         totalTasks += pTotal;
@@ -916,6 +1134,16 @@ const user = data.user;
         .replace(/'/g, '&#039;');
     }
 
+    function formatExternalUrl(url) {
+      if (!url || url === '#') return '#';
+      const trimmed = String(url).trim();
+      if (!trimmed) return '#';
+      if (/^https?:\/\//i.test(trimmed)) {
+        return trimmed;
+      }
+      return `https://${trimmed}`;
+    }
+
     function renderProjectsTableView() {
       const tbody = document.getElementById("projectsTableBody");
       const emptyState = document.getElementById("tableEmptyState");
@@ -923,6 +1151,9 @@ const user = data.user;
       tbody.innerHTML = "";
 
       let filtered = projects.filter((p) => {
+        // Exclude live deployed websites from internal task management table
+        if (p.liveUrl || (p.category && p.category.includes("Web Live"))) return false;
+
         const tasks = p.tasks || [];
         const total = tasks.length;
         const completed = tasks.filter((t) => t.completed).length;
@@ -978,12 +1209,14 @@ const user = data.user;
 
         tr.innerHTML = `
 					<td class="px-6 py-4">
-						<div class="font-bold text-slate-900 dark:text-white text-sm group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors">
-							${escapeHtml(p.title)}
+						<div class="font-bold text-slate-900 dark:text-white text-sm group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors flex items-center gap-2">
+							<span>${escapeHtml(p.title)}</span>
+							${p.liveUrl ? `<span class="px-1.5 py-0.5 rounded text-[10px] font-bold bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800">Deployed</span>` : ''}
 						</div>
 						<div class="text-slate-500 dark:text-slate-400 text-xs line-clamp-1 mt-0.5 font-normal">
 							${escapeHtml(p.description)}
 						</div>
+						${p.liveUrl ? `<div class="mt-1 flex items-center gap-2"><a href="${escapeHtml(p.liveUrl)}" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()" class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[11px] font-semibold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/80 hover:underline"><i class="fa-solid fa-globe text-[10px]"></i> ${escapeHtml(p.liveUrl)}</a></div>` : ''}
 					</td>
 					<td class="px-6 py-4 whitespace-nowrap">
 						<span class="px-2.5 py-1 rounded-md text-[11px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
@@ -1096,6 +1329,40 @@ const user = data.user;
 
       const taskCountElem = document.getElementById("detailTaskCountLabel");
       if (taskCountElem) taskCountElem.innerText = `${completedTasks} dari ${totalTasks} task selesai`;
+
+      // Live URL & Visitor Counter population
+      const liveContainer = document.getElementById("detailLiveUrlContainer");
+      const liveLink = document.getElementById("detailLiveUrlLink");
+      const visitBtn = document.getElementById("detailVisitBtn");
+      const visitorText = document.getElementById("visitorCountText");
+
+      if (project.liveUrl) {
+        const formattedUrl = formatExternalUrl(project.liveUrl);
+        if (liveContainer) liveContainer.classList.remove("hidden");
+        if (liveLink) {
+          liveLink.href = formattedUrl;
+          liveLink.innerText = project.liveUrl;
+        }
+        if (visitBtn) {
+          visitBtn.href = formattedUrl;
+          visitBtn.onclick = async () => {
+            try {
+              await fetch(`/api/projects/${project.id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ incrementVisitor: true }),
+              });
+              project.visitorCount = (project.visitorCount || 0) + 1;
+              if (visitorText) visitorText.innerText = project.visitorCount;
+            } catch (err) {
+              console.error("Gagal mengupdate visitor hit:", err);
+            }
+          };
+        }
+        if (visitorText) visitorText.innerText = project.visitorCount || 0;
+      } else {
+        if (liveContainer) liveContainer.classList.add("hidden");
+      }
 
       // Render Task List
       const tasksContainer = document.getElementById("tasksListContainer");

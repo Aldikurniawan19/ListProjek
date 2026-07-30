@@ -54,14 +54,26 @@
       />
     </div>
 
-    <!-- Main Action Button -->
-    <button
-      id="mainActionBtn"
-      onclick="openModal('projectModal')"
-      class="bg-brand-600 hover:bg-brand-700 text-white px-4 py-2 rounded-lg text-xs font-semibold flex items-center gap-2 transition-all shadow-sm shadow-brand-500/20 whitespace-nowrap"
-    >
-      <i class="fa-solid fa-plus"></i>
-      <span>Projek Baru</span>
-    </button>
+    <!-- Action Buttons -->
+    <div class="flex items-center gap-2">
+      <button
+        id="addDeployedWebBtn"
+        onclick="openModal('deployedWebModal')"
+        class="bg-emerald-600 hover:bg-emerald-700 text-white px-3.5 py-2 rounded-lg text-xs font-semibold flex items-center gap-2 transition-all shadow-sm shadow-emerald-500/20 whitespace-nowrap cursor-pointer"
+        title="Tambah Web Online / Live App"
+      >
+        <i class="fa-solid fa-globe"></i>
+        <span>+ Web Online</span>
+      </button>
+      <button
+        id="mainActionBtn"
+        onclick="openModal('projectModal')"
+        class="bg-brand-600 hover:bg-brand-700 text-white px-3.5 py-2 rounded-lg text-xs font-semibold flex items-center gap-2 transition-all shadow-sm shadow-brand-500/20 whitespace-nowrap cursor-pointer"
+        title="Buat Projek Baru yang Akan Dikerjakan"
+      >
+        <i class="fa-solid fa-plus"></i>
+        <span>Projek Baru</span>
+      </button>
+    </div>
   </div>
 </header>

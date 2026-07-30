@@ -81,11 +81,12 @@ export const POST: APIRoute = async ({ request, cookies }) => {
       });
     }
 
-    const project = await prisma.project.create({
+    const project = await (prisma.project as any).create({
       data: {
         title: body.title,
         category: body.category || 'Umum',
         description: body.description || 'Tidak ada deskripsi projek.',
+        liveUrl: body.liveUrl || null,
         userId: authUser.id,
       },
       include: { tasks: true },

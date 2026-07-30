@@ -21,15 +21,22 @@ export const GET: APIRoute = async ({ params }) => {
 export const PUT: APIRoute = async ({ params, request }) => {
   const prisma = getPrisma();
   const body = await request.json();
-  const project = await prisma.project.update({
+
+  const updateData: any = {};
+  if (body.title !== undefined) updateData.title = body.title;
+  if (body.category !== undefined) updateData.category = body.category;
+  if (body.description !== undefined) updateData.description = body.description;
+  if (body.liveUrl !== undefined) updateData.liveUrl = body.liveUrl;
+  if (body.incrementVisitor) {
+    updateData.visitorCount = { increment: 1 };
+  }
+
+  const project = await (prisma.project as any).update({
     where: { id: params.id },
-    data: {
-      title: body.title,
-      category: body.category,
-      description: body.description,
-    },
+    data: updateData,
     include: { tasks: true },
   });
+
   return new Response(JSON.stringify(project), {
     headers: { 'Content-Type': 'application/json' },
   });

@@ -1,0 +1,108 @@
+---
+---
+<div
+  id="deployedWebModal"
+  class="fixed inset-0 bg-slate-950/70 z-50 flex items-center justify-center p-4 hidden backdrop-blur-md modal"
+>
+  <div
+    class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xl w-full max-w-md overflow-hidden modal-content"
+  >
+    <div
+      class="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-slate-50/80 dark:bg-slate-800/80"
+    >
+      <h3 class="font-bold text-slate-900 dark:text-white text-sm flex items-center gap-2">
+        <i class="fa-solid fa-globe text-emerald-600 dark:text-emerald-400"></i>
+        Tambah Web Online / Deployed App
+      </h3>
+      <button
+        onclick="closeModal('deployedWebModal')"
+        class="text-slate-400 dark:text-slate-500 hover:text-slate-700 dark:hover:text-white text-sm"
+      >
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+    <form
+      id="deployedWebForm"
+      onsubmit="saveDeployedWeb(event)"
+      class="p-6 space-y-4"
+    >
+      <div>
+        <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1"
+          >Nama Website / App Online <span class="text-rose-500">*</span></label
+        >
+        <input
+          type="text"
+          id="deployedTitle"
+          required
+          placeholder="Contoh: Website Toko Online Vercel"
+          class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white dark:focus:bg-slate-800 transition-all"
+        />
+      </div>
+
+      <div>
+        <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1 flex items-center justify-between">
+          <span>URL Web Live Deployment <span class="text-rose-500">*</span></span>
+          <span class="text-[10px] text-emerald-600 dark:text-emerald-400 font-medium">Vercel / Netlify / Domain</span>
+        </label>
+        <div class="relative">
+          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+            <i class="fa-solid fa-link text-xs"></i>
+          </div>
+          <input
+            type="url"
+            id="deployedLiveUrl"
+            required
+            placeholder="https://aplikasi-saya.vercel.app"
+            class="w-full pl-8 pr-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white dark:focus:bg-slate-800 transition-all"
+          />
+        </div>
+      </div>
+
+      <div>
+        <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1"
+          >Platform Hosting / Server</label
+        >
+        <select
+          id="deployedPlatform"
+          class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-xs text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all"
+        >
+          <option value="Vercel App">Vercel (Free / Hobby)</option>
+          <option value="Netlify">Netlify</option>
+          <option value="Railway / Render">Railway / Render</option>
+          <option value="GitHub Pages">GitHub Pages</option>
+          <option value="Custom Domain">Custom Domain</option>
+        </select>
+      </div>
+
+      <div>
+        <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1"
+          >Deskripsi Ringkas Web</label
+        >
+        <textarea
+          id="deployedDesc"
+          rows="2"
+          placeholder="Gambaran umum fitur web yang sudah live ini..."
+          class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white dark:focus:bg-slate-800 transition-all resize-none"
+        ></textarea>
+      </div>
+
+      <div
+        class="flex items-center justify-end gap-2 pt-2 border-t border-slate-100 dark:border-slate-800"
+      >
+        <button
+          type="button"
+          onclick="closeModal('deployedWebModal')"
+          class="px-4 py-2 rounded-lg text-xs font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all"
+        >
+          Batal
+        </button>
+        <button
+          type="submit"
+          class="px-4 py-2 rounded-lg text-xs font-semibold bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm shadow-emerald-500/20 transition-all"
+        >
+          Simpan Web Online
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
