@@ -1,0 +1,131 @@
+---
+---
+<!-- Modal PDF Web Reader -->
+<div
+  id="bookReaderModal"
+  class="modal fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-slate-950/80 backdrop-blur-md hidden transition-opacity duration-300"
+>
+  <div
+    class="modal-content relative w-full max-w-5xl h-[92vh] sm:h-[90vh] bg-white dark:bg-slate-900 rounded-2xl sm:rounded-3xl shadow-2xl border border-slate-200/80 dark:border-slate-800 overflow-hidden flex flex-col"
+  >
+    <!-- Reader Header -->
+    <div
+      class="px-4 sm:px-6 py-3.5 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between bg-slate-50 dark:bg-slate-900 shrink-0 gap-3"
+    >
+      <div class="flex items-center gap-3 min-w-0 flex-1">
+        <div
+          class="w-9 h-9 rounded-xl bg-gradient-to-tr from-rose-500 to-amber-500 flex items-center justify-center text-white text-base shadow-sm shrink-0"
+        >
+          <i class="fa-solid fa-book-open"></i>
+        </div>
+        <div class="min-w-0 flex-1">
+          <h3 id="readerBookTitle" class="text-sm sm:text-base font-bold text-slate-900 dark:text-white truncate">
+            Judul Buku
+          </h3>
+          <p id="readerBookAuthor" class="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 truncate">
+            Penulis
+          </p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2 shrink-0">
+        <!-- Open External Tab Button -->
+        <a
+          id="readerExternalLink"
+          href="#"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-semibold border border-slate-200/80 dark:border-slate-700 transition-all cursor-pointer"
+          title="Buka PDF di Tab Baru Browser"
+        >
+          <i class="fa-solid fa-arrow-up-right-from-square text-[11px]"></i>
+          <span>Tab Baru</span>
+        </a>
+
+        <!-- Download Button -->
+        <a
+          id="readerDownloadLink"
+          href="#"
+          download
+          class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-brand-600 hover:bg-brand-700 text-white text-xs font-semibold transition-all cursor-pointer shadow-sm shadow-brand-500/20"
+          title="Unduh File PDF"
+        >
+          <i class="fa-solid fa-download text-[11px]"></i>
+          <span class="hidden xs:inline">Unduh</span>
+        </a>
+
+        <!-- Close Reader Modal -->
+        <button
+          type="button"
+          onclick="closeBookReaderModal()"
+          class="w-8 h-8 rounded-full flex items-center justify-center text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-all cursor-pointer"
+          title="Tutup Reader"
+        >
+          <i class="fa-solid fa-xmark text-base"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- PDF Viewer Frame Container -->
+    <div class="relative flex-1 bg-slate-900 overflow-hidden w-full h-full">
+      <!-- Loading Skeleton / Spinner for PDF -->
+      <div
+        id="readerFrameLoading"
+        class="absolute inset-0 z-10 flex flex-col items-center justify-center bg-slate-900 text-slate-400 space-y-3"
+      >
+        <div class="w-12 h-12 rounded-full border-4 border-slate-800 border-t-brand-500 animate-spin"></div>
+        <p class="text-xs font-medium tracking-wide">Memuat Dokumen PDF Buku...</p>
+      </div>
+
+      <!-- PDF iframe -->
+      <iframe
+        id="readerPdfFrame"
+        src=""
+        class="w-full h-full border-0 relative z-0"
+        onload="document.getElementById('readerFrameLoading').classList.add('hidden')"
+      ></iframe>
+    </div>
+  </div>
+</div>
+
+<script is:inline>
+  function openBookReaderModal(pdfUrl, title, author) {
+    const modal = document.getElementById('bookReaderModal');
+    const titleEl = document.getElementById('readerBookTitle');
+    const authorEl = document.getElementById('readerBookAuthor');
+    const frame = document.getElementById('readerPdfFrame');
+    const loading = document.getElementById('readerFrameLoading');
+    const externalLink = document.getElementById('readerExternalLink');
+    const downloadLink = document.getElementById('readerDownloadLink');
+
+    if (!modal || !frame) return;
+
+    if (titleEl) titleEl.innerText = title || 'Membaca Buku';
+    if (authorEl) authorEl.innerText = author ? `Oleh ${author}` : 'Penulis Tidak Diketahui';
+    if (externalLink) externalLink.href = pdfUrl;
+    if (downloadLink) downloadLink.href = pdfUrl;
+
+    if (loading) loading.classList.remove('hidden');
+
+    // Load PDF file directly in iframe
+    frame.src = pdfUrl;
+
+    modal.classList.remove('hidden');
+    setTimeout(() => {
+      modal.classList.add('open');
+    }, 10);
+  }
+
+  function closeBookReaderModal() {
+    const modal = document.getElementById('bookReaderModal');
+    const frame = document.getElementById('readerPdfFrame');
+
+    if (!modal) return;
+
+    modal.classList.remove('open');
+    setTimeout(() => {
+      modal.classList.add('hidden');
+      if (frame) frame.src = '';
+    }, 300);
+  }
+</script>

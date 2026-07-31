@@ -7,10 +7,13 @@ import Dashboard from './dashboard/index.astro';
 import ProjectDetail from './projects/detail.astro';
 import Calendar from './calendar/index.astro';
 import NewsPortal from './news/index.astro';
+import BooksView from './books/index.astro';
 import ProjectModal from '~/components/ProjectModal.astro';
 import TaskModal from '~/components/TaskModal.astro';
 import EventModal from '~/components/EventModal.astro';
 import DeployedWebModal from '~/components/DeployedWebModal.astro';
+import BookModal from '~/components/BookModal.astro';
+import BookReaderModal from '~/components/BookReaderModal.astro';
 import DeployedView from '~/components/DeployedView.astro';
 import MobileBottomNav from '~/components/MobileBottomNav.astro';
 import Toast from '~/components/Toast.astro';
@@ -50,6 +53,7 @@ const user = data.user;
       <ProjectDetail />
       <Calendar />
       <NewsPortal />
+      <BooksView />
     </main>
     <footer class="hidden md:flex py-2.5 px-4 md:px-6 border-t border-slate-200/70 dark:border-slate-800/80 bg-white/70 dark:bg-slate-900/70 backdrop-blur-md shrink-0 text-slate-500 dark:text-slate-400 text-[11px] font-medium flex-col sm:flex-row items-center justify-between gap-1.5 z-20">
       <div class="flex items-center gap-2">
@@ -66,6 +70,8 @@ const user = data.user;
   <TaskModal />
   <EventModal />
   <DeployedWebModal />
+  <BookModal />
+  <BookReaderModal />
   <MobileBottomNav />
   <Toast />
   <script is:inline src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
@@ -128,6 +134,7 @@ const user = data.user;
         { id: "navNewProjectBtn", isChild: true, mobileId: null, defaultIconClass: "fa-solid fa-folder-plus text-slate-400 dark:text-slate-500 w-4 text-center", activeIconClass: "fa-solid fa-folder-plus text-white w-4 text-center" },
         { id: "navDeployedBtn", isChild: true, mobileId: "mobileNavDeployedBtn", defaultIconClass: "fa-solid fa-globe text-slate-400 dark:text-slate-500 w-4 text-center", activeIconClass: "fa-solid fa-globe text-white w-4 text-center" },
         { id: "navCalendarBtn", isChild: false, mobileId: "mobileNavCalendarBtn", defaultIconClass: "fa-solid fa-calendar-days text-slate-400 dark:text-slate-500 w-5 text-center", activeIconClass: "fa-solid fa-calendar-days text-white w-5 text-center" },
+        { id: "navBooksBtn", isChild: false, mobileId: "mobileNavBooksBtn", defaultIconClass: "fa-solid fa-book-open text-slate-400 dark:text-slate-500 w-5 text-center", activeIconClass: "fa-solid fa-book-open text-white w-5 text-center" },
         { id: "navNewsBtn", isChild: false, mobileId: "mobileNavNewsBtn", defaultIconClass: "fa-solid fa-newspaper text-slate-400 dark:text-slate-500 w-5 text-center", activeIconClass: "fa-solid fa-newspaper text-white w-5 text-center" }
       ];
 
@@ -176,6 +183,8 @@ const user = data.user;
       document.getElementById("calendarView").style.display = "none";
       const newsView = document.getElementById("newsView");
       if (newsView) newsView.style.display = "none";
+      const booksView = document.getElementById("booksView");
+      if (booksView) booksView.style.display = "none";
       const deployedView = document.getElementById("deployedView");
       if (deployedView) deployedView.style.display = "none";
 
@@ -193,6 +202,18 @@ const user = data.user;
       if (mainBtn) mainBtn.style.display = "flex";
       renderDashboard();
     }
+
+    function showBooksView() {
+      updateSidebarNav("navBooksBtn");
+      activeProjectId = null;
+      showView("booksView");
+      document.getElementById("statsOverview").style.display = "none";
+      document.getElementById("viewTitle").innerText = "Read Book / Perpustakaan Digital";
+      const mainBtn = document.getElementById("mainActionBtn");
+      if (mainBtn) mainBtn.style.display = "none";
+      fetchBooks();
+    }
+    window.showBooksView = showBooksView;
 
     let currentDeployedFilter = "all";
 
@@ -1632,6 +1653,197 @@ const user = data.user;
         tasksContainer.appendChild(item);
       });
     }
-  
+
+    // Books Library Client Logic
+    let booksData = [];
+
+    async function fetchBooks() {
+      const booksGrid = document.getElementById("booksGrid");
+      const emptyState = document.getElementById("booksEmptyState");
+      const countBadge = document.getElementById("booksCountBadge");
+
+      try {
+        if (booksGrid && booksData.length === 0) {
+          booksGrid.innerHTML = `
+            <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-4 space-y-3 animate-pulse col-span-full max-w-sm">
+              <div class="w-full h-36 bg-slate-200 dark:bg-slate-800 rounded-xl"></div>
+              <div class="h-4 bg-slate-200 dark:bg-slate-800 rounded w-3/4"></div>
+              <div class="h-3 bg-slate-200 dark:bg-slate-800 rounded w-1/2"></div>
+            </div>
+          `;
+        }
+
+        const res = await fetch("/api/books");
+        if (!res.ok) throw new Error("Gagal mengambil daftar buku");
+        booksData = await res.json();
+
+        if (countBadge) {
+          countBadge.innerText = `${booksData.length} Buku`;
+        }
+
+        renderBooks(booksData);
+      } catch (err) {
+        console.error("Error fetching books:", err);
+        if (window.Ghostoast) {
+          Ghostoast.error("Gagal mengambil data buku dari Supabase");
+        }
+      }
+    }
+    window.fetchBooks = fetchBooks;
+
+    function handleBookSearch() {
+      const query = (document.getElementById("bookSearchInput")?.value || "").toLowerCase().trim();
+      if (!query) {
+        renderBooks(booksData);
+        return;
+      }
+      const filtered = booksData.filter(b =>
+        (b.title || "").toLowerCase().includes(query) ||
+        (b.author || "").toLowerCase().includes(query) ||
+        (b.description || "").toLowerCase().includes(query)
+      );
+      renderBooks(filtered);
+    }
+    window.handleBookSearch = handleBookSearch;
+
+    function renderBooks(books) {
+      const booksGrid = document.getElementById("booksGrid");
+      const emptyState = document.getElementById("booksEmptyState");
+
+      if (!booksGrid || !emptyState) return;
+
+      if (!books || books.length === 0) {
+        booksGrid.innerHTML = "";
+        booksGrid.classList.add("hidden");
+        emptyState.classList.remove("hidden");
+        emptyState.classList.add("flex");
+        return;
+      }
+
+      emptyState.classList.add("hidden");
+      emptyState.classList.remove("flex");
+      booksGrid.classList.remove("hidden");
+
+      const gradients = [
+        "from-indigo-600 via-purple-600 to-pink-600",
+        "from-blue-600 via-teal-600 to-emerald-600",
+        "from-rose-600 via-red-600 to-amber-600",
+        "from-violet-600 via-indigo-600 to-blue-600",
+        "from-emerald-600 via-cyan-600 to-indigo-600",
+      ];
+
+      booksGrid.innerHTML = books.map((book, idx) => {
+        const gradient = gradients[idx % gradients.length];
+        const formattedSize = book.file_size ? formatBytes(book.file_size) : 'PDF';
+        const formattedDate = book.created_at ? new Date(book.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) : '';
+        const safeTitle = (book.title || 'Tanpa Judul').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+        const safeAuthor = (book.author || 'Anonim').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+
+        return `
+          <div class="group bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800/80 hover:border-brand-500/50 dark:hover:border-brand-500/50 shadow-xs hover:shadow-xl transition-all duration-300 flex flex-col overflow-hidden">
+            <!-- Book Cover Top Banner -->
+            <div class="relative h-40 bg-gradient-to-tr ${gradient} p-5 flex flex-col justify-between text-white overflow-hidden shrink-0">
+              <!-- Background Deco Overlay -->
+              <div class="absolute -right-4 -bottom-4 text-white/10 text-8xl font-black select-none pointer-events-none group-hover:scale-110 transition-transform">
+                <i class="fa-solid fa-book"></i>
+              </div>
+              
+              <div class="flex items-center justify-between gap-2 z-10">
+                <span class="px-2.5 py-1 rounded-lg text-[10px] font-bold bg-white/20 backdrop-blur-md text-white border border-white/20 flex items-center gap-1 shadow-xs">
+                  <i class="fa-solid fa-file-pdf"></i> ${formattedSize}
+                </span>
+                <button
+                  onclick="deleteBook('${book.id}', '${safeTitle}')"
+                  title="Hapus Buku"
+                  class="w-7 h-7 rounded-lg bg-black/20 hover:bg-rose-600 text-white/80 hover:text-white backdrop-blur-md transition-all flex items-center justify-center text-xs cursor-pointer"
+                >
+                  <i class="fa-solid fa-trash-can"></i>
+                </button>
+              </div>
+
+              <div class="z-10 mt-auto">
+                <span class="text-[10px] font-medium text-white/80 uppercase tracking-wider block">Buku Digital</span>
+                <h4 class="font-bold text-base leading-tight text-white line-clamp-2 drop-shadow-xs" title="${safeTitle}">
+                  ${escapeHtml(book.title || 'Tanpa Judul')}
+                </h4>
+              </div>
+            </div>
+
+            <!-- Book Card Body -->
+            <div class="p-4 flex-1 flex flex-col justify-between space-y-3">
+              <div class="space-y-1.5">
+                <div class="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400 font-medium">
+                  <i class="fa-solid fa-user-pen text-[11px] text-brand-500"></i>
+                  <span class="truncate" title="${safeAuthor}">${escapeHtml(book.author || 'Penulis Tidak Diketahui')}</span>
+                </div>
+                <p class="text-xs text-slate-600 dark:text-slate-400 line-clamp-2 leading-relaxed">
+                  ${escapeHtml(book.description || 'Tidak ada deskripsi singkat untuk buku ini.')}
+                </p>
+              </div>
+
+              <div class="pt-2 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between gap-2">
+                <span class="text-[10px] text-slate-400 dark:text-slate-500 font-medium">
+                  ${formattedDate}
+                </span>
+                <div class="flex items-center gap-1.5">
+                  <a
+                    href="${book.file_url}"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    title="Buka File di Tab Baru"
+                    class="w-8 h-8 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 flex items-center justify-center text-xs transition-all cursor-pointer"
+                  >
+                    <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                  </a>
+                  <button
+                    onclick="openBookReaderModal('${book.file_url}', '${safeTitle}', '${safeAuthor}')"
+                    class="px-3 py-1.5 rounded-xl bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold transition-all shadow-xs flex items-center gap-1.5 cursor-pointer"
+                  >
+                    <i class="fa-solid fa-book-open text-[11px]"></i>
+                    <span>Baca Buku</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+    window.renderBooks = renderBooks;
+
+    async function deleteBook(id, title) {
+      if (!confirm(`Apakah Anda yakin ingin menghapus buku "${title}" dari database dan storage?`)) {
+        return;
+      }
+
+      try {
+        if (window.showLoadingScreen) {
+          window.showLoadingScreen("Menghapus Buku", `Sedang menghapus "${title}"...`);
+        }
+
+        const res = await fetch(`/api/books?id=${id}`, {
+          method: "DELETE",
+        });
+
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || "Gagal menghapus buku");
+
+        if (window.Ghostoast) {
+          Ghostoast.success(`Buku "${title}" berhasil dihapus`, "Terhapus");
+        }
+
+        fetchBooks();
+      } catch (err) {
+        console.error("Error deleting book:", err);
+        if (window.Ghostoast) {
+          Ghostoast.error(err.message || "Gagal menghapus buku");
+        }
+      } finally {
+        if (window.hideLoadingScreen) {
+          window.hideLoadingScreen();
+        }
+      }
+    }
+    window.deleteBook = deleteBook;
   </script>
 </Layout>

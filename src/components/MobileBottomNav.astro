@@ -68,10 +68,28 @@
         <i class="fa-solid fa-calendar-plus text-purple-400"></i>
         <span>Acara Kalender</span>
       </button>
+      <button
+        onclick="closeMobileQuickMenu(); openModal('bookModal')"
+        class="w-full flex items-center gap-2.5 px-3 py-2 text-xs text-white hover:bg-slate-800 rounded-xl transition-all text-left"
+      >
+        <i class="fa-solid fa-book-medical text-amber-400"></i>
+        <span>Upload Buku PDF</span>
+      </button>
     </div>
   </div>
 
-  <!-- Nav Item 3: Kalender -->
+  <!-- Nav Item 3: Buku -->
+  <button
+    type="button"
+    onclick="showBooksView()"
+    id="mobileNavBooksBtn"
+    class="mobile-nav-item flex flex-col items-center justify-center py-1 px-2 rounded-xl text-slate-400 hover:text-slate-200 transition-all active:scale-90"
+  >
+    <i class="fa-solid fa-book-open text-base mb-0.5"></i>
+    <span class="text-[10px] tracking-tight">Buku</span>
+  </button>
+
+  <!-- Nav Item 4: Kalender -->
   <button
     type="button"
     onclick="showCalendarView()"

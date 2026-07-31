@@ -1,0 +1,325 @@
+---
+---
+<!-- Modal Tambah Buku Baru -->
+<div
+  id="bookModal"
+  class="modal fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-md hidden transition-opacity duration-300"
+>
+  <div
+    class="modal-content relative w-full max-w-lg bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-200/80 dark:border-slate-800 overflow-hidden flex flex-col max-h-[90vh]"
+  >
+    <!-- Modal Header -->
+    <div
+      class="px-6 py-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-slate-50/50 dark:bg-slate-900/50"
+    >
+      <div class="flex items-center gap-3">
+        <div
+          class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-brand-600 via-indigo-600 to-violet-600 flex items-center justify-center text-white text-lg shadow-md shadow-brand-500/25"
+        >
+          <i class="fa-solid fa-book-medical"></i>
+        </div>
+        <div>
+          <h3 class="text-base font-bold text-slate-900 dark:text-white">
+            Tambah Buku Baru
+          </h3>
+          <p class="text-xs text-slate-500 dark:text-slate-400">
+            Unggah file PDF buku ke database & storage Supabase
+          </p>
+        </div>
+      </div>
+      <button
+        type="button"
+        onclick="closeModal('bookModal')"
+        class="w-8 h-8 rounded-full flex items-center justify-center text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-all cursor-pointer"
+      >
+        <i class="fa-solid fa-xmark text-sm"></i>
+      </button>
+    </div>
+
+    <!-- Modal Form Body -->
+    <form id="bookForm" onsubmit="handleBookSubmit(event)" class="p-6 space-y-4 overflow-y-auto">
+      <!-- File PDF Upload Dropzone -->
+      <div>
+        <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
+          File PDF Buku <span class="text-rose-500">*</span>
+        </label>
+        <div
+          id="pdfDropzone"
+          onclick="document.getElementById('bookFileInput').click()"
+          class="relative border-2 border-dashed border-slate-300 dark:border-slate-700 hover:border-brand-500 dark:hover:border-brand-400 rounded-2xl p-5 text-center cursor-pointer bg-slate-50/50 dark:bg-slate-800/30 transition-all group"
+        >
+          <input
+            type="file"
+            id="bookFileInput"
+            accept=".pdf,application/pdf"
+            onchange="handleBookFileSelect(event)"
+            class="hidden"
+            required
+          />
+
+          <!-- Empty State View -->
+          <div id="dropzoneEmptyView" class="space-y-2 py-2">
+            <div class="w-12 h-12 rounded-2xl bg-brand-50 dark:bg-brand-950/50 text-brand-600 dark:text-brand-400 flex items-center justify-center mx-auto text-xl group-hover:scale-110 transition-transform">
+              <i class="fa-solid fa-file-pdf"></i>
+            </div>
+            <div>
+              <p class="text-xs font-semibold text-slate-800 dark:text-slate-200">
+                Klik atau tarik file PDF ke sini
+              </p>
+              <p class="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5">
+                Format PDF (Maksimal 50MB)
+              </p>
+            </div>
+          </div>
+
+          <!-- File Selected State View -->
+          <div id="dropzoneSelectedView" class="hidden flex items-center justify-between p-3 bg-brand-50/80 dark:bg-brand-950/60 rounded-xl border border-brand-200 dark:border-brand-900/60">
+            <div class="flex items-center gap-3 min-w-0 flex-1 text-left">
+              <div class="w-10 h-10 rounded-xl bg-brand-600 text-white flex items-center justify-center text-lg shrink-0">
+                <i class="fa-solid fa-file-pdf"></i>
+              </div>
+              <div class="min-w-0 flex-1">
+                <p id="selectedFileName" class="text-xs font-bold text-slate-900 dark:text-white truncate">
+                  filename.pdf
+                </p>
+                <p id="selectedFileSize" class="text-[10px] text-brand-600 dark:text-brand-400 font-semibold">
+                  0 KB
+                </p>
+              </div>
+            </div>
+            <button
+              type="button"
+              onclick="event.stopPropagation(); resetBookFileSelection()"
+              class="w-7 h-7 rounded-lg text-slate-400 hover:text-rose-500 hover:bg-white dark:hover:bg-slate-800 transition-all text-xs"
+              title="Ganti file"
+            >
+              <i class="fa-solid fa-rotate-left"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Judul Buku -->
+      <div>
+        <label for="bookTitleInput" class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+          Judul Buku <span class="text-rose-500">*</span>
+        </label>
+        <input
+          type="text"
+          id="bookTitleInput"
+          name="title"
+          required
+          placeholder="Contoh: Pemrograman JavaScript Modern"
+          class="w-full px-3.5 py-2.5 rounded-xl text-xs bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 outline-none focus:ring-2 focus:ring-brand-500 transition-all font-medium"
+        />
+      </div>
+
+      <!-- Penulis / Pengarang -->
+      <div>
+        <label for="bookAuthorInput" class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+          Penulis / Pengarang
+        </label>
+        <input
+          type="text"
+          id="bookAuthorInput"
+          name="author"
+          placeholder="Contoh: Aldi Kurniawan"
+          class="w-full px-3.5 py-2.5 rounded-xl text-xs bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 outline-none focus:ring-2 focus:ring-brand-500 transition-all font-medium"
+        />
+      </div>
+
+      <!-- Deskripsi Ringkas -->
+      <div>
+        <label for="bookDescInput" class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+          Deskripsi Ringkas
+        </label>
+        <textarea
+          id="bookDescInput"
+          name="description"
+          rows="3"
+          placeholder="Tuliskan ringkasan atau sinopsis buku ini..."
+          class="w-full px-3.5 py-2.5 rounded-xl text-xs bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 outline-none focus:ring-2 focus:ring-brand-500 transition-all font-medium resize-none"
+        ></textarea>
+      </div>
+
+      <!-- Modal Footer Action Buttons -->
+      <div class="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-end gap-2.5">
+        <button
+          type="button"
+          onclick="closeModal('bookModal')"
+          class="px-4 py-2.5 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all cursor-pointer"
+        >
+          Batal
+        </button>
+        <button
+          type="submit"
+          id="saveBookBtn"
+          class="px-5 py-2.5 rounded-xl text-xs font-bold bg-gradient-to-tr from-brand-600 to-indigo-600 text-white hover:from-brand-700 hover:to-indigo-700 shadow-md shadow-brand-500/25 transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50"
+        >
+          <i id="saveBookIcon" class="fa-solid fa-cloud-arrow-up"></i>
+          <span id="saveBookText">Simpan & Unggah Buku</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script is:inline>
+  function handleBookFileSelect(event) {
+    const input = event.target;
+    if (input.files && input.files[0]) {
+      const file = input.files[0];
+      const emptyView = document.getElementById('dropzoneEmptyView');
+      const selectedView = document.getElementById('dropzoneSelectedView');
+      const fileNameEl = document.getElementById('selectedFileName');
+      const fileSizeEl = document.getElementById('selectedFileSize');
+
+      if (emptyView && selectedView && fileNameEl && fileSizeEl) {
+        emptyView.classList.add('hidden');
+        selectedView.classList.remove('hidden');
+        selectedView.classList.add('flex');
+        fileNameEl.innerText = file.name;
+        fileSizeEl.innerText = formatBytes(file.size);
+      }
+
+      // Auto fill title if title is empty
+      const titleInput = document.getElementById('bookTitleInput');
+      if (titleInput && !titleInput.value.trim()) {
+        const cleanName = file.name.replace(/\.[^/.]+$/, '').replace(/[-_]/g, ' ');
+        titleInput.value = cleanName;
+      }
+    }
+  }
+
+  function resetBookFileSelection() {
+    const input = document.getElementById('bookFileInput');
+    if (input) input.value = '';
+
+    const emptyView = document.getElementById('dropzoneEmptyView');
+    const selectedView = document.getElementById('dropzoneSelectedView');
+
+    if (emptyView && selectedView) {
+      emptyView.classList.remove('hidden');
+      selectedView.classList.add('hidden');
+      selectedView.classList.remove('flex');
+    }
+  }
+
+  function formatBytes(bytes, decimals = 1) {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const dm = decimals < 0 ? 0 : decimals;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+  }
+
+  async function handleBookSubmit(e) {
+    e.preventDefault();
+    const saveBtn = document.getElementById('saveBookBtn');
+    const saveIcon = document.getElementById('saveBookIcon');
+    const saveText = document.getElementById('saveBookText');
+    const fileInput = document.getElementById('bookFileInput');
+
+    if (!fileInput || !fileInput.files || !fileInput.files[0]) {
+      if (window.Ghostoast) Ghostoast.warning('Silakan pilih file PDF buku terlebih dahulu');
+      return;
+    }
+
+    const file = fileInput.files[0];
+    const title = document.getElementById('bookTitleInput').value.trim();
+    const author = document.getElementById('bookAuthorInput').value.trim();
+    const description = document.getElementById('bookDescInput').value.trim();
+
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('title', title);
+    formData.append('author', author);
+    formData.append('description', description);
+
+    try {
+      if (saveBtn) saveBtn.disabled = true;
+      if (saveIcon) saveIcon.className = 'fa-solid fa-spinner animate-spin';
+      if (saveText) saveText.innerText = 'Mengunggah ke Supabase...';
+
+      if (window.showLoadingScreen) {
+        window.showLoadingScreen(
+          'Mengunggah Buku Baru',
+          `Sedang menyimpan "${title}" & file PDF ke Supabase...`
+        );
+      }
+
+      const res = await fetch('/api/books', {
+        method: 'POST',
+        body: formData,
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || 'Gagal mengunggah buku');
+      }
+
+      if (window.Ghostoast) {
+        Ghostoast.success(`Buku "${data.title}" berhasil disimpan ke database!`, 'Berhasil Unggah');
+      }
+
+      closeModal('bookModal');
+      document.getElementById('bookForm').reset();
+      resetBookFileSelection();
+
+      if (window.fetchBooks) {
+        window.fetchBooks();
+      }
+    } catch (err) {
+      console.error('Error submit book:', err);
+      if (window.Ghostoast) {
+        Ghostoast.error(err.message || 'Gagal mengunggah buku', 'Terjadi Kesalahan');
+      }
+    } finally {
+      if (saveBtn) saveBtn.disabled = false;
+      if (saveIcon) saveIcon.className = 'fa-solid fa-cloud-arrow-up';
+      if (saveText) saveText.innerText = 'Simpan & Unggah Buku';
+
+      if (window.hideLoadingScreen) {
+        window.hideLoadingScreen();
+      }
+    }
+  }
+
+  // Setup drag and drop event handlers
+  document.addEventListener('DOMContentLoaded', () => {
+    const dropzone = document.getElementById('pdfDropzone');
+    if (!dropzone) return;
+
+    ['dragenter', 'dragover'].forEach(eventName => {
+      dropzone.addEventListener(eventName, (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        dropzone.classList.add('border-brand-500', 'bg-brand-50/50', 'dark:bg-brand-950/40');
+      }, false);
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+      dropzone.addEventListener(eventName, (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        dropzone.classList.remove('border-brand-500', 'bg-brand-50/50', 'dark:bg-brand-950/40');
+      }, false);
+    });
+
+    dropzone.addEventListener('drop', (e) => {
+      const dt = e.dataTransfer;
+      const files = dt.files;
+      if (files && files.length > 0 && files[0].type.includes('pdf')) {
+        const input = document.getElementById('bookFileInput');
+        if (input) {
+          input.files = files;
+          handleBookFileSelect({ target: input });
+        }
+      } else if (window.Ghostoast) {
+        Ghostoast.warning('File yang diunggah harus bertipe PDF!');
+      }
+    });
+  });
+</script>
