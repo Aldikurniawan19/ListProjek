@@ -7,9 +7,10 @@ interface Props {
 }
 
 const { user } = Astro.props;
-const userEmail = user?.email || 'Pengguna';
+const userEmail = user?.email || "Pengguna";
 const userInitial = userEmail.charAt(0).toUpperCase();
 ---
+
 <div
   id="sidebarOverlay"
   class="fixed inset-0 bg-slate-950/50 z-20 hidden md:hidden backdrop-blur-xs"
@@ -32,7 +33,9 @@ const userInitial = userEmail.charAt(0).toUpperCase();
             <i class="fa-solid fa-list-check"></i>
           </div>
           <div>
-            <h1 class="font-bold text-slate-900 dark:text-white text-base leading-tight">
+            <h1
+              class="font-bold text-slate-900 dark:text-white text-base leading-tight"
+            >
               ProgresTask
             </h1>
             <p
@@ -51,40 +54,91 @@ const userInitial = userEmail.charAt(0).toUpperCase();
       </div>
 
       <nav class="p-4 space-y-1.5">
-        <button
-          type="button"
-          onclick="showDashboardView()"
-          id="navProjectBtn"
-          class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl bg-brand-600 text-white font-semibold text-sm shadow-md shadow-brand-500/25 transition-all text-left"
-        >
-          <i class="fa-solid fa-folder-open text-white w-5 text-center"></i>
-          <span>Daftar Projek</span>
-        </button>
-        <button
-          type="button"
-          onclick="showDeployedView()"
-          id="navDeployedBtn"
-          class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100/80 dark:hover:bg-slate-800/80 hover:text-slate-900 dark:hover:text-white font-medium text-sm transition-all text-left"
-        >
-          <i class="fa-solid fa-globe text-slate-400 dark:text-slate-500 w-5 text-center"></i>
-          <span>Web Online & Portofolio</span>
-        </button>
+        <!-- Tree Menu Parent: Daftar Projek -->
+        <div class="space-y-1">
+          <button
+            type="button"
+            onclick="toggleProjectTree()"
+            id="navProjectParentBtn"
+            class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-slate-700 dark:text-slate-200 hover:bg-slate-100/80 dark:hover:bg-slate-800/80 hover:text-slate-900 dark:hover:text-white font-semibold text-sm transition-all text-left cursor-pointer group"
+          >
+            <div class="flex items-center gap-3">
+              <i
+                class="fa-solid fa-folder-tree text-brand-600 dark:text-brand-400 w-5 text-center"
+              ></i>
+              <span>Daftar Projek</span>
+            </div>
+            <i
+              id="projectTreeChevron"
+              class="fa-solid fa-chevron-down text-xs text-slate-400 dark:text-slate-500 transition-transform duration-200 rotate-180"
+            ></i>
+          </button>
+
+          <!-- Tree Submenu Children -->
+          <div
+            id="projectSubmenu"
+            class="ml-4 pl-3 border-l-2 border-slate-200 dark:border-slate-800 my-1 space-y-1 transition-all duration-200"
+          >
+            <!-- Child 1: Semua Projek -->
+            <button
+              type="button"
+              onclick="showDashboardView()"
+              id="navProjectBtn"
+              class="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl bg-brand-600 text-white font-semibold text-xs shadow-md shadow-brand-500/25 transition-all text-left"
+            >
+              <i class="fa-solid fa-layer-group text-white w-4 text-center"></i>
+              <span>Semua Projek</span>
+            </button>
+
+            <!-- Child 2: Projek Baru -->
+            <!-- <button
+              type="button"
+              onclick="showDashboardView(); openModal('projectModal');"
+              id="navNewProjectBtn"
+              class="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100/80 dark:hover:bg-slate-800/80 hover:text-slate-900 dark:hover:text-white font-medium text-xs transition-all text-left"
+            >
+              <i class="fa-solid fa-folder-plus text-slate-400 dark:text-slate-500 w-4 text-center"></i>
+              <span>Projek Baru</span>
+            </button> -->
+
+            <!-- Child 3: Projek Web Online -->
+            <button
+              type="button"
+              onclick="showDeployedView()"
+              id="navDeployedBtn"
+              class="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100/80 dark:hover:bg-slate-800/80 hover:text-slate-900 dark:hover:text-white font-medium text-xs transition-all text-left"
+            >
+              <i
+                class="fa-solid fa-globe text-slate-400 dark:text-slate-500 w-4 text-center"
+              ></i>
+              <span>Projek Web Online</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Kalender & Jadwal -->
         <button
           type="button"
           onclick="showCalendarView()"
           id="navCalendarBtn"
           class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100/80 dark:hover:bg-slate-800/80 hover:text-slate-900 dark:hover:text-white font-medium text-sm transition-all text-left"
         >
-          <i class="fa-solid fa-calendar-days text-slate-400 dark:text-slate-500 w-5 text-center"></i>
+          <i
+            class="fa-solid fa-calendar-days text-slate-400 dark:text-slate-500 w-5 text-center"
+          ></i>
           <span>Kalender & Jadwal</span>
         </button>
+
+        <!-- Portal Berita -->
         <button
           type="button"
           onclick="showNewsView()"
           id="navNewsBtn"
           class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100/80 dark:hover:bg-slate-800/80 hover:text-slate-900 dark:hover:text-white font-medium text-sm transition-all text-left"
         >
-          <i class="fa-solid fa-newspaper text-slate-400 dark:text-slate-500 w-5 text-center"></i>
+          <i
+            class="fa-solid fa-newspaper text-slate-400 dark:text-slate-500 w-5 text-center"
+          ></i>
           <span>Portal Berita</span>
         </button>
       </nav>
@@ -92,25 +146,42 @@ const userInitial = userEmail.charAt(0).toUpperCase();
 
     <!-- User Profile & Integrated Logout Button on the Right -->
     <div class="p-4 border-t border-slate-100 dark:border-slate-800 mt-auto">
-      <div class="flex items-center justify-between gap-2.5 px-3 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-700/60">
+      <div
+        class="flex items-center justify-between gap-2.5 px-3 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-700/60"
+      >
         <!-- Profile Info -->
         <div class="flex items-center gap-2.5 min-w-0 flex-1">
-          <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-brand-600 to-indigo-600 flex items-center justify-center text-white font-bold text-sm shadow-sm shrink-0">
+          <div
+            class="w-9 h-9 rounded-xl bg-gradient-to-tr from-brand-600 to-indigo-600 flex items-center justify-center text-white font-bold text-sm shadow-sm shrink-0"
+          >
             {userInitial}
           </div>
           <div class="min-w-0 flex-1">
-            <p class="text-xs font-bold text-slate-900 dark:text-white truncate" title={userEmail}>
+            <p
+              class="text-xs font-bold text-slate-900 dark:text-white truncate"
+              title={userEmail}
+            >
               {userEmail}
             </p>
-            <span class="inline-flex items-center gap-1 text-[10px] font-medium text-emerald-600 dark:text-emerald-400">
-              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+            <span
+              class="inline-flex items-center gap-1 text-[10px] font-medium text-emerald-600 dark:text-emerald-400"
+            >
+              <span
+                class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"
+              ></span>
               Online
             </span>
           </div>
         </div>
 
         <!-- Logout Button on the Right -->
-        <form id="logoutForm" action="/api/auth/logout" method="POST" onsubmit="handleLogout(event)" class="shrink-0">
+        <form
+          id="logoutForm"
+          action="/api/auth/logout"
+          method="POST"
+          onsubmit="handleLogout(event)"
+          class="shrink-0"
+        >
           <button
             type="submit"
             title="Keluar (Logout)"
@@ -125,9 +196,30 @@ const userInitial = userEmail.charAt(0).toUpperCase();
 </aside>
 
 <script is:inline>
+  function toggleProjectTree(forceOpen = null) {
+    const submenu = document.getElementById("projectSubmenu");
+    const chevron = document.getElementById("projectTreeChevron");
+    if (!submenu) return;
+
+    const isHidden = submenu.classList.contains("hidden");
+    const shouldOpen = forceOpen !== null ? forceOpen : isHidden;
+
+    if (shouldOpen) {
+      submenu.classList.remove("hidden");
+      if (chevron) chevron.classList.add("rotate-180");
+    } else {
+      submenu.classList.add("hidden");
+      if (chevron) chevron.classList.remove("rotate-180");
+    }
+  }
+  window.toggleProjectTree = toggleProjectTree;
+
   function handleLogout(e) {
     if (window.showLoadingScreen) {
-      window.showLoadingScreen('Proses Keluar', 'Sedang mengakhiri sesi Anda...');
+      window.showLoadingScreen(
+        "Proses Keluar",
+        "Sedang mengakhiri sesi Anda...",
+      );
     }
   }
 </script>

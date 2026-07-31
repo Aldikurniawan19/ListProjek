@@ -124,31 +124,47 @@ const user = data.user;
 
     function updateSidebarNav(activeNavId) {
       const navBtns = [
-        { id: "navProjectBtn", mobileId: "mobileNavProjectBtn", defaultIconClass: "fa-solid fa-folder-open text-slate-400 dark:text-slate-500 w-5 text-center", activeIconClass: "fa-solid fa-folder-open text-white w-5 text-center" },
-        { id: "navDeployedBtn", mobileId: "mobileNavDeployedBtn", defaultIconClass: "fa-solid fa-globe text-slate-400 dark:text-slate-500 w-5 text-center", activeIconClass: "fa-solid fa-globe text-white w-5 text-center" },
-        { id: "navCalendarBtn", mobileId: "mobileNavCalendarBtn", defaultIconClass: "fa-solid fa-calendar-days text-slate-400 dark:text-slate-500 w-5 text-center", activeIconClass: "fa-solid fa-calendar-days text-white w-5 text-center" },
-        { id: "navNewsBtn", mobileId: "mobileNavNewsBtn", defaultIconClass: "fa-solid fa-newspaper text-slate-400 dark:text-slate-500 w-5 text-center", activeIconClass: "fa-solid fa-newspaper text-white w-5 text-center" }
+        { id: "navProjectBtn", isChild: true, mobileId: "mobileNavProjectBtn", defaultIconClass: "fa-solid fa-layer-group text-slate-400 dark:text-slate-500 w-4 text-center", activeIconClass: "fa-solid fa-layer-group text-white w-4 text-center" },
+        { id: "navNewProjectBtn", isChild: true, mobileId: null, defaultIconClass: "fa-solid fa-folder-plus text-slate-400 dark:text-slate-500 w-4 text-center", activeIconClass: "fa-solid fa-folder-plus text-white w-4 text-center" },
+        { id: "navDeployedBtn", isChild: true, mobileId: "mobileNavDeployedBtn", defaultIconClass: "fa-solid fa-globe text-slate-400 dark:text-slate-500 w-4 text-center", activeIconClass: "fa-solid fa-globe text-white w-4 text-center" },
+        { id: "navCalendarBtn", isChild: false, mobileId: "mobileNavCalendarBtn", defaultIconClass: "fa-solid fa-calendar-days text-slate-400 dark:text-slate-500 w-5 text-center", activeIconClass: "fa-solid fa-calendar-days text-white w-5 text-center" },
+        { id: "navNewsBtn", isChild: false, mobileId: "mobileNavNewsBtn", defaultIconClass: "fa-solid fa-newspaper text-slate-400 dark:text-slate-500 w-5 text-center", activeIconClass: "fa-solid fa-newspaper text-white w-5 text-center" }
       ];
+
+      const isProjectSubmenuActive = ["navProjectBtn", "navNewProjectBtn", "navDeployedBtn"].includes(activeNavId);
+      if (isProjectSubmenuActive && window.toggleProjectTree) {
+        window.toggleProjectTree(true);
+      }
 
       navBtns.forEach(nav => {
         const btn = document.getElementById(nav.id);
         if (btn) {
           const icon = btn.querySelector("i");
           if (nav.id === activeNavId) {
-            btn.className = "w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl bg-brand-600 text-white font-semibold text-sm shadow-md shadow-brand-500/25 transition-all text-left";
+            if (nav.isChild) {
+              btn.className = "w-full flex items-center gap-2.5 px-3 py-2 rounded-xl bg-brand-600 text-white font-semibold text-xs shadow-md shadow-brand-500/25 transition-all text-left";
+            } else {
+              btn.className = "w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl bg-brand-600 text-white font-semibold text-sm shadow-md shadow-brand-500/25 transition-all text-left";
+            }
             if (icon) icon.className = nav.activeIconClass;
           } else {
-            btn.className = "w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/80 hover:text-slate-900 dark:hover:text-white font-medium text-sm transition-all text-left";
+            if (nav.isChild) {
+              btn.className = "w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100/80 dark:hover:bg-slate-800/80 hover:text-slate-900 dark:hover:text-white font-medium text-xs transition-all text-left";
+            } else {
+              btn.className = "w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100/80 dark:hover:bg-slate-800/80 hover:text-slate-900 dark:hover:text-white font-medium text-sm transition-all text-left";
+            }
             if (icon) icon.className = nav.defaultIconClass;
           }
         }
 
-        const mobileBtn = document.getElementById(nav.mobileId);
-        if (mobileBtn) {
-          if (nav.id === activeNavId) {
-            mobileBtn.className = "mobile-nav-item flex flex-col items-center justify-center py-1 px-2 rounded-xl text-brand-400 font-bold transition-all scale-105";
-          } else {
-            mobileBtn.className = "mobile-nav-item flex flex-col items-center justify-center py-1 px-2 rounded-xl text-slate-400 hover:text-slate-200 transition-all";
+        if (nav.mobileId) {
+          const mobileBtn = document.getElementById(nav.mobileId);
+          if (mobileBtn) {
+            if (nav.id === activeNavId) {
+              mobileBtn.className = "mobile-nav-item flex flex-col items-center justify-center py-1 px-2 rounded-xl text-brand-400 font-bold transition-all scale-105";
+            } else {
+              mobileBtn.className = "mobile-nav-item flex flex-col items-center justify-center py-1 px-2 rounded-xl text-slate-400 hover:text-slate-200 transition-all";
+            }
           }
         }
       });
@@ -323,6 +339,9 @@ const user = data.user;
       if (modal) {
         modal.classList.remove('hidden');
         setTimeout(() => modal.classList.add('open'), 10);
+        if (modalId === "projectModal") {
+          updateSidebarNav("navNewProjectBtn");
+        }
       }
     }
 
@@ -332,7 +351,10 @@ const user = data.user;
         modal.classList.remove('open');
         setTimeout(() => {
           modal.classList.add('hidden');
-          if (modalId === "projectModal") document.getElementById("projectForm").reset();
+          if (modalId === "projectModal") {
+            document.getElementById("projectForm").reset();
+            updateSidebarNav("navProjectBtn");
+          }
           if (modalId === "taskModal") document.getElementById("taskForm").reset();
           if (modalId === "deployedWebModal") document.getElementById("deployedWebForm").reset();
         }, 300);
