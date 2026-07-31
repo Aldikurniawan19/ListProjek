@@ -860,6 +860,21 @@ const user = data.user;
       renderDeployedTable();
     }
 
+    function formatDate(dateStr) {
+      if (!dateStr) return "-";
+      try {
+        const d = new Date(dateStr);
+        if (isNaN(d.getTime())) return "-";
+        return d.toLocaleDateString("id-ID", {
+          day: "numeric",
+          month: "short",
+          year: "numeric"
+        });
+      } catch (e) {
+        return "-";
+      }
+    }
+
     function renderDeployedTable() {
       const tbody = document.getElementById("deployedTableBody");
       const mobileList = document.getElementById("deployedMobileList");
@@ -951,6 +966,11 @@ const user = data.user;
               <span>${visitorHits} Akses</span>
             </div>
           </td>
+          <td class="px-6 py-4 whitespace-nowrap text-slate-600 dark:text-slate-400 text-xs font-medium">
+            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-slate-100/80 dark:bg-slate-800/80 border border-slate-200/60 dark:border-slate-700/60 text-[11px]">
+              <i class="fa-regular fa-calendar-check text-emerald-500"></i> ${formatDate(p.createdAt)}
+            </span>
+          </td>
           <td class="px-6 py-4 whitespace-nowrap text-center">
             <div class="flex items-center justify-center gap-2">
               <a
@@ -1007,6 +1027,9 @@ const user = data.user;
                 </span>
                 <span class="text-[10px] font-semibold text-slate-500 dark:text-slate-400 flex items-center gap-1">
                   <i class="fa-solid fa-chart-line text-brand-500 text-[9px]"></i> ${visitorHits} Akses
+                </span>
+                <span class="text-[10px] font-medium text-slate-400 dark:text-slate-500 flex items-center gap-1">
+                  <i class="fa-regular fa-calendar-days text-[9px]"></i> ${formatDate(p.createdAt)}
                 </span>
               </div>
               <div class="flex items-center gap-1.5 shrink-0">
@@ -1374,6 +1397,11 @@ const user = data.user;
 							 </span>`
             }
 					</td>
+					<td class="px-4 py-3 whitespace-nowrap text-slate-600 dark:text-slate-400 text-xs font-medium">
+						<span class="inline-flex items-center gap-1.5 px-2 py-1 rounded-md bg-slate-100/80 dark:bg-slate-800/80 border border-slate-200/60 dark:border-slate-700/60 text-[11px]">
+							<i class="fa-regular fa-calendar-check text-brand-500"></i> ${formatDate(p.createdAt)}
+						</span>
+					</td>
 					<td class="px-4 py-3 whitespace-nowrap text-center">
 						<div class="flex items-center justify-center gap-1.5">
 							<button onclick="event.stopPropagation(); showProjectDetailView('${p.id}')" class="px-2.5 py-1 bg-slate-100 dark:bg-slate-800 hover:bg-brand-600 hover:text-white dark:hover:bg-brand-600 text-slate-700 dark:text-slate-300 rounded-lg text-[11px] font-semibold transition-all border border-slate-200 dark:border-slate-700 flex items-center gap-1">
@@ -1415,7 +1443,10 @@ const user = data.user;
                 <span class="font-bold text-brand-600 dark:text-brand-400 text-[10px] shrink-0">${progress}%</span>
               </div>
               <span class="text-[10px] text-slate-500 dark:text-slate-400 font-medium shrink-0">
-                <i class="fa-regular fa-check-square mr-1 text-brand-500"></i>${completedTasks}/${totalTasks} Task
+                <i class="fa-regular fa-check-square mr-1 text-brand-500"></i>${completedTasks}/${totalTasks}
+              </span>
+              <span class="text-[10px] text-slate-400 dark:text-slate-500 font-medium shrink-0 flex items-center gap-1">
+                <i class="fa-regular fa-calendar-days text-slate-400"></i>${formatDate(p.createdAt)}
               </span>
               <button onclick="deleteProject('${p.id}', event)" title="Hapus Projek" class="text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 p-1 rounded-lg transition-colors shrink-0">
                 <i class="fa-regular fa-trash-can text-xs"></i>
