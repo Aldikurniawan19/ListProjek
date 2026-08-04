@@ -2,44 +2,60 @@
 ---
 <div
   id="listView"
-  class="flex-1 min-h-0 flex flex-col space-y-4 overflow-hidden"
+  class="flex-1 flex flex-col space-y-4"
 >
   <div
-    class="flex flex-row items-center justify-between gap-2.5 bg-white dark:bg-slate-900 p-2.5 sm:p-3 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-sm shrink-0 transition-colors duration-200"
+    class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5 bg-white dark:bg-slate-900 p-2.5 sm:p-3 rounded-xl border border-slate-200/80 dark:border-slate-800 shadow-sm shrink-0 transition-colors duration-200"
   >
-    <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar flex-1 min-w-0">
+    <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar flex-1 min-w-0 w-full sm:w-auto">
       <button
         onclick="setFilter('all')"
         id="filter-all"
-        class="filter-btn px-3 py-1 rounded-lg text-[11px] font-semibold transition-all bg-brand-600 text-white whitespace-nowrap cursor-pointer"
+        class="filter-btn px-3 py-1 rounded-lg text-[11px] font-semibold transition-all bg-brand-600 text-white whitespace-nowrap cursor-pointer shrink-0"
       >
         Semua Projek
       </button>
       <button
         onclick="setFilter('in-progress')"
         id="filter-in-progress"
-        class="filter-btn px-3 py-1 rounded-lg text-[11px] font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white transition-all whitespace-nowrap cursor-pointer"
+        class="filter-btn px-3 py-1 rounded-lg text-[11px] font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white transition-all whitespace-nowrap cursor-pointer shrink-0"
       >
         Sedang Berjalan
       </button>
       <button
         onclick="setFilter('completed')"
         id="filter-completed"
-        class="filter-btn px-3 py-1 rounded-lg text-[11px] font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white transition-all whitespace-nowrap cursor-pointer"
+        class="filter-btn px-3 py-1 rounded-lg text-[11px] font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white transition-all whitespace-nowrap cursor-pointer shrink-0"
       >
         Selesai
       </button>
     </div>
-    <span
-      class="text-[11px] text-slate-500 dark:text-slate-400 px-2 font-medium whitespace-nowrap"
-      id="projectCountLabel">Menampilkan 0 Projek</span
-    >
+
+    <div class="flex items-center justify-between sm:justify-end gap-3 w-full sm:w-auto shrink-0 border-t sm:border-t-0 pt-2 sm:pt-0 border-slate-100 dark:border-slate-800">
+      <div class="flex items-center gap-1.5 shrink-0">
+        <span class="text-[11px] text-slate-500 dark:text-slate-400 font-medium">Tampilkan:</span>
+        <select
+          id="projectPageSizeSelect"
+          onchange="setProjectPageSize(this.value)"
+          class="px-2 py-1 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-semibold text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-brand-500 cursor-pointer"
+        >
+          <option value="10">10 / Hal</option>
+          <option value="25">25 / Hal</option>
+          <option value="50">50 / Hal</option>
+        </select>
+      </div>
+
+      <span
+        class="text-[11px] text-slate-500 dark:text-slate-400 font-medium whitespace-nowrap"
+        id="projectCountLabel">Menampilkan 0 Projek</span
+      >
+    </div>
   </div>
 
   <div
-    class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm overflow-hidden flex-1 min-h-0 flex flex-col transition-colors duration-200"
+    class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm overflow-hidden flex flex-col transition-colors duration-200"
   >
-    <div class="overflow-y-auto flex-1 min-h-0">
+    <div class="flex-1">
       <!-- Mobile View: Clean Modern Project Cards -->
       <div id="projectsMobileList" class="md:hidden divide-y divide-slate-100 dark:divide-slate-800"></div>
 
@@ -47,7 +63,7 @@
       <div class="hidden md:block overflow-x-auto">
         <table class="w-full text-left border-collapse">
           <thead
-            class="bg-slate-50/80 dark:bg-slate-800/80 border-b border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 uppercase text-[10px] tracking-wider font-bold sticky top-0 z-10 shadow-2xs"
+            class="bg-slate-50/80 dark:bg-slate-800/80 border-b border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 uppercase text-[10px] tracking-wider font-bold z-10 shadow-2xs"
           >
             <tr>
               <th class="px-4 py-3">Nama Projek & Deskripsi</th>
@@ -90,6 +106,18 @@
       >
         + Tambah Projek Baru
       </button>
+    </div>
+
+    <!-- Project Pagination Footer Bar -->
+    <div
+      id="projectPaginationContainer"
+      class="p-3 sm:px-4 border-t border-slate-200/80 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/40 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs shrink-0"
+    >
+      <span id="projectPaginationInfo" class="text-slate-500 dark:text-slate-400 font-medium">
+        Menampilkan 0 - 0 dari 0 projek
+      </span>
+      <div id="projectPaginationControls" class="flex items-center gap-1.5">
+      </div>
     </div>
   </div>
 </div>

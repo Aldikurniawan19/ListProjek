@@ -45,7 +45,7 @@ const user = data.user;
     <Header />
     <main
       id="mainContent"
-      class="flex-1 p-3 sm:p-4 md:p-6 pb-20 md:pb-6 overflow-hidden flex flex-col min-h-0 space-y-4"
+      class="flex-1 p-3 sm:p-4 md:p-6 pb-24 md:pb-8 overflow-y-auto space-y-4"
     >
       <Stats />
       <Dashboard />
@@ -376,7 +376,10 @@ const user = data.user;
             document.getElementById("projectForm").reset();
             updateSidebarNav("navProjectBtn");
           }
-          if (modalId === "taskModal") document.getElementById("taskForm").reset();
+          if (modalId === "taskModal") {
+            document.getElementById("taskForm").reset();
+            if (typeof clearTaskParentId === 'function') clearTaskParentId();
+          }
           if (modalId === "deployedWebModal") document.getElementById("deployedWebForm").reset();
         }, 300);
       }
@@ -712,6 +715,15 @@ const user = data.user;
     window.trackWebHit = trackWebHit;
     window.saveProject = saveProject;
     window.saveTask = saveTask;
+    window.openSubTaskModal = openSubTaskModal;
+    window.clearTaskParentId = clearTaskParentId;
+    window.toggleExpandTask = toggleExpandTask;
+    window.addSubTaskRow = addSubTaskRow;
+    window.removeSubTaskRow = removeSubTaskRow;
+    window.setProjectPageSize = setProjectPageSize;
+    window.setProjectPage = setProjectPage;
+    window.setTaskPageSize = setTaskPageSize;
+    window.setTaskPage = setTaskPage;
     window.quickAddTask = quickAddTask;
     window.toggleTask = toggleTask;
     window.deleteTask = deleteTask;
@@ -1134,37 +1146,311 @@ const user = data.user;
       }
     }
 
+    let expandedTaskIds = new Set();
+
+    function addSubTaskRow(value = "") {
+      const container = document.getElementById("subTasksContainer");
+      if (!container) return;
+
+      const row = document.createElement("div");
+      row.className = "flex items-center gap-2 sub-task-row animate-fadeIn";
+      row.innerHTML = `
+        <div class="w-2 h-2 rounded-full bg-brand-500 shrink-0 ml-1"></div>
+        <input
+          type="text"
+          name="subTaskTitle"
+          value="${escapeHtml(value)}"
+          placeholder="Nama sub-task (misal: Sub Menu 1)"
+          class="flex-1 px-3 py-1.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:bg-white dark:focus:bg-slate-800 transition-all"
+        />
+        <button
+          type="button"
+          onclick="removeSubTaskRow(this)"
+          class="w-7 h-7 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/50 flex items-center justify-center text-xs transition-all shrink-0 cursor-pointer"
+          title="Hapus Sub-Task"
+        >
+          <i class="fa-regular fa-trash-can text-xs"></i>
+        </button>
+      `;
+
+      container.appendChild(row);
+      const input = row.querySelector("input");
+      if (input) input.focus();
+    }
+
+    function removeSubTaskRow(btn) {
+      const row = btn.closest(".sub-task-row");
+      if (row) row.remove();
+    }
+
+    function clearSubTaskRows() {
+      const container = document.getElementById("subTasksContainer");
+      if (container) container.innerHTML = "";
+    }
+
+    function openSubTaskModal(parentId, parentTitle, event) {
+      if (event) event.stopPropagation();
+      const parentInput = document.getElementById("taskParentId");
+      const parentBanner = document.getElementById("parentTaskBanner");
+      const parentTitleName = document.getElementById("parentTaskTitleName");
+      const modalTitle = document.getElementById("taskModalTitle");
+      const subTaskSection = document.getElementById("subTaskFormSection");
+
+      if (parentInput) parentInput.value = parentId;
+      if (parentTitleName) parentTitleName.innerText = parentTitle;
+      if (parentBanner) {
+        parentBanner.classList.remove("hidden");
+        parentBanner.classList.add("flex");
+      }
+      if (modalTitle) {
+        const titleSpan = modalTitle.querySelector("span");
+        if (titleSpan) titleSpan.innerText = "Tambah Sub-Task Baru";
+      }
+      if (subTaskSection) {
+        subTaskSection.classList.add("hidden");
+      }
+
+      clearSubTaskRows();
+      openModal("taskModal");
+    }
+
+    function clearTaskParentId() {
+      const parentInput = document.getElementById("taskParentId");
+      const parentBanner = document.getElementById("parentTaskBanner");
+      const modalTitle = document.getElementById("taskModalTitle");
+      const subTaskSection = document.getElementById("subTaskFormSection");
+
+      if (parentInput) parentInput.value = "";
+      if (parentBanner) {
+        parentBanner.classList.add("hidden");
+        parentBanner.classList.remove("flex");
+      }
+      if (modalTitle) {
+        const titleSpan = modalTitle.querySelector("span");
+        if (titleSpan) titleSpan.innerText = "Tambah Task / Pekerjaan Baru";
+      }
+      if (subTaskSection) {
+        subTaskSection.classList.remove("hidden");
+      }
+      clearSubTaskRows();
+    }
+
+    function toggleExpandTask(taskId, event) {
+      if (event) event.stopPropagation();
+      if (expandedTaskIds.has(taskId)) {
+        expandedTaskIds.delete(taskId);
+      } else {
+        expandedTaskIds.add(taskId);
+      }
+      renderDashboard();
+    }
+
+    function buildTaskTree(allTasks) {
+      const map = {};
+      const roots = [];
+
+      (allTasks || []).forEach((task) => {
+        map[task.id] = { ...task, children: [] };
+      });
+
+      (allTasks || []).forEach((task) => {
+        if (task.parentId && map[task.parentId]) {
+          map[task.parentId].children.push(map[task.id]);
+        } else {
+          roots.push(map[task.id]);
+        }
+      });
+
+      return roots;
+    }
+
+    function filterTaskTree(nodes, filterMode, query) {
+      const result = [];
+
+      (nodes || []).forEach((node) => {
+        const filteredChildren = filterTaskTree(node.children || [], filterMode, query);
+        
+        let matchesSelf = true;
+        if (filterMode === "active" && node.completed) matchesSelf = false;
+        if (filterMode === "completed" && !node.completed) matchesSelf = false;
+        if (query) {
+          const q = query.toLowerCase();
+          const matchTitle = (node.title || "").toLowerCase().includes(q);
+          const matchDesc = (node.description || "").toLowerCase().includes(q);
+          if (!matchTitle && !matchDesc) matchesSelf = false;
+        }
+
+        if (matchesSelf || filteredChildren.length > 0) {
+          if (filteredChildren.length > 0 && query) {
+            expandedTaskIds.add(node.id);
+          }
+          result.push({
+            ...node,
+            children: filteredChildren,
+          });
+        }
+      });
+
+      return result;
+    }
+
+    function renderTaskTreeItem(task, project, container, level = 0) {
+      const hasChildren = task.children && task.children.length > 0;
+      
+      if (!expandedTaskIds.has(`initialized_${task.id}`)) {
+        expandedTaskIds.add(`initialized_${task.id}`);
+        if (hasChildren) expandedTaskIds.add(task.id);
+      }
+      const isExpanded = expandedTaskIds.has(task.id);
+
+      const wrapper = document.createElement("div");
+      wrapper.className = "task-tree-node flex flex-col transition-all";
+
+      const item = document.createElement("div");
+      item.className = `p-2.5 sm:p-3 flex items-center justify-between gap-2 sm:gap-3 border-l-4 ${
+        level > 0 ? 'border-l-brand-500/40 dark:border-l-brand-500/50 bg-slate-50/70 dark:bg-slate-800/40' : 'border-l-transparent hover:border-l-brand-600 dark:hover:border-l-brand-400 bg-white dark:bg-slate-900'
+      } hover:bg-slate-100/90 dark:hover:bg-slate-800/90 transition-all group rounded-xl my-0.5 border-t border-b border-r border-slate-100 dark:border-slate-800/60 shadow-2xs ${hasChildren ? 'cursor-pointer' : ''}`;
+
+      if (hasChildren) {
+        item.onclick = (e) => toggleExpandTask(task.id, e);
+      }
+
+      item.innerHTML = `
+        <div class="flex items-center gap-2 sm:gap-2.5 flex-1 min-w-0">
+          ${hasChildren ? `
+            <button
+              type="button"
+              onclick="toggleExpandTask('${task.id}', event)"
+              class="w-6 h-6 rounded-lg bg-brand-50 dark:bg-brand-950/60 hover:bg-brand-100 dark:hover:bg-brand-900/80 text-brand-600 dark:text-brand-400 flex items-center justify-center text-xs transition-all shrink-0 cursor-pointer shadow-2xs border border-brand-200/50 dark:border-brand-800/50"
+              title="${isExpanded ? 'Sembunyikan Sub-task' : 'Tampilkan Sub-task'}"
+            >
+              <i class="fa-solid fa-chevron-${isExpanded ? 'down' : 'right'} text-[10px]"></i>
+            </button>
+          ` : `
+            <div class="w-6 h-6 shrink-0 flex items-center justify-center">
+              ${level > 0 ? '<span class="w-1.5 h-1.5 rounded-full bg-slate-300 dark:bg-slate-600"></span>' : ''}
+            </div>
+          `}
+
+          <input
+            type="checkbox"
+            ${task.completed ? "checked" : ""}
+            onclick="event.stopPropagation()"
+            onchange="event.stopPropagation(); toggleTask('${project.id}', '${task.id}')"
+            class="w-4 h-4 rounded border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-brand-600 focus:ring-brand-500 cursor-pointer accent-brand-600 shrink-0"
+          />
+
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-2 flex-wrap">
+              <h4 class="text-xs sm:text-sm font-bold text-slate-900 dark:text-white ${task.completed ? "line-through text-slate-400 dark:text-slate-500 font-normal" : ""} leading-snug">
+                ${escapeHtml(task.title)}
+              </h4>
+              ${hasChildren ? `
+                <span class="px-1.5 py-0.5 text-[9px] font-bold rounded-md bg-brand-50 dark:bg-brand-950/60 text-brand-600 dark:text-brand-400 border border-brand-200/50 dark:border-brand-800/50 flex items-center gap-1">
+                  <i class="fa-solid fa-sitemap text-[8px]"></i>
+                  ${task.children.length} sub-task
+                </span>
+              ` : ''}
+            </div>
+            ${task.description ? `<p class="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 mt-0.5 line-clamp-1 sm:line-clamp-2 font-normal">${escapeHtml(task.description)}</p>` : ""}
+          </div>
+        </div>
+
+        <div class="flex items-center gap-1.5 sm:gap-2 shrink-0 ml-1">
+          <span class="hidden md:inline-flex text-[10px] font-bold px-2 py-0.5 rounded-full ${
+            task.completed
+              ? "bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60"
+              : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700"
+          }">
+            ${task.completed ? "Selesai" : "Belum"}
+          </span>
+
+          <button
+            type="button"
+            onclick="event.stopPropagation(); deleteTask('${project.id}', '${task.id}')"
+            class="text-slate-400 dark:text-slate-500 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/50 p-1.5 sm:p-2 rounded-xl transition-all cursor-pointer"
+            title="Hapus Task"
+          >
+            <i class="fa-regular fa-trash-can text-xs"></i>
+          </button>
+        </div>
+      `;
+
+      wrapper.appendChild(item);
+
+      if (hasChildren && isExpanded) {
+        const childrenContainer = document.createElement("div");
+        childrenContainer.className = "task-children-container flex flex-col relative pl-3 sm:pl-4 border-l-2 border-slate-200/80 dark:border-slate-800/80 ml-3.5 sm:ml-5 space-y-0.5 my-1";
+        
+        task.children.forEach((childNode) => {
+          renderTaskTreeItem(childNode, project, childrenContainer, level + 1);
+        });
+
+        wrapper.appendChild(childrenContainer);
+      }
+
+      container.appendChild(wrapper);
+    }
+
     async function saveTask(e) {
       e.preventDefault();
       if (!activeProjectId) return;
 
       const title = document.getElementById("taskTitle").value.trim();
       const description = document.getElementById("taskDesc").value.trim();
+      const parentIdElem = document.getElementById("taskParentId");
+      const parentId = parentIdElem ? parentIdElem.value.trim() : "";
       if (!title) return;
 
+      const subTaskInputs = document.querySelectorAll('input[name="subTaskTitle"]');
+      const subtasks = Array.from(subTaskInputs).map(i => i.value.trim()).filter(v => v.length > 0);
+
       if (window.showLoadingScreen) {
-        window.showLoadingScreen('Menambahkan Task Baru', 'Menyimpan task ke dalam projek...');
+        window.showLoadingScreen('Menambahkan Task Baru', 'Menyimpan task beserta sub-task...');
       }
 
       try {
-        const task = await api(`/api/projects/${activeProjectId}/tasks`, {
+        const response = await api(`/api/projects/${activeProjectId}/tasks`, {
           method: "POST",
-          body: JSON.stringify({ title, description }),
+          body: JSON.stringify({ title, description, parentId: parentId || null, subtasks }),
         });
+
         const project = projects.find((p) => p.id === activeProjectId);
         if (project) {
           if (!project.tasks) project.tasks = [];
-          project.tasks.push(task);
+          if (response.createdTasks && Array.isArray(response.createdTasks)) {
+            response.createdTasks.forEach(t => {
+              if (!project.tasks.some(existing => existing.id === t.id)) {
+                project.tasks.push(t);
+              }
+            });
+          } else if (response.task) {
+            project.tasks.push(response.task);
+          } else {
+            project.tasks.push(response);
+          }
+
+          if (parentId) {
+            expandedTaskIds.add(parentId);
+          }
+          if (response.task && response.task.id && subtasks.length > 0) {
+            expandedTaskIds.add(response.task.id);
+          }
         }
+
+        clearSubTaskRows();
         closeModal("taskModal");
+        clearTaskParentId();
+
         try {
           renderDashboard();
         } catch (renderErr) {
           console.error("Gagal merender dashboard:", renderErr);
         }
+
         if (window.Ghostoast) {
           Ghostoast.success(
-            `Task "${title}" berhasil ditambahkan.`,
+            `Task "${title}" ${subtasks.length > 0 ? `beserta ${subtasks.length} sub-task ` : ''}berhasil ditambahkan.`,
             "Task Dibuat",
           );
         }
@@ -1210,6 +1496,16 @@ const user = data.user;
       }
     }
 
+    function getDescendantTaskIds(allTasks, parentId) {
+      let ids = [];
+      const children = (allTasks || []).filter((t) => t.parentId === parentId);
+      children.forEach((child) => {
+        ids.push(child.id);
+        ids = ids.concat(getDescendantTaskIds(allTasks, child.id));
+      });
+      return ids;
+    }
+
     async function deleteTask(projectId, taskId) {
       const project = projects.find((p) => p.id === projectId);
       if (!project) return;
@@ -1218,12 +1514,13 @@ const user = data.user;
 
       Ghostoast.confirm({
         title: title,
-        message: "Task ini akan dihapus secara permanen dari daftar projek.",
+        message: "Task ini beserta seluruh sub-task di dalamnya akan dihapus secara permanen.",
         confirmText: "Ya, Hapus Task",
         onConfirm: async () => {
           try {
             await api(`/api/tasks/${taskId}`, { method: "DELETE" });
-            project.tasks = project.tasks.filter((t) => t.id !== taskId);
+            const toDelete = new Set([taskId, ...getDescendantTaskIds(project.tasks, taskId)]);
+            project.tasks = (project.tasks || []).filter((t) => !toDelete.has(t.id));
             Ghostoast.info("Task berhasil dihapus.", "Task Dihapus");
             renderDashboard();
           } catch (err) {
@@ -1234,8 +1531,107 @@ const user = data.user;
       });
     }
 
+    let projectPageSize = 10;
+    let projectCurrentPage = 1;
+    let taskPageSize = 10;
+    let taskCurrentPage = 1;
+
+    function setProjectPageSize(size) {
+      projectPageSize = parseInt(size, 10) || 10;
+      projectCurrentPage = 1;
+      renderDashboard();
+    }
+
+    function setProjectPage(page) {
+      projectCurrentPage = page;
+      renderDashboard();
+    }
+
+    function setTaskPageSize(size) {
+      taskPageSize = parseInt(size, 10) || 10;
+      taskCurrentPage = 1;
+      renderDashboard();
+    }
+
+    function setTaskPage(page) {
+      taskCurrentPage = page;
+      renderDashboard();
+    }
+
+    function renderPagination(containerId, infoId, controlsId, totalItems, currentPage, pageSize, pageChangeFnName, itemLabel = "data") {
+      const container = document.getElementById(containerId);
+      const info = document.getElementById(infoId);
+      const controls = document.getElementById(controlsId);
+
+      if (!container) return;
+
+      const totalPages = Math.ceil(totalItems / pageSize) || 1;
+      const validPage = Math.min(Math.max(1, currentPage), totalPages);
+      const startIndex = totalItems === 0 ? 0 : (validPage - 1) * pageSize + 1;
+      const endIndex = Math.min(validPage * pageSize, totalItems);
+
+      if (info) {
+        info.innerText = `Menampilkan ${totalItems === 0 ? 0 : startIndex} - ${endIndex} dari ${totalItems} ${itemLabel}`;
+      }
+
+      if (!controls) return;
+      controls.innerHTML = "";
+
+      if (totalItems <= pageSize) {
+        controls.innerHTML = `<span class="px-2 py-1 rounded bg-slate-100 dark:bg-slate-800 text-slate-500 font-semibold text-[11px]">Halaman 1 dari 1</span>`;
+        return;
+      }
+
+      // Prev Button
+      const prevBtn = document.createElement("button");
+      prevBtn.type = "button";
+      prevBtn.disabled = validPage <= 1;
+      prevBtn.onclick = () => window[pageChangeFnName](validPage - 1);
+      prevBtn.className = `px-2.5 py-1 rounded-lg border text-xs font-semibold flex items-center gap-1 transition-all ${
+        validPage <= 1
+          ? "border-slate-200 dark:border-slate-800 text-slate-300 dark:text-slate-700 cursor-not-allowed opacity-50"
+          : "border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
+      }`;
+      prevBtn.innerHTML = `<i class="fa-solid fa-chevron-left text-[10px]"></i> Prev`;
+      controls.appendChild(prevBtn);
+
+      // Page numbers
+      let startPage = Math.max(1, validPage - 2);
+      let endPage = Math.min(totalPages, startPage + 4);
+      if (endPage - startPage < 4) {
+        startPage = Math.max(1, endPage - 4);
+      }
+
+      for (let i = startPage; i <= endPage; i++) {
+        const pageBtn = document.createElement("button");
+        pageBtn.type = "button";
+        pageBtn.onclick = () => window[pageChangeFnName](i);
+        pageBtn.className = `w-7 h-7 rounded-lg text-xs font-bold transition-all ${
+          i === validPage
+            ? "bg-brand-600 text-white shadow-xs"
+            : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
+        }`;
+        pageBtn.innerText = i;
+        controls.appendChild(pageBtn);
+      }
+
+      // Next Button
+      const nextBtn = document.createElement("button");
+      nextBtn.type = "button";
+      nextBtn.disabled = validPage >= totalPages;
+      nextBtn.onclick = () => window[pageChangeFnName](validPage + 1);
+      nextBtn.className = `px-2.5 py-1 rounded-lg border text-xs font-semibold flex items-center gap-1 transition-all ${
+        validPage >= totalPages
+          ? "border-slate-200 dark:border-slate-800 text-slate-300 dark:text-slate-700 cursor-not-allowed opacity-50"
+          : "border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
+      }`;
+      nextBtn.innerHTML = `Next <i class="fa-solid fa-chevron-right text-[10px]"></i>`;
+      controls.appendChild(nextBtn);
+    }
+
     function setFilter(filter) {
       currentFilter = filter;
+      projectCurrentPage = 1;
       document.querySelectorAll(".filter-btn").forEach((btn) => {
         btn.classList.remove("bg-brand-600", "text-white");
         btn.classList.add("text-slate-600", "dark:text-slate-400");
@@ -1250,6 +1646,7 @@ const user = data.user;
 
     function setTaskFilter(filter) {
       currentTaskFilter = filter;
+      taskCurrentPage = 1;
       ["all", "active", "completed"].forEach((f) => {
         const btn = document.getElementById(`taskFilter-${f}`);
         if (!btn) return;
@@ -1266,6 +1663,8 @@ const user = data.user;
 
     function handleSearch() {
       searchQuery = document.getElementById("searchInput").value.toLowerCase();
+      projectCurrentPage = 1;
+      taskCurrentPage = 1;
       renderDashboard();
     }
 
@@ -1324,7 +1723,6 @@ const user = data.user;
       if (mobileList) mobileList.innerHTML = "";
 
       let filtered = projects.filter((p) => {
-        // Exclude live deployed websites from internal task management table
         if (p.liveUrl || (p.category && p.category.includes("Web Live"))) return false;
 
         const tasks = p.tasks || [];
@@ -1351,11 +1749,19 @@ const user = data.user;
         return true;
       });
 
+      const totalItems = filtered.length;
+      const totalPages = Math.ceil(totalItems / projectPageSize) || 1;
+      if (projectCurrentPage > totalPages) projectCurrentPage = totalPages;
+      if (projectCurrentPage < 1) projectCurrentPage = 1;
+
+      const startIndex = (projectCurrentPage - 1) * projectPageSize;
+      const pagedProjects = filtered.slice(startIndex, startIndex + projectPageSize);
+
       const countLabel = document.getElementById("projectCountLabel");
-      if (countLabel) countLabel.innerText = `Menampilkan ${filtered.length} Projek`;
+      if (countLabel) countLabel.innerText = `Menampilkan ${pagedProjects.length} dari ${totalItems} Projek`;
 
       if (emptyState) {
-        if (filtered.length === 0) {
+        if (totalItems === 0) {
           emptyState.classList.remove("hidden");
           emptyState.classList.add("flex");
         } else {
@@ -1364,7 +1770,7 @@ const user = data.user;
         }
       }
 
-      filtered.forEach((p, index) => {
+      pagedProjects.forEach((p, index) => {
         const tasks = p.tasks || [];
         const totalTasks = tasks.length;
         const completedTasks = tasks.filter((t) => t.completed).length;
@@ -1477,6 +1883,17 @@ const user = data.user;
           mobileList.appendChild(card);
         }
       });
+
+      renderPagination(
+        "projectPaginationContainer",
+        "projectPaginationInfo",
+        "projectPaginationControls",
+        totalItems,
+        projectCurrentPage,
+        projectPageSize,
+        "setProjectPage",
+        "projek"
+      );
     }
 
     async function quickAddTask(e) {
@@ -1582,27 +1999,26 @@ const user = data.user;
         if (liveContainer) liveContainer.classList.add("hidden");
       }
 
-      // Render Task List
+      // Render Task List (Tree View with Pagination)
       const tasksContainer = document.getElementById("tasksListContainer");
       const emptyState = document.getElementById("tasksEmptyState");
 
       if (!tasksContainer) return;
       tasksContainer.innerHTML = "";
 
-      let filteredTasks = (project.tasks || []).filter((t) => {
-        if (currentTaskFilter === "active" && t.completed) return false;
-        if (currentTaskFilter === "completed" && !t.completed) return false;
-        if (searchQuery) {
-          const q = searchQuery.toLowerCase();
-          const matchTitle = (t.title || "").toLowerCase().includes(q);
-          const matchDesc = (t.description || "").toLowerCase().includes(q);
-          return matchTitle || matchDesc;
-        }
-        return true;
-      });
+      const rawTree = buildTaskTree(project.tasks || []);
+      const filteredTree = filterTaskTree(rawTree, currentTaskFilter, searchQuery);
+
+      const totalItems = filteredTree.length;
+      const totalPages = Math.ceil(totalItems / taskPageSize) || 1;
+      if (taskCurrentPage > totalPages) taskCurrentPage = totalPages;
+      if (taskCurrentPage < 1) taskCurrentPage = 1;
+
+      const startIndex = (taskCurrentPage - 1) * taskPageSize;
+      const pagedTree = filteredTree.slice(startIndex, startIndex + taskPageSize);
 
       if (emptyState) {
-        if (filteredTasks.length === 0) {
+        if (totalItems === 0) {
           emptyState.classList.remove("hidden");
           emptyState.classList.add("flex");
         } else {
@@ -1611,47 +2027,20 @@ const user = data.user;
         }
       }
 
-      filteredTasks.forEach((t) => {
-        const item = document.createElement("div");
-        item.className =
-          "p-3 sm:p-4 sm:px-5 flex items-center justify-between gap-2.5 sm:gap-4 border-l-4 border-l-transparent hover:border-l-brand-600 dark:hover:border-l-brand-400 hover:bg-slate-100/70 dark:hover:bg-slate-800/80 transition-all group cursor-pointer";
-
-        item.innerHTML = `
-          <div class="flex items-start gap-2.5 sm:gap-3.5 flex-1 min-w-0">
-            <input
-              type="checkbox"
-              ${t.completed ? "checked" : ""}
-              onchange="toggleTask('${project.id}', '${t.id}')"
-              class="w-4 h-4 rounded border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-brand-600 focus:ring-brand-500 mt-0.5 cursor-pointer accent-brand-600 shrink-0"
-            />
-            <div class="flex-1 min-w-0">
-              <h4 class="text-xs sm:text-sm font-bold text-slate-900 dark:text-white ${t.completed ? "line-through text-slate-400 dark:text-slate-500 font-normal" : ""} leading-snug">
-                ${escapeHtml(t.title)}
-              </h4>
-              ${t.description ? `<p class="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 mt-0.5 sm:mt-1 line-clamp-1 sm:line-clamp-2 font-normal">${escapeHtml(t.description)}</p>` : ""}
-            </div>
-          </div>
-
-          <div class="flex items-center gap-1.5 sm:gap-3 shrink-0">
-            <span class="hidden sm:inline-flex text-[10px] font-bold px-2.5 py-1 rounded-full ${
-              t.completed
-                ? "bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60"
-                : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700"
-            }">
-              ${t.completed ? "Selesai" : "Belum Selesai"}
-            </span>
-            <button
-              onclick="deleteTask('${project.id}', '${t.id}')"
-              class="text-slate-400 dark:text-slate-500 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/50 p-1.5 sm:p-2 rounded-xl transition-all"
-              title="Hapus Task"
-            >
-              <i class="fa-regular fa-trash-can text-xs"></i>
-            </button>
-          </div>
-        `;
-
-        tasksContainer.appendChild(item);
+      pagedTree.forEach((rootTask) => {
+        renderTaskTreeItem(rootTask, project, tasksContainer, 0);
       });
+
+      renderPagination(
+        "taskPaginationContainer",
+        "taskPaginationInfo",
+        "taskPaginationControls",
+        totalItems,
+        taskCurrentPage,
+        taskPageSize,
+        "setTaskPage",
+        "task"
+      );
     }
 
     // Books Library Client Logic
